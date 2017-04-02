@@ -1,0 +1,37 @@
+{
+  "name": "aekino",
+  "version": "1.0.0",
+  "description": "WebGL render engine",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --progress --colors",
+    "dev": "webpack-dev-server --content-base dist/ --progress --colors --watch --open"
+  },
+  "keywords": [
+    "WebGL",
+    "render",
+    "engine",
+    "es6",
+    "2D",
+    "3D"
+  ],
+  "author": "Damien Doussaud (namide.com)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/namide/aekino.git"
+  },
+  "bugs": {
+    "url": "https://github.com/namide/aekino/issues"
+  },
+  "homepage": "https://github.com/namide/aekino#readme",
+  "dependencies": {
+    "gl-matrix": "^2.3.2"
+  },
+  "devDependencies": {
+    "gl-matrix": "^2.3.2",
+    "webpack": "^2.3.2",
+    "webpack-dev-server": "^2.4.2"
+  }
+}
