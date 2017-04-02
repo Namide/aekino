@@ -3,7 +3,7 @@ var webpack = require("webpack");
 module.exports = {
     entry: {
         "bundle": "./src/main.js",
-        "bundle.min": "./src/main.js",
+        // "bundle.min": "./src/main.js",
     },
     output: {
         path: path.resolve(__dirname, "dist"),
@@ -16,9 +16,9 @@ module.exports = {
             minimize: true
         })
     ],
-    module: {
-        /*loaders: [
+    /*module: {
+        loaders: [
             { test: /\.css$/, loader: "style!css" }
-        ]*/
-    }
+        ]
+    }*/
 };
