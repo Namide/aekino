@@ -22,24 +22,30 @@
  * THE SOFTWARE.
  */
 
+import mat4 from 'gl-matrix/src/gl-matrix/mat4.js'
 import Attribute from './Attribute'
 
-export default class Geom extends Attribute
+export default class Cam3D extends Attribute
 {
-    constructor(vertices, dimension)
+    constructor()
     {
-        super(
-            'aVertexPosition',
-            new Float32Array(vertices)
-        )
-
-        super.setArray(new Float32Array(vertices))
-        super.setItems(5126 /* gl.FLOAT */, dimension)
+        super('uPMatrix')
+       
+        this.fovv = 45
+        this.near = 0.1
+        this.far = 100
+        this.matrix = mat4.create()
     }
     
-    draw(gl, program)
+    translate(...pos)
     {
-        super.draw(gl, program)
-        gl.drawArrays(gl.TRIANGLES, 0, this.numItems)
+        mat4.translate(this.matrix, this.matrix, pos)
+    }
+    
+    init(gl, program)
+    {
+        mat4.perspective(this.fovv, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, this.matrix)
+        
+        this.pointer = gl.getUniformLocation(program, super.label);
     }
 }

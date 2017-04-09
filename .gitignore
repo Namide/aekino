@@ -1,5 +1,7 @@
 
 node_modules/
+nbproject/
+
 
 Thumbs.db
 ehthumbs.db

@@ -22,24 +22,45 @@
  * THE SOFTWARE.
  */
 
-import Attribute from './Attribute'
-
-export default class Geom extends Attribute
+export default class Uniform
 {
-    constructor(vertices, dimension)
+    /**
+     * type
+     *      gl.FLOAT_MAT4       35676
+     */
+    constructor(label, type, data)
     {
-        super(
-            'aVertexPosition',
-            new Float32Array(vertices)
-        )
-
-        super.setArray(new Float32Array(vertices))
-        super.setItems(5126 /* gl.FLOAT */, dimension)
+        this.label = label
+        this.type = type
+        this.data = data
+        this.location = null
     }
     
-    draw(gl, program)
+    isInitialized()
     {
-        super.draw(gl, program)
-        gl.drawArrays(gl.TRIANGLES, 0, this.numItems)
+        return !!this.location
+    }
+    
+    init(gl, program)
+    {
+        // Link Uniform to Program
+        // this.pointer = gl.getUniformLocation(program, this.label)
+        
+        
+        this.location = program.uniforms[this.label]
+    }
+    
+    draw(gl, pointer)
+    {
+        switch(this.type)
+        {
+            case 35676: // gl.FLOAT_MAT4
+                gl.uniformMatrix4fv(pointer, false, this.data)
+                break
+                
+            default:
+                console.error('Uniform type unknow: {label:', this.label,
+                    ', type:', this.type, '}')
+        }
     }
 }
