@@ -23,29 +23,27 @@
  */
 
 import mat4 from 'gl-matrix/src/gl-matrix/mat4.js'
-import Attribute from './Attribute'
+import Uniform from './Uniform'
 
-export default class Cam3D extends Attribute
+export default class Cam3D extends Uniform
 {
     constructor()
     {
-        super('uPMatrix')
+        super('uPMatrix', 35676, mat4.create())
        
         this.fovv = 45
         this.near = 0.1
         this.far = 100
-        this.matrix = mat4.create()
     }
     
     translate(...pos)
     {
-        mat4.translate(this.matrix, this.matrix, pos)
+        mat4.translate(this.data, this.data, pos)
     }
     
     init(gl, program)
     {
-        mat4.perspective(this.fovv, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, this.matrix)
-        
-        this.pointer = gl.getUniformLocation(program, super.label);
+        super.init(gl, program)
+        mat4.perspective(this.fovv, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, this.data)
     }
 }

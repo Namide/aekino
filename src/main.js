@@ -120,7 +120,7 @@ scene.addMesh(pyramidMesh)
 
 
 // Square
-const cubeVertices = [
+/*const cubeVertices = [
     // Front face
     -1.0, -1.0,  1.0,
      1.0, -1.0,  1.0,
@@ -178,7 +178,7 @@ cubeAttributeColor.setItems(5126, 4)
 const cubeMesh = new Mesh3D(cubeGeom, program)
 cubeMesh.addAttribute(cubeAttributeColor)
 cubeMesh.translate(3.0, 0.0, 0.0)
-scene.addMesh(cubeMesh)
+scene.addMesh(cubeMesh)*/
 
 
 

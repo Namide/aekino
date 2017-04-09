@@ -90,7 +90,7 @@ export default class Attribute
         
         
         this.buffer = buffer
-        this.location = program.attributes[this.label]
+        this.location = program.getAttributeLocation(this.label)
     }
     
     draw(gl)
@@ -98,7 +98,6 @@ export default class Attribute
         gl.bindBuffer(this.arrayType, this.buffer)
         gl.vertexAttribPointer(this.location, this.itemSize, this.itemType, false, 0, 0)
         // gl.vertexAttribPointer(this.vertexAttribute, this.itemSize, this.itemType, false, 0, 0)
-        
     }
     
 

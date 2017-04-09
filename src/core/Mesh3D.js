@@ -29,6 +29,7 @@ export default class Mesh3D
 {
     constructor(geom, program)
     {
+        this.geom = geom
         this.attributes = [geom]
         this.program = program
         
@@ -74,29 +75,31 @@ export default class Mesh3D
         return true
     }
     
-    init(gl)
+    init(gl, globalUniforms)
     {
         const program = this.program
+        const allUniforms = [...this.uniforms, ...globalUniforms]
+
         if (!this.program.isInitialized())
-            this.program.init(gl, this.attributes, this.uniforms)
-        
+            this.program.init(gl, this.attributes, allUniforms)
+            
             
         for (const attribute of this.attributes)
             if (!attribute.isInitialized())
                 attribute.init(gl, program)
         
-        /*for (const uniform of this.uniforms)
+        
+        for (const uniform of allUniforms)
             if (!uniform.isInitialized())
-                uniform.init(gl, program)*/
-        
-        
+                uniform.init(gl, program)
     }
     
     draw(gl)
     {
         for(const attribute of this.attributes)
-        {
             attribute.draw(gl)
-        }
+        
+        this.geom.display(gl)
+        // gl.drawArrays(gl.TRIANGLES, 0, pyramidVertexPositionBuffer.numItems)
     }
 }

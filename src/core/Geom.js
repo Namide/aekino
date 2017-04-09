@@ -37,9 +37,10 @@ export default class Geom extends Attribute
         super.setItems(5126 /* gl.FLOAT */, dimension)
     }
     
-    draw(gl, program)
+    display(gl)
     {
-        super.draw(gl, program)
         gl.drawArrays(gl.TRIANGLES, 0, this.numItems)
     }
+        
+    
 }

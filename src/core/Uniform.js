@@ -46,8 +46,7 @@ export default class Uniform
         // Link Uniform to Program
         // this.pointer = gl.getUniformLocation(program, this.label)
         
-        
-        this.location = program.uniforms[this.label]
+        this.location = program.getUniformLocation(this.label)
     }
     
     draw(gl, pointer)

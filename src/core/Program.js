@@ -55,8 +55,34 @@ export default class Program
         this.uniforms = {}
     }
     
+    isInitialized()
+    {
+        return !!this.pointer
+    }
+    
+    getUniformLocation(label)
+    {        
+        if (this.uniforms.hasOwnProperty(label))
+            return this.uniforms[label]
+        else
+            console.error('The uniform location ' + label + ' don\'nt exist on this program')
+            
+        return null
+    }
+    
+    getAttributeLocation(label)
+    {
+        if (this.attributes.hasOwnProperty(label))
+            return this.attributes[label]
+        else
+            console.error('The attribute location ' + label + ' don\'nt exist on this program')
+            
+        return null
+    }
+    
     init(gl, attributes, uniforms)
     {
+
         this.vertexShader = this._createShader(gl, 35633 /* gl.VERTEX_SHADER */, vs)
         this.fragmentShader = this._createShader(gl, 35632 /* gl.FRAGMENT_SHADER */, fs)
         
@@ -71,14 +97,6 @@ export default class Program
         }
         
         gl.useProgram(program)
-        
-        /*for (const buffer in buffers)
-        {
-            const label = buffer.label
-            program[label] = gl.getUniformLocation(program, label)
-        }*/
-        
-        
         
             
         
@@ -106,11 +124,6 @@ export default class Program
         this.pointer = program
     }
     
-    isInitialized()
-    {
-        return !!this.pointer
-    }
-    
     _createShader(gl, type, src)
     {
         const shader = gl.createShader(type)
@@ -121,7 +134,7 @@ export default class Program
         {  
             return console.error('Une erreur est survenue au cours de la compilation du shader: ' + gl.getShaderInfoLog(shader))
         }
-        
+
         return shader
     }
 }

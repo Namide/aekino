@@ -24,31 +24,32 @@
 
 export default class Scene
 {
-    constructor(canvas)
+    constructor(canvas, cam)
     {
         this.canvas = canvas
         this.init(canvas)
         this.meshs = []
-        this.cam = null
+        this.cam = cam
+        this.uniforms = [cam]
     }
     
-    addCam(cam)
+    _addCamToMeshs()
+    {
+        const cam = this.cam
+        this.uniforms.push(cam)
+    }
+    
+    /*addCam(cam)
     {
         this.cam = cam
-        
-        for (const mesh of this.meshs)
-            mesh.addAttribute(cam)
-    }
+    }*/
     
     addMesh(mesh)
     {
         this.meshs.push(mesh)
         
         if (!mesh.isInitialized())
-            mesh.init(this.gl)
-            
-        if (this.cam)
-            mesh.addAttribute(cam)
+            mesh.init(this.gl, this.uniforms)
     }
     
     rmMesh(mesh)
@@ -87,12 +88,11 @@ export default class Scene
     draw()
     {
         const gl = this.gl
-        
-        for (const mesh of this.meshs)
-            mesh.draw(gl)
 
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-        
+            
+        for (const mesh of this.meshs)
+            mesh.draw(gl)        
     }
 }
