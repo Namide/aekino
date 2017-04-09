@@ -105,99 +105,53 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * THE SOFTWARE.
  */
 
-var Attribute = function () {
-    function Attribute(label) {
-        _classCallCheck(this, Attribute);
+var Uniform = function () {
+    /**
+     * type
+     *      gl.FLOAT_MAT4       35676
+     */
+    function Uniform(label, type, data) {
+        _classCallCheck(this, Uniform);
 
         this.label = label;
-        this.buffer = null;
+        this.type = type;
+        this.data = data;
         this.location = null;
     }
 
-    _createClass(Attribute, [{
-        key: "isInitialized",
+    _createClass(Uniform, [{
+        key: 'isInitialized',
         value: function isInitialized() {
             return !!this.location;
         }
-
-        /**
-         * type
-         *      gl.ARRAY_BUFFER         34962
-         *      Buffer containing vertex attributes, such as vertex coordinates,
-         *      texture coordinate data, or vertex color data.
-         *
-         *      gl.ELEMENT_ARRAY_BUFFER 34963
-         *      Buffer used for element indices.
-         *
-         * usage
-         *      gl.STATIC_DRAW          35044
-         *      Contents of the buffer are likely to be used often and not change often.
-         *      Contents are written to the buffer, but not read.
-         *
-         *      gl.DYNAMIC_DRAW         35048
-         *      Contents of the buffer are likely to be used often and change often.
-         *      Contents are written to the buffer, but not read.
-         *      
-         *      gl.STREAM_DRAW          35040
-         *      Contents of the buffer are likely to not be used often.
-         *      Contents are written to the buffer, but not read.
-         */
-
     }, {
-        key: "setArray",
-        value: function setArray(vertices) {
-            var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 34962;
-            var indices = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-            var usage = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 35044;
-
-            this.arrayType = type;
-            this.vertices = vertices;
-            this.indices = indices;
-            this.arrayUsage = usage;
-        }
-
-        /**
-         * itemType
-         *      gl.FLOAT          5126
-         */
-
-    }, {
-        key: "setItems",
-        value: function setItems() {
-            var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 5126;
-            var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 3;
-            var num = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-
-            this.itemType = type;
-            this.itemSize = size;
-            this.numItems = num;
-        }
-    }, {
-        key: "init",
+        key: 'init',
         value: function init(gl, program) {
-            this.numItems = this.numItems || this.vertices.length / this.itemSize;
+            // Link Uniform to Program
+            // this.pointer = gl.getUniformLocation(program, this.label)
 
-            // Create buffer
-            var buffer = gl.createBuffer();
-            gl.bindBuffer(this.arrayType, buffer);
-            gl.bufferData(this.arrayType, this.vertices, this.arrayUsage);
-
-            this.buffer = buffer;
-            this.location = program.attributes[this.label];
+            this.location = program.getUniformLocation(this.label);
         }
     }, {
-        key: "draw",
-        value: function draw(gl) {
-            gl.bindBuffer(this.arrayType, this.buffer);
-            gl.vertexAttribPointer(this.location, this.itemSize, this.itemType, false, 0, 0);
-            // gl.vertexAttribPointer(this.vertexAttribute, this.itemSize, this.itemType, false, 0, 0)
+        key: 'draw',
+        value: function draw(gl, pointer) {
+            switch (this.type) {
+                case 35676:
+                    // gl.FLOAT_MAT4
+                    console.log(this.data);
+                    gl.uniformMatrix4fv(pointer, false, this.data);
+                    break;
+
+                default:
+                    console.error('Uniform type unknow: {label:', this.label, ', type:', this.type, '}');
+            }
         }
     }]);
 
-    return Attribute;
+    return Uniform;
 }();
 
-exports.default = Attribute;
+exports.default = Uniform;
 
 /***/ }),
 /* 1 */
@@ -2380,53 +2334,118 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * THE SOFTWARE.
  */
 
-var Uniform = function () {
-    /**
-     * type
-     *      gl.FLOAT_MAT4       35676
-     */
-    function Uniform(label, type, data) {
-        _classCallCheck(this, Uniform);
+var Attribute = function () {
+    function Attribute(label) {
+        _classCallCheck(this, Attribute);
 
         this.label = label;
-        this.type = type;
-        this.data = data;
+        this.buffer = null;
         this.location = null;
     }
 
-    _createClass(Uniform, [{
-        key: 'isInitialized',
+    _createClass(Attribute, [{
+        key: "isInitialized",
         value: function isInitialized() {
             return !!this.location;
         }
+
+        /**
+         * type
+         *      gl.ARRAY_BUFFER         34962
+         *      Buffer containing vertex attributes, such as vertex coordinates,
+         *      texture coordinate data, or vertex color data.
+         *
+         *      gl.ELEMENT_ARRAY_BUFFER 34963
+         *      Buffer used for element indices.
+         *
+         * usage
+         *      gl.STATIC_DRAW          35044
+         *      Contents of the buffer are likely to be used often and not change often.
+         *      Contents are written to the buffer, but not read.
+         *
+         *      gl.DYNAMIC_DRAW         35048
+         *      Contents of the buffer are likely to be used often and change often.
+         *      Contents are written to the buffer, but not read.
+         *      
+         *      gl.STREAM_DRAW          35040
+         *      Contents of the buffer are likely to not be used often.
+         *      Contents are written to the buffer, but not read.
+         */
+
     }, {
-        key: 'init',
-        value: function init(gl, program) {
-            // Link Uniform to Program
-            // this.pointer = gl.getUniformLocation(program, this.label)
+        key: "setArray",
+        value: function setArray(vertices) {
+            var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 34962;
+            var indices = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+            var usage = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 35044;
 
+            this.arrayType = type;
+            this.vertices = vertices;
+            this.indices = indices;
+            this.arrayUsage = usage;
+        }
 
-            this.location = program.uniforms[this.label];
+        /**
+         * https://gist.github.com/szimek/763999
+         *
+         * itemType
+         *      gl.INT              5124   
+         *      gl.UNSIGNED_INT     5125
+         *      gl.FLOAT            5126  
+         *      gl.FLOAT_VEC2       35664 
+         *      gl.FLOAT_VEC3       35665 
+         *      gl.FLOAT_VEC4       35666 
+         *      gl.INT_VEC2         35667    
+         *      gl.INT_VEC3         35668  
+         *      gl.INT_VEC4         35669 
+         *      gl.BOOL             35670   
+         *      gl.BOOL_VEC2        35671 
+         *      gl.BOOL_VEC3        35672 
+         *      gl.BOOL_VEC4        35673   
+         *      gl.FLOAT_MAT2       35674 
+         *      gl.FLOAT_MAT3       35675 
+         *      gl.FLOAT_MAT4       35676  
+         *      gl.SAMPLER_2D       35678   
+         *      gl.SAMPLER_CUBE     35680 
+         */
+
+    }, {
+        key: "setItems",
+        value: function setItems() {
+            var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 5126;
+            var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 3;
+            var num = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+            this.itemType = type;
+            this.itemSize = size;
+            this.numItems = num;
         }
     }, {
-        key: 'draw',
-        value: function draw(gl, pointer) {
-            switch (this.type) {
-                case 35676:
-                    // gl.FLOAT_MAT4
-                    gl.uniformMatrix4fv(pointer, false, this.data);
-                    break;
+        key: "init",
+        value: function init(gl, program) {
+            this.numItems = this.numItems || this.vertices.length / this.itemSize;
 
-                default:
-                    console.error('Uniform type unknow: {label:', this.label, ', type:', this.type, '}');
-            }
+            // Create buffer
+            var buffer = gl.createBuffer();
+            gl.bindBuffer(this.arrayType, buffer);
+            gl.bufferData(this.arrayType, this.vertices, this.arrayUsage);
+
+            this.buffer = buffer;
+            this.location = program.getAttributeLocation(this.label);
+        }
+    }, {
+        key: "draw",
+        value: function draw(gl) {
+            gl.bindBuffer(this.arrayType, this.buffer);
+            gl.vertexAttribPointer(this.location, this.itemSize, this.itemType, false, 0, 0);
+            // gl.vertexAttribPointer(this.vertexAttribute, this.itemSize, this.itemType, false, 0, 0)
         }
     }]);
 
-    return Uniform;
+    return Attribute;
 }();
 
-exports.default = Uniform;
+exports.default = Attribute;
 
 /***/ }),
 /* 3 */
@@ -2447,9 +2466,9 @@ var _mat = __webpack_require__(1);
 
 var _mat2 = _interopRequireDefault(_mat);
 
-var _Attribute2 = __webpack_require__(0);
+var _Uniform2 = __webpack_require__(0);
 
-var _Attribute3 = _interopRequireDefault(_Attribute2);
+var _Uniform3 = _interopRequireDefault(_Uniform2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2481,18 +2500,17 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 * THE SOFTWARE.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 */
 
-var Cam3D = function (_Attribute) {
-    _inherits(Cam3D, _Attribute);
+var Cam3D = function (_Uniform) {
+    _inherits(Cam3D, _Uniform);
 
     function Cam3D() {
         _classCallCheck(this, Cam3D);
 
-        var _this = _possibleConstructorReturn(this, (Cam3D.__proto__ || Object.getPrototypeOf(Cam3D)).call(this, 'uPMatrix'));
+        var _this = _possibleConstructorReturn(this, (Cam3D.__proto__ || Object.getPrototypeOf(Cam3D)).call(this, 'uPMatrix', 35676, _mat2.default.create()));
 
-        _this.fovv = 45;
+        _this.fovy = 45;
         _this.near = 0.1;
         _this.far = 100;
-        _this.matrix = _mat2.default.create();
         return _this;
     }
 
@@ -2503,19 +2521,22 @@ var Cam3D = function (_Attribute) {
                 pos[_key] = arguments[_key];
             }
 
-            _mat2.default.translate(this.matrix, this.matrix, pos);
+            _mat2.default.translate(this.data, this.data, pos);
         }
     }, {
         key: 'init',
         value: function init(gl, program) {
-            _mat2.default.perspective(this.fovv, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, this.matrix);
+            _get(Cam3D.prototype.__proto__ || Object.getPrototypeOf(Cam3D.prototype), 'init', this).call(this, gl, program);
+            // out, fovy, aspect, near, far
+            _mat2.default.perspective(this.data, this.fovy, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
 
-            this.pointer = gl.getUniformLocation(program, _get(Cam3D.prototype.__proto__ || Object.getPrototypeOf(Cam3D.prototype), 'label', this));
+            // temporary, fake perspective
+            this.data = new Float32Array([2.4142136573791504, 0, 0, 0, 0, 2.4142136573791504, 0, 0, 0, 0, -1.0020020008087158, -1, 0, 0, -0.20020020008087158, 0]);
         }
     }]);
 
     return Cam3D;
-}(_Attribute3.default);
+}(_Uniform3.default);
 
 exports.default = Cam3D;
 
@@ -2556,7 +2577,7 @@ var _get = function get(object, property, receiver) { if (object === null) objec
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              * THE SOFTWARE.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              */
 
-var _Attribute2 = __webpack_require__(0);
+var _Attribute2 = __webpack_require__(2);
 
 var _Attribute3 = _interopRequireDefault(_Attribute2);
 
@@ -2574,7 +2595,7 @@ var Geom = function (_Attribute) {
     function Geom(vertices, dimension) {
         _classCallCheck(this, Geom);
 
-        var _this = _possibleConstructorReturn(this, (Geom.__proto__ || Object.getPrototypeOf(Geom)).call(this, 'aVertexPosition', new Float32Array(vertices)));
+        var _this = _possibleConstructorReturn(this, (Geom.__proto__ || Object.getPrototypeOf(Geom)).call(this, 'aVertexPosition'));
 
         _get(Geom.prototype.__proto__ || Object.getPrototypeOf(Geom.prototype), 'setArray', _this).call(_this, new Float32Array(vertices));
         _get(Geom.prototype.__proto__ || Object.getPrototypeOf(Geom.prototype), 'setItems', _this).call(_this, 5126 /* gl.FLOAT */, dimension);
@@ -2582,9 +2603,8 @@ var Geom = function (_Attribute) {
     }
 
     _createClass(Geom, [{
-        key: 'draw',
-        value: function draw(gl, program) {
-            _get(Geom.prototype.__proto__ || Object.getPrototypeOf(Geom.prototype), 'draw', this).call(this, gl, program);
+        key: 'display',
+        value: function display(gl) {
             gl.drawArrays(gl.TRIANGLES, 0, this.numItems);
         }
     }]);
@@ -2633,11 +2653,13 @@ var _mat = __webpack_require__(1);
 
 var _mat2 = _interopRequireDefault(_mat);
 
-var _Uniform = __webpack_require__(2);
+var _Uniform = __webpack_require__(0);
 
 var _Uniform2 = _interopRequireDefault(_Uniform);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -2645,6 +2667,7 @@ var Mesh3D = function () {
     function Mesh3D(geom, program) {
         _classCallCheck(this, Mesh3D);
 
+        this.geom = geom;
         this.attributes = [geom];
         this.program = program;
 
@@ -2738,9 +2761,11 @@ var Mesh3D = function () {
         }
     }, {
         key: 'init',
-        value: function init(gl) {
+        value: function init(gl, globalUniforms) {
             var program = this.program;
-            if (!this.program.isInitialized()) this.program.init(gl, this.attributes, this.uniforms);
+            var allUniforms = [].concat(_toConsumableArray(this.uniforms), _toConsumableArray(globalUniforms));
+
+            if (!this.program.isInitialized()) this.program.init(gl, this.attributes, allUniforms);
 
             var _iteratorNormalCompletion3 = true;
             var _didIteratorError3 = false;
@@ -2751,9 +2776,7 @@ var Mesh3D = function () {
                     var attribute = _step3.value;
 
                     if (!attribute.isInitialized()) attribute.init(gl, program);
-                } /*for (const uniform of this.uniforms)
-                      if (!uniform.isInitialized())
-                          uniform.init(gl, program)*/
+                }
             } catch (err) {
                 _didIteratorError3 = true;
                 _iteratorError3 = err;
@@ -2768,19 +2791,16 @@ var Mesh3D = function () {
                     }
                 }
             }
-        }
-    }, {
-        key: 'draw',
-        value: function draw(gl) {
+
             var _iteratorNormalCompletion4 = true;
             var _didIteratorError4 = false;
             var _iteratorError4 = undefined;
 
             try {
-                for (var _iterator4 = this.attributes[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                    var attribute = _step4.value;
+                for (var _iterator4 = allUniforms[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                    var uniform = _step4.value;
 
-                    attribute.draw(gl);
+                    if (!uniform.isInitialized()) uniform.init(gl, program);
                 }
             } catch (err) {
                 _didIteratorError4 = true;
@@ -2796,6 +2816,64 @@ var Mesh3D = function () {
                     }
                 }
             }
+        }
+    }, {
+        key: 'draw',
+        value: function draw(gl, globalUniforms) {
+            var allUniforms = [].concat(_toConsumableArray(this.uniforms), _toConsumableArray(globalUniforms));
+
+            var _iteratorNormalCompletion5 = true;
+            var _didIteratorError5 = false;
+            var _iteratorError5 = undefined;
+
+            try {
+                for (var _iterator5 = this.attributes[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                    var attribute = _step5.value;
+
+                    attribute.draw(gl);
+                }
+            } catch (err) {
+                _didIteratorError5 = true;
+                _iteratorError5 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                        _iterator5.return();
+                    }
+                } finally {
+                    if (_didIteratorError5) {
+                        throw _iteratorError5;
+                    }
+                }
+            }
+
+            var _iteratorNormalCompletion6 = true;
+            var _didIteratorError6 = false;
+            var _iteratorError6 = undefined;
+
+            try {
+                for (var _iterator6 = allUniforms[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                    var uniform = _step6.value;
+
+                    uniform.draw(gl);
+                }
+            } catch (err) {
+                _didIteratorError6 = true;
+                _iteratorError6 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                        _iterator6.return();
+                    }
+                } finally {
+                    if (_didIteratorError6) {
+                        throw _iteratorError6;
+                    }
+                }
+            }
+
+            this.geom.display(gl);
+            // gl.drawArrays(gl.TRIANGLES, 0, pyramidVertexPositionBuffer.numItems)
         }
     }]);
 
@@ -2856,8 +2934,28 @@ var Program = function () {
     }
 
     _createClass(Program, [{
+        key: 'isInitialized',
+        value: function isInitialized() {
+            return !!this.pointer;
+        }
+    }, {
+        key: 'getUniformLocation',
+        value: function getUniformLocation(label) {
+            if (this.uniforms.hasOwnProperty(label)) return this.uniforms[label];else console.error('The uniform location ' + label + ' don\'nt exist on this program');
+
+            return null;
+        }
+    }, {
+        key: 'getAttributeLocation',
+        value: function getAttributeLocation(label) {
+            if (this.attributes.hasOwnProperty(label)) return this.attributes[label];else console.error('The attribute location ' + label + ' don\'nt exist on this program');
+
+            return null;
+        }
+    }, {
         key: 'init',
         value: function init(gl, attributes, uniforms) {
+
             this.vertexShader = this._createShader(gl, 35633 /* gl.VERTEX_SHADER */, vs);
             this.fragmentShader = this._createShader(gl, 35632 /* gl.FRAGMENT_SHADER */, fs);
 
@@ -2871,12 +2969,6 @@ var Program = function () {
             }
 
             gl.useProgram(program);
-
-            /*for (const buffer in buffers)
-            {
-                const label = buffer.label
-                program[label] = gl.getUniformLocation(program, label)
-            }*/
 
             // Link buffer / program
             var _iteratorNormalCompletion = true;
@@ -2939,11 +3031,6 @@ var Program = function () {
             this.pointer = program;
         }
     }, {
-        key: 'isInitialized',
-        value: function isInitialized() {
-            return !!this.pointer;
-        }
-    }, {
         key: '_createShader',
         value: function _createShader(gl, type, src) {
             var shader = gl.createShader(type);
@@ -3003,53 +3090,34 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  */
 
 var Scene = function () {
-    function Scene(canvas) {
+    function Scene(canvas, cam) {
         _classCallCheck(this, Scene);
 
         this.canvas = canvas;
         this.init(canvas);
         this.meshs = [];
-        this.cam = null;
+        this.cam = cam;
+        this.uniforms = [cam];
     }
 
     _createClass(Scene, [{
-        key: 'addCam',
-        value: function addCam(cam) {
-            this.cam = cam;
-
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
-
-            try {
-                for (var _iterator = this.meshs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var mesh = _step.value;
-
-                    mesh.addAttribute(cam);
-                }
-            } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
-                    }
-                } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
-                    }
-                }
-            }
+        key: '_addCamToMeshs',
+        value: function _addCamToMeshs() {
+            var cam = this.cam;
+            this.uniforms.push(cam);
         }
+
+        /*addCam(cam)
+        {
+            this.cam = cam
+        }*/
+
     }, {
         key: 'addMesh',
         value: function addMesh(mesh) {
             this.meshs.push(mesh);
 
-            if (!mesh.isInitialized()) mesh.init(this.gl);
-
-            if (this.cam) mesh.addAttribute(cam);
+            if (!mesh.isInitialized()) mesh.init(this.gl, this.uniforms);
         }
     }, {
         key: 'rmMesh',
@@ -3084,33 +3152,33 @@ var Scene = function () {
         value: function draw() {
             var gl = this.gl;
 
-            var _iteratorNormalCompletion2 = true;
-            var _didIteratorError2 = false;
-            var _iteratorError2 = undefined;
+            gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
 
             try {
-                for (var _iterator2 = this.meshs[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                    var mesh = _step2.value;
+                for (var _iterator = this.meshs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var mesh = _step.value;
 
-                    mesh.draw(gl);
+                    mesh.draw(gl, this.uniforms);
                 }
             } catch (err) {
-                _didIteratorError2 = true;
-                _iteratorError2 = err;
+                _didIteratorError = true;
+                _iteratorError = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                        _iterator2.return();
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
                     }
                 } finally {
-                    if (_didIteratorError2) {
-                        throw _iteratorError2;
+                    if (_didIteratorError) {
+                        throw _iteratorError;
                     }
                 }
             }
-
-            gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         }
     }]);
 
@@ -3130,11 +3198,11 @@ var _mat = __webpack_require__(1);
 
 var _mat2 = _interopRequireDefault(_mat);
 
-var _Attribute = __webpack_require__(0);
+var _Attribute = __webpack_require__(2);
 
 var _Attribute2 = _interopRequireDefault(_Attribute);
 
-var _Uniform = __webpack_require__(2);
+var _Uniform = __webpack_require__(0);
 
 var _Uniform2 = _interopRequireDefault(_Uniform);
 
@@ -3250,72 +3318,67 @@ pyramidMesh.translate(-1.5, 0.0, -8.0);
 scene.addMesh(pyramidMesh);
 
 // Square
-var cubeVertices = [
-// Front face
--1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0,
+/*const cubeVertices = [
+    // Front face
+    -1.0, -1.0,  1.0,
+     1.0, -1.0,  1.0,
+     1.0,  1.0,  1.0,
+    -1.0,  1.0,  1.0,
 
-// Back face
--1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0, -1.0,
+    // Back face
+    -1.0, -1.0, -1.0,
+    -1.0,  1.0, -1.0,
+     1.0,  1.0, -1.0,
+     1.0, -1.0, -1.0,
 
-// Top face
--1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0,
+    // Top face
+    -1.0,  1.0, -1.0,
+    -1.0,  1.0,  1.0,
+     1.0,  1.0,  1.0,
+     1.0,  1.0, -1.0,
 
-// Bottom face
--1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, -1.0, -1.0, 1.0,
+    // Bottom face
+    -1.0, -1.0, -1.0,
+     1.0, -1.0, -1.0,
+     1.0, -1.0,  1.0,
+    -1.0, -1.0,  1.0,
 
-// Right face
-1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0,
+    // Right face
+     1.0, -1.0, -1.0,
+     1.0,  1.0, -1.0,
+     1.0,  1.0,  1.0,
+     1.0, -1.0,  1.0,
 
-// Left face
--1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0];
-var cubeGeom = new _Geom2.default(cubeVertices);
-var cubeColors = [1.0, 0.0, 0.0, 1.0, // Front face
-1.0, 1.0, 0.0, 1.0, // Back face
-0.0, 1.0, 0.0, 1.0, // Top face
-1.0, 0.5, 0.5, 1.0, // Bottom face
-1.0, 0.0, 1.0, 1.0, // Right face
-0.0, 0.0, 1.0, 1.0 // Left face
-];
-var unpackedCubeColors = [];
-var _iteratorNormalCompletion = true;
-var _didIteratorError = false;
-var _iteratorError = undefined;
+    // Left face
+    -1.0, -1.0, -1.0,
+    -1.0, -1.0,  1.0,
+    -1.0,  1.0,  1.0,
+    -1.0,  1.0, -1.0
+]
+const cubeGeom = new Geom(cubeVertices)
+const cubeColors = [
+    1.0, 0.0, 0.0, 1.0, // Front face
+    1.0, 1.0, 0.0, 1.0, // Back face
+    0.0, 1.0, 0.0, 1.0, // Top face
+    1.0, 0.5, 0.5, 1.0, // Bottom face
+    1.0, 0.0, 1.0, 1.0, // Right face
+    0.0, 0.0, 1.0, 1.0  // Left face
+]
+let unpackedCubeColors = []
+for (const color of cubeColors)
+    for (let j = 0; j < 4; j++)
+        unpackedCubeColors = unpackedCubeColors.concat(color)
 
-try {
-    for (var _iterator = cubeColors[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-        var color = _step.value;
+const cubeAttributeColor = new Attribute('aVertexColor')
+cubeAttributeColor.setArray(new Float32Array(unpackedCubeColors))
+cubeAttributeColor.setItems(5126, 4)
 
-        for (var j = 0; j < 4; j++) {
-            unpackedCubeColors = unpackedCubeColors.concat(color);
-        }
-    }
-} catch (err) {
-    _didIteratorError = true;
-    _iteratorError = err;
-} finally {
-    try {
-        if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-        }
-    } finally {
-        if (_didIteratorError) {
-            throw _iteratorError;
-        }
-    }
-}
-
-var cubeAttributeColor = new _Attribute2.default('aVertexColor');
-cubeAttributeColor.setArray(new Float32Array(unpackedCubeColors));
-cubeAttributeColor.setItems(5126, 4);
-
-var cubeMesh = new _Mesh3D2.default(cubeGeom, program);
-cubeMesh.addAttribute(cubeAttributeColor);
-cubeMesh.translate(3.0, 0.0, 0.0);
-scene.addMesh(cubeMesh);
+const cubeMesh = new Mesh3D(cubeGeom, program)
+cubeMesh.addAttribute(cubeAttributeColor)
+cubeMesh.translate(3.0, 0.0, 0.0)
+scene.addMesh(cubeMesh)*/
 
 scene.draw();
-
-console.log('test');
 
 /***/ }),
 /* 9 */
