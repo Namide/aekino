@@ -183,6 +183,3 @@ scene.addMesh(cubeMesh)*/
 
 
 scene.draw()
-
-
-console.log('test')

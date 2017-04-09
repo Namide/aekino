@@ -31,7 +31,7 @@ export default class Cam3D extends Uniform
     {
         super('uPMatrix', 35676, mat4.create())
        
-        this.fovv = 45
+        this.fovy = 45
         this.near = 0.1
         this.far = 100
     }
@@ -44,6 +44,11 @@ export default class Cam3D extends Uniform
     init(gl, program)
     {
         super.init(gl, program)
-        mat4.perspective(this.fovv, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, this.data)
+        // out, fovy, aspect, near, far
+        mat4.perspective(this.data, this.fovy, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0)
+        
+        // temporary, fake perspective
+        this.data = new Float32Array([2.4142136573791504, 0, 0, 0, 0, 2.4142136573791504, 0, 0, 0, 0, -1.0020020008087158, -1, 0, 0, -0.20020020008087158, 0])
+        
     }
 }

@@ -67,8 +67,27 @@ export default class Attribute
     }
     
     /**
+     * https://gist.github.com/szimek/763999
+     *
      * itemType
-     *      gl.FLOAT          5126
+     *      gl.INT              5124   
+     *      gl.UNSIGNED_INT     5125
+     *      gl.FLOAT            5126  
+     *      gl.FLOAT_VEC2       35664 
+     *      gl.FLOAT_VEC3       35665 
+     *      gl.FLOAT_VEC4       35666 
+     *      gl.INT_VEC2         35667    
+     *      gl.INT_VEC3         35668  
+     *      gl.INT_VEC4         35669 
+     *      gl.BOOL             35670   
+     *      gl.BOOL_VEC2        35671 
+     *      gl.BOOL_VEC3        35672 
+     *      gl.BOOL_VEC4        35673   
+     *      gl.FLOAT_MAT2       35674 
+     *      gl.FLOAT_MAT3       35675 
+     *      gl.FLOAT_MAT4       35676  
+     *      gl.SAMPLER_2D       35678   
+     *      gl.SAMPLER_CUBE     35680 
      */
     setItems(type = 5126, size = 3, num = null)
     {

@@ -29,8 +29,7 @@ export default class Geom extends Attribute
     constructor(vertices, dimension)
     {
         super(
-            'aVertexPosition',
-            new Float32Array(vertices)
+            'aVertexPosition'
         )
 
         super.setArray(new Float32Array(vertices))
@@ -40,7 +39,5 @@ export default class Geom extends Attribute
     display(gl)
     {
         gl.drawArrays(gl.TRIANGLES, 0, this.numItems)
-    }
-        
-    
+    }   
 }

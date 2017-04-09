@@ -93,6 +93,6 @@ export default class Scene
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
             
         for (const mesh of this.meshs)
-            mesh.draw(gl)        
+            mesh.draw(gl, this.uniforms)        
     }
 }

@@ -94,10 +94,15 @@ export default class Mesh3D
                 uniform.init(gl, program)
     }
     
-    draw(gl)
+    draw(gl, globalUniforms)
     {
+        const allUniforms = [...this.uniforms, ...globalUniforms]
+        
         for(const attribute of this.attributes)
             attribute.draw(gl)
+            
+        for(const uniform of allUniforms)
+            uniform.draw(gl)
         
         this.geom.display(gl)
         // gl.drawArrays(gl.TRIANGLES, 0, pyramidVertexPositionBuffer.numItems)
