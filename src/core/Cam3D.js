@@ -45,10 +45,6 @@ export default class Cam3D extends Uniform
     {
         super.init(gl, program)
         // out, fovy, aspect, near, far
-        mat4.perspective(this.data, this.fovy, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0)
-        
-        // temporary, fake perspective
-        this.data = new Float32Array([2.4142136573791504, 0, 0, 0, 0, 2.4142136573791504, 0, 0, 0, 0, -1.0020020008087158, -1, 0, 0, -0.20020020008087158, 0])
-        
+        mat4.perspective(this.data, this.fovy * Math.PI / 180, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0)
     }
 }
