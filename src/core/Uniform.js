@@ -54,7 +54,6 @@ export default class Uniform
         switch(this.type)
         {
             case 35676: // gl.FLOAT_MAT4
-                console.log(this.data)
                 gl.uniformMatrix4fv(pointer, false, this.data)
                 break
                 

@@ -133,7 +133,6 @@
 
 
     function setMatrixUniforms() {
-        console.log(pMatrix, mvMatrix)
         gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
         gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
     }
@@ -206,7 +205,7 @@
         pyramidVertexColorBuffer.numItems = 12;
 
 
-        cubeVertexPositionBuffer = gl.createBuffer();
+        /*cubeVertexPositionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
         vertices = [
             // Front face
@@ -282,7 +281,7 @@
         ];
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
         cubeVertexIndexBuffer.itemSize = 1;
-        cubeVertexIndexBuffer.numItems = 36;
+        cubeVertexIndexBuffer.numItems = 36;*/
     }
 
 
@@ -317,7 +316,7 @@
         mat4.translate(mvMatrix, [3.0, 0.0, 0.0]);
 
         mvPushMatrix();
-        mat4.rotate(mvMatrix, degToRad(rCube), [1, 1, 1]);
+        /*mat4.rotate(mvMatrix, degToRad(rCube), [1, 1, 1]);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
         gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, cubeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -327,7 +326,7 @@
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
         setMatrixUniforms();
-        gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);*/
 
         mvPopMatrix();
 

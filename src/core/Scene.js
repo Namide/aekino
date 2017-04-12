@@ -91,7 +91,13 @@ export default class Scene
 
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-            
+        
+console.log(`
+// draw Scene
+gl.viewport(0, 0, ${gl.viewportWidth}, ${gl.viewportHeight})
+gl.clear(${gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT})
+`)
+        
         for (const mesh of this.meshs)
             mesh.draw(gl, this.uniforms)        
     }

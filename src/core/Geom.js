@@ -39,5 +39,10 @@ export default class Geom extends Attribute
     display(gl)
     {
         gl.drawArrays(gl.TRIANGLES, 0, this.numItems)
+        
+console.log(`
+// draw Geom (${this.label})
+gl.drawArrays(${gl.TRIANGLES}, 0, ${this.numItems})
+`)
     }   
 }

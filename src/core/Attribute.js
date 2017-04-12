@@ -105,11 +105,18 @@ export default class Attribute
         const buffer = gl.createBuffer()
         gl.bindBuffer(this.arrayType, buffer)
         gl.bufferData(this.arrayType, this.vertices, this.arrayUsage)
-        
-        
+                
         
         this.buffer = buffer
         this.location = program.getAttributeLocation(this.label)
+        
+console.log(`
+// init Attribute (${this.label})
+const buffer = gl.createBuffer()
+gl.bindBuffer(${this.arrayType}, ${buffer})
+gl.bufferData(${this.arrayType}, ${this.vertices}, ${this.arrayUsage})
+program.getAttributeLocation(${this.label})
+`)
     }
     
     draw(gl)
@@ -117,6 +124,11 @@ export default class Attribute
         gl.bindBuffer(this.arrayType, this.buffer)
         gl.vertexAttribPointer(this.location, this.itemSize, this.itemType, false, 0, 0)
         // gl.vertexAttribPointer(this.vertexAttribute, this.itemSize, this.itemType, false, 0, 0)
+console.log(`
+// draw Attribute (${this.label})
+gl.bindBuffer(${this.arrayType}, ${this.buffer})
+gl.vertexAttribPointer(${this.location}, ${this.itemSize}, ${this.itemType}, false, 0, 0)
+`)
     }
     
 
