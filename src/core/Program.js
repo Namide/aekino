@@ -51,8 +51,8 @@ export default class Program
 {
     constructor()
     {
-        this.attributes = {}
-        this.uniforms = {}
+        this._attribLocation = {}
+        this.uniformLocation = {}
     }
     
     isInitialized()
@@ -62,18 +62,18 @@ export default class Program
     
     getUniformLocation(label)
     {        
-        if (this.uniforms.hasOwnProperty(label))
-            return this.uniforms[label]
+        if (this.uniformLocation.hasOwnProperty(label))
+            return this.uniformLocation[label]
         else
             console.error('The uniform location ' + label + ' don\'nt exist on this program')
             
         return null
     }
     
-    getAttributeLocation(label)
+    getAttribLocation(label)
     {
-        if (this.attributes.hasOwnProperty(label))
-            return this.attributes[label]
+        if (this._attribLocation.hasOwnProperty(label))
+            return this._attribLocation[label]
         else
             console.error('The attribute location ' + label + ' don\'nt exist on this program')
             
@@ -97,16 +97,30 @@ export default class Program
         }
         
         gl.useProgram(program)
-        
-            
-        
+
+
+console.log(`
+// Init program
+const program = gl.createProgram()
+gl.attachShader(${program}, ${this.vertexShader})
+gl.attachShader(${program}, ${this.fragmentShader})
+gl.linkProgram(${program})
+gl.useProgram(${program})
+`)
+
+
         // Link buffer / program
         for (const attribute of attributes)
         {
             const attributePointer = gl.getAttribLocation(program, attribute.label)
             gl.enableVertexAttribArray(attributePointer)
             // this.vertexAttribute = vertexAttribute
-            this.attributes[attribute.label] = attributePointer
+            this._attribLocation[attribute.label] = attributePointer
+
+console.log(`
+const attributePointer = gl.getAttribLocation(${program}, ${attribute.label})
+gl.enableVertexAttribArray(${attributePointer})
+`)
         }
         
         
@@ -115,7 +129,11 @@ export default class Program
         {
             const uniformPointer = gl.getUniformLocation(program, uniform.label)
             // uniform.pointer = uniformPointer
-            this.uniforms[uniform.label] = uniformPointer
+            this.uniformLocation[uniform.label] = uniformPointer
+            
+console.log(`
+const uniformPointer = gl.getUniformLocation(${program}, ${uniform.label})
+`)
         }
         
         
@@ -134,6 +152,13 @@ export default class Program
         {  
             return console.error('Une erreur est survenue au cours de la compilation du shader: ' + gl.getShaderInfoLog(shader))
         }
+
+console.log(`
+// Init shader
+const shader = gl.createShader(${type})
+gl.shaderSource(${shader}, ${src})
+gl.compileShader(${shader})
+`)
 
         return shader
     }

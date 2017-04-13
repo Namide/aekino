@@ -108,14 +108,13 @@ export default class Attribute
                 
         
         this.buffer = buffer
-        this.location = program.getAttributeLocation(this.label)
+        this.location = program.getAttribLocation(this.label)
         
 console.log(`
 // init Attribute (${this.label})
 const buffer = gl.createBuffer()
 gl.bindBuffer(${this.arrayType}, ${buffer})
 gl.bufferData(${this.arrayType}, ${this.vertices}, ${this.arrayUsage})
-program.getAttributeLocation(${this.label})
 `)
     }
     

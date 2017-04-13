@@ -54,7 +54,11 @@ export default class Uniform
         switch(this.type)
         {
             case 35676: // gl.FLOAT_MAT4
-                gl.uniformMatrix4fv(pointer, false, this.data)
+                gl.uniformMatrix4fv(this.location, false, this.data)
+console.log(`
+// Draw uniform (${this.label})
+gl.uniformMatrix4fv(${this.location}, false, ${this.data})
+`)
                 break
                 
             default:
