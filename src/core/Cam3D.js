@@ -46,9 +46,5 @@ export default class Cam3D extends Uniform
         super.init(gl, program)
         // out, fovy, aspect, near, far
         mat4.perspective(this.data, this.fovy * Math.PI / 180, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0)
-console.log(`
-// init Uniform (Cam3D)
-mat4.perspective(${this.data}, ${this.fovy * Math.PI / 180}, ${gl.viewportWidth / gl.viewportHeight}, 0.1, 100.0)
-`)
     }
 }

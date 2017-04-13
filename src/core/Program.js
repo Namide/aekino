@@ -51,7 +51,7 @@ export default class Program
 {
     constructor()
     {
-        this._attribLocation = {}
+        this.attribLocation = {}
         this.uniformLocation = {}
     }
     
@@ -72,8 +72,8 @@ export default class Program
     
     getAttribLocation(label)
     {
-        if (this._attribLocation.hasOwnProperty(label))
-            return this._attribLocation[label]
+        if (this.attribLocation.hasOwnProperty(label))
+            return this.attribLocation[label]
         else
             console.error('The attribute location ' + label + ' don\'nt exist on this program')
             
@@ -99,28 +99,13 @@ export default class Program
         gl.useProgram(program)
 
 
-console.log(`
-// Init program
-const program = gl.createProgram()
-gl.attachShader(${program}, ${this.vertexShader})
-gl.attachShader(${program}, ${this.fragmentShader})
-gl.linkProgram(${program})
-gl.useProgram(${program})
-`)
-
-
         // Link buffer / program
         for (const attribute of attributes)
         {
             const attributePointer = gl.getAttribLocation(program, attribute.label)
             gl.enableVertexAttribArray(attributePointer)
             // this.vertexAttribute = vertexAttribute
-            this._attribLocation[attribute.label] = attributePointer
-
-console.log(`
-const attributePointer = gl.getAttribLocation(${program}, ${attribute.label})
-gl.enableVertexAttribArray(${attributePointer})
-`)
+            this.attribLocation[attribute.label] = attributePointer
         }
         
         
@@ -130,10 +115,6 @@ gl.enableVertexAttribArray(${attributePointer})
             const uniformPointer = gl.getUniformLocation(program, uniform.label)
             // uniform.pointer = uniformPointer
             this.uniformLocation[uniform.label] = uniformPointer
-            
-console.log(`
-const uniformPointer = gl.getUniformLocation(${program}, ${uniform.label})
-`)
         }
         
         
@@ -152,13 +133,6 @@ const uniformPointer = gl.getUniformLocation(${program}, ${uniform.label})
         {  
             return console.error('Une erreur est survenue au cours de la compilation du shader: ' + gl.getShaderInfoLog(shader))
         }
-
-console.log(`
-// Init shader
-const shader = gl.createShader(${type})
-gl.shaderSource(${shader}, ${src})
-gl.compileShader(${shader})
-`)
 
         return shader
     }

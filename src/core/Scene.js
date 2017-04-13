@@ -68,14 +68,6 @@ export default class Scene
             gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
             gl.viewportWidth = canvas.width
             gl.viewportHeight = canvas.height
-
-console.log(`
-// init (${canvas})
-gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
-gl.viewportWidth = ${canvas.width}
-gl.viewportHeight = ${canvas.height}
-`)
-
         }
         catch(e)
         {
@@ -89,11 +81,6 @@ gl.viewportHeight = ${canvas.height}
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0)
         gl.enable(gl.DEPTH_TEST)
-    
-console.log(`
-gl.clearColor(0.0, 0.0, 0.0, 1.0)
-gl.enable(${gl.DEPTH_TEST})
-`)
 
         this.gl = gl
     }
@@ -104,12 +91,6 @@ gl.enable(${gl.DEPTH_TEST})
 
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-        
-console.log(`
-// draw Scene
-gl.viewport(0, 0, ${gl.viewportWidth}, ${gl.viewportHeight})
-gl.clear(${gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT})
-`)
         
         for (const mesh of this.meshs)
             mesh.draw(gl, this.uniforms)        

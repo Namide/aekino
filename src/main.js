@@ -86,7 +86,6 @@ const pyramidVertices = [
    -1.0, -1.0, -1.0,
    -1.0, -1.0,  1.0
 ]
-const pyramidGeom = new Geom(pyramidVertices)
 const pyramidColors = [
     // Front face
     1.0, 0.0, 0.0, 1.0,
@@ -108,12 +107,11 @@ const pyramidColors = [
     0.0, 0.0, 1.0, 1.0,
     0.0, 1.0, 0.0, 1.0
 ]
-const triangleAttributeColor = new Attribute('aVertexColor')
-triangleAttributeColor.setArray(new Float32Array(pyramidColors))
-triangleAttributeColor.setItems(5126, 4)
+const pyramidGeom = new Geom()
+pyramidGeom.addAttribute('aVertexPosition', pyramidVertices, 3)
+pyramidGeom.addAttribute('aVertexColor', pyramidColors, 4)
     
 const pyramidMesh = new Mesh3D(pyramidGeom, program)
-pyramidMesh.addAttribute(triangleAttributeColor)
 pyramidMesh.translate(-1.5, 0.0, -8.0)
 scene.addMesh(pyramidMesh)
 

@@ -24,25 +24,46 @@
 
 import Attribute from './Attribute'
 
-export default class Geom extends Attribute
+export default class Geom
 {
-    constructor(vertices, dimension)
+    constructor()
     {
-        super(
-            'aVertexPosition'
-        )
-
-        super.setArray(new Float32Array(vertices))
-        super.setItems(5126 /* gl.FLOAT */, dimension)
+        this.attributes = []
+    }
+    
+    isInitialized()
+    {
+        for (const attribute of this.attributes)
+            if (!attribute.isInitialized())
+                return false
+        
+        return true
+    }
+    
+    addAttribute(label, vertices, dimension)
+    {
+        const attribute = new Attribute(label)
+        attribute.setArray(new Float32Array(vertices))
+        attribute.setItems(5126 /* gl.FLOAT */, dimension)
+        
+        this.attributes.push(attribute)
+    }
+    
+    init(gl, program)
+    {
+        for (const attribute of this.attributes)
+            if (!attribute.isInitialized())
+                attribute.init(gl, program)
+    }
+    
+    draw(gl)
+    {
+        for(const attribute of this.attributes)
+            attribute.draw(gl)
     }
     
     display(gl)
     {
-        gl.drawArrays(gl.TRIANGLES, 0, this.numItems)
-        
-console.log(`
-// draw Geom (${this.label})
-gl.drawArrays(${gl.TRIANGLES}, 0, ${this.numItems})
-`)
+        gl.drawArrays(gl.TRIANGLES, 0, this.attributes[0].numItems)
     }   
 }

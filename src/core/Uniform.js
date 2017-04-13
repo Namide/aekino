@@ -43,9 +43,6 @@ export default class Uniform
     
     init(gl, program)
     {
-        // Link Uniform to Program
-        // this.pointer = gl.getUniformLocation(program, this.label)
-        
         this.location = program.getUniformLocation(this.label)
     }
     
@@ -55,10 +52,6 @@ export default class Uniform
         {
             case 35676: // gl.FLOAT_MAT4
                 gl.uniformMatrix4fv(this.location, false, this.data)
-console.log(`
-// Draw uniform (${this.label})
-gl.uniformMatrix4fv(${this.location}, false, ${this.data})
-`)
                 break
                 
             default:

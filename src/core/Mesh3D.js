@@ -30,7 +30,6 @@ export default class Mesh3D
     constructor(geom, program)
     {
         this.geom = geom
-        this.attributes = [geom]
         this.program = program
         
         // position, rotation, scale -> uniform
@@ -49,11 +48,6 @@ export default class Mesh3D
         mat4.translate(matrix, matrix, pos)
     }
     
-    addAttribute(attribute)
-    {
-        this.attributes.push(attribute)
-    }
-    
     addUniform(uniform)
     {
         this.uniforms.push(uniform)
@@ -64,9 +58,8 @@ export default class Mesh3D
         if (!this.program.isInitialized())
             return false
         
-        for (const attribute of this.attributes)
-            if (!attribute.isInitialized())
-                return false
+        if (!this.geom.isInitialized())
+            return false
         
         for (const uniform of this.uniforms)
             if (!uniform.isInitialized())
@@ -81,12 +74,10 @@ export default class Mesh3D
         const allUniforms = [...this.uniforms, ...globalUniforms]
 
         if (!this.program.isInitialized())
-            this.program.init(gl, this.attributes, allUniforms)
+            this.program.init(gl, this.geom.attributes, allUniforms)
             
-            
-        for (const attribute of this.attributes)
-            if (!attribute.isInitialized())
-                attribute.init(gl, program)
+        if (!this.geom.isInitialized())
+            this.geom.init(gl, program)
         
         
         for (const uniform of allUniforms)
@@ -98,8 +89,7 @@ export default class Mesh3D
     {
         const allUniforms = [...this.uniforms, ...globalUniforms]
         
-        for(const attribute of this.attributes)
-            attribute.draw(gl)
+        this.geom.draw(gl)
             
         for(const uniform of allUniforms)
             uniform.draw(gl)
