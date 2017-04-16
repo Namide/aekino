@@ -9,7 +9,7 @@
     "build-std": "webpack --config webpack/build.config.js --progress --colors",
     "build-es6": "webpack --config webpack/build-es6.config.js --progress --colors",
     "build-min": "webpack --config webpack/build-min.config.js --progress --colors",
-    "build": "npm run build-std ; npm run build-min ; npm run build-es6",
+    "build": "npm run build-std && npm run build-min && npm run build-es6",
 
     "dev": "webpack-dev-server --content-base dist/ --config webpack/dev.config.js --progress --colors --watch --open"
   },
