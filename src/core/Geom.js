@@ -43,8 +43,18 @@ export default class Geom
     addAttribute(label, vertices, dimension)
     {
         const attribute = new Attribute(label)
-        attribute.setArray(new Float32Array(vertices))
+        attribute.setArray(new Float32Array(vertices), 34962 /* gl.ARRAY_BUFFER */)
         attribute.setItems(5126 /* gl.FLOAT */, dimension)
+        
+        this.attributes.push(attribute)
+    }
+    
+    addIndices(indices)
+    {
+        const attribute = new Attribute()
+        
+        attribute.setArray(new Uint16Array(indices), 34963 /* gl.ELEMENT_ARRAY_BUFFER */)
+        attribute.setItems(5125 /* gl.UNSIGNED_INT */, 1 /* dimension */)
         
         this.attributes.push(attribute)
     }

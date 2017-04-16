@@ -29,6 +29,8 @@ export default class Attribute
         this.label = label
         this.buffer = null
         this.location = null
+        
+        this.isVertices = null
     }
     
     isInitialized()
@@ -58,12 +60,13 @@ export default class Attribute
      *      Contents of the buffer are likely to not be used often.
      *      Contents are written to the buffer, but not read.
      */
-    setArray(vertices, type = 34962, indices = null, usage = 35044)
+    setArray(vertices, type = 34962, usage = 35044)
     {
         this.arrayType = type
         this.vertices = vertices
-        this.indices = indices
         this.arrayUsage = usage
+        
+        this.isVertices = type === 34962
     }
     
     /**
@@ -105,16 +108,20 @@ export default class Attribute
         const buffer = gl.createBuffer()
         gl.bindBuffer(this.arrayType, buffer)
         gl.bufferData(this.arrayType, this.vertices, this.arrayUsage)
-                
+        
         
         this.buffer = buffer
-        this.location = program.getAttribLocation(this.label)
+        
+        if (this.isVertices)
+            this.location = program.getAttribLocation(this.label)
     }
     
     draw(gl)
     {
         gl.bindBuffer(this.arrayType, this.buffer)
-        gl.vertexAttribPointer(this.location, this.itemSize, this.itemType, false, 0, 0)
+        
+        if (this.isVertices)
+            gl.vertexAttribPointer(this.location, this.itemSize, this.itemType, false, 0, 0)
         // gl.vertexAttribPointer(this.vertexAttribute, this.itemSize, this.itemType, false, 0, 0)
     }
     

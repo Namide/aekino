@@ -2258,9 +2258,6 @@ class Uniform
     
     init(gl, program)
     {
-        // Link Uniform to Program
-        // this.pointer = gl.getUniformLocation(program, this.label)
-        
         this.location = program.getUniformLocation(this.label)
     }
     
@@ -2269,8 +2266,7 @@ class Uniform
         switch(this.type)
         {
             case 35676: // gl.FLOAT_MAT4
-                console.log(this.data)
-                gl.uniformMatrix4fv(pointer, false, this.data)
+                gl.uniformMatrix4fv(this.location, false, this.data)
                 break
                 
             default:
@@ -2395,11 +2391,10 @@ class Attribute
         const buffer = gl.createBuffer()
         gl.bindBuffer(this.arrayType, buffer)
         gl.bufferData(this.arrayType, this.vertices, this.arrayUsage)
-        
-        
+                
         
         this.buffer = buffer
-        this.location = program.getAttributeLocation(this.label)
+        this.location = program.getAttribLocation(this.label)
     }
     
     draw(gl)
@@ -2469,11 +2464,7 @@ class Cam3D extends __WEBPACK_IMPORTED_MODULE_1__Uniform__["a" /* default */]
     {
         super.init(gl, program)
         // out, fovy, aspect, near, far
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_mat4_js___default.a.perspective(this.data, this.fovy, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0)
-        
-        // temporary, fake perspective
-        this.data = new Float32Array([2.4142136573791504, 0, 0, 0, 0, 2.4142136573791504, 0, 0, 0, 0, -1.0020020008087158, -1, 0, 0, -0.20020020008087158, 0])
-        
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_mat4_js___default.a.perspective(this.data, this.fovy * Math.PI / 180, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0)
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Cam3D;
@@ -2511,21 +2502,47 @@ class Cam3D extends __WEBPACK_IMPORTED_MODULE_1__Uniform__["a" /* default */]
 
 
 
-class Geom extends __WEBPACK_IMPORTED_MODULE_0__Attribute__["a" /* default */]
+class Geom
 {
-    constructor(vertices, dimension)
+    constructor()
     {
-        super(
-            'aVertexPosition'
-        )
-
-        super.setArray(new Float32Array(vertices))
-        super.setItems(5126 /* gl.FLOAT */, dimension)
+        this.attributes = []
+    }
+    
+    isInitialized()
+    {
+        for (const attribute of this.attributes)
+            if (!attribute.isInitialized())
+                return false
+        
+        return true
+    }
+    
+    addAttribute(label, vertices, dimension)
+    {
+        const attribute = new __WEBPACK_IMPORTED_MODULE_0__Attribute__["a" /* default */](label)
+        attribute.setArray(new Float32Array(vertices))
+        attribute.setItems(5126 /* gl.FLOAT */, dimension)
+        
+        this.attributes.push(attribute)
+    }
+    
+    init(gl, program)
+    {
+        for (const attribute of this.attributes)
+            if (!attribute.isInitialized())
+                attribute.init(gl, program)
+    }
+    
+    draw(gl)
+    {
+        for(const attribute of this.attributes)
+            attribute.draw(gl)
     }
     
     display(gl)
     {
-        gl.drawArrays(gl.TRIANGLES, 0, this.numItems)
+        gl.drawArrays(gl.TRIANGLES, 0, this.attributes[0].numItems)
     }   
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Geom;
@@ -2571,7 +2588,6 @@ class Mesh3D
     constructor(geom, program)
     {
         this.geom = geom
-        this.attributes = [geom]
         this.program = program
         
         // position, rotation, scale -> uniform
@@ -2590,11 +2606,6 @@ class Mesh3D
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_mat4_js___default.a.translate(matrix, matrix, pos)
     }
     
-    addAttribute(attribute)
-    {
-        this.attributes.push(attribute)
-    }
-    
     addUniform(uniform)
     {
         this.uniforms.push(uniform)
@@ -2605,9 +2616,8 @@ class Mesh3D
         if (!this.program.isInitialized())
             return false
         
-        for (const attribute of this.attributes)
-            if (!attribute.isInitialized())
-                return false
+        if (!this.geom.isInitialized())
+            return false
         
         for (const uniform of this.uniforms)
             if (!uniform.isInitialized())
@@ -2622,12 +2632,10 @@ class Mesh3D
         const allUniforms = [...this.uniforms, ...globalUniforms]
 
         if (!this.program.isInitialized())
-            this.program.init(gl, this.attributes, allUniforms)
+            this.program.init(gl, this.geom.attributes, allUniforms)
             
-            
-        for (const attribute of this.attributes)
-            if (!attribute.isInitialized())
-                attribute.init(gl, program)
+        if (!this.geom.isInitialized())
+            this.geom.init(gl, program)
         
         
         for (const uniform of allUniforms)
@@ -2639,8 +2647,7 @@ class Mesh3D
     {
         const allUniforms = [...this.uniforms, ...globalUniforms]
         
-        for(const attribute of this.attributes)
-            attribute.draw(gl)
+        this.geom.draw(gl)
             
         for(const uniform of allUniforms)
             uniform.draw(gl)
@@ -2711,8 +2718,8 @@ class Program
 {
     constructor()
     {
-        this.attributes = {}
-        this.uniforms = {}
+        this.attribLocation = {}
+        this.uniformLocation = {}
     }
     
     isInitialized()
@@ -2722,18 +2729,18 @@ class Program
     
     getUniformLocation(label)
     {        
-        if (this.uniforms.hasOwnProperty(label))
-            return this.uniforms[label]
+        if (this.uniformLocation.hasOwnProperty(label))
+            return this.uniformLocation[label]
         else
             console.error('The uniform location ' + label + ' don\'nt exist on this program')
             
         return null
     }
     
-    getAttributeLocation(label)
+    getAttribLocation(label)
     {
-        if (this.attributes.hasOwnProperty(label))
-            return this.attributes[label]
+        if (this.attribLocation.hasOwnProperty(label))
+            return this.attribLocation[label]
         else
             console.error('The attribute location ' + label + ' don\'nt exist on this program')
             
@@ -2757,16 +2764,15 @@ class Program
         }
         
         gl.useProgram(program)
-        
-            
-        
+
+
         // Link buffer / program
         for (const attribute of attributes)
         {
             const attributePointer = gl.getAttribLocation(program, attribute.label)
             gl.enableVertexAttribArray(attributePointer)
             // this.vertexAttribute = vertexAttribute
-            this.attributes[attribute.label] = attributePointer
+            this.attribLocation[attribute.label] = attributePointer
         }
         
         
@@ -2775,7 +2781,7 @@ class Program
         {
             const uniformPointer = gl.getUniformLocation(program, uniform.label)
             // uniform.pointer = uniformPointer
-            this.uniforms[uniform.label] = uniformPointer
+            this.uniformLocation[uniform.label] = uniformPointer
         }
         
         
@@ -2889,7 +2895,7 @@ class Scene
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0)
         gl.enable(gl.DEPTH_TEST)
-        
+
         this.gl = gl
     }
     
@@ -2899,7 +2905,7 @@ class Scene
 
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-            
+        
         for (const mesh of this.meshs)
             mesh.draw(gl, this.uniforms)        
     }
@@ -3086,7 +3092,6 @@ const pyramidVertices = [
    -1.0, -1.0, -1.0,
    -1.0, -1.0,  1.0
 ]
-const pyramidGeom = new __WEBPACK_IMPORTED_MODULE_4__core_Geom__["a" /* default */](pyramidVertices)
 const pyramidColors = [
     // Front face
     1.0, 0.0, 0.0, 1.0,
@@ -3108,12 +3113,11 @@ const pyramidColors = [
     0.0, 0.0, 1.0, 1.0,
     0.0, 1.0, 0.0, 1.0
 ]
-const triangleAttributeColor = new __WEBPACK_IMPORTED_MODULE_1__core_Attribute__["a" /* default */]('aVertexColor')
-triangleAttributeColor.setArray(new Float32Array(pyramidColors))
-triangleAttributeColor.setItems(5126, 4)
+const pyramidGeom = new __WEBPACK_IMPORTED_MODULE_4__core_Geom__["a" /* default */]()
+pyramidGeom.addAttribute('aVertexPosition', pyramidVertices, 3)
+pyramidGeom.addAttribute('aVertexColor', pyramidColors, 4)
     
 const pyramidMesh = new __WEBPACK_IMPORTED_MODULE_5__core_Mesh3D__["a" /* default */](pyramidGeom, program)
-pyramidMesh.addAttribute(triangleAttributeColor)
 pyramidMesh.translate(-1.5, 0.0, -8.0)
 scene.addMesh(pyramidMesh)
 
