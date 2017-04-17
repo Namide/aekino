@@ -33,25 +33,16 @@ export default class Uniform
         this.label = label
         this.type = type
         this.data = data
-        this.location = null
+        // this.location = null
     }
     
-    isInitialized()
-    {
-        return !!this.location
-    }
-    
-    init(gl, program)
-    {
-        this.location = program.getUniformLocation(this.label)
-    }
-    
-    draw(gl, pointer)
+    draw(gl, program)
     {
         switch(this.type)
         {
             case 35676: // gl.FLOAT_MAT4
-                gl.uniformMatrix4fv(this.location, false, this.data)
+                const location = program.getUniformLocation(this.label)
+                gl.uniformMatrix4fv(location, false, this.data)
                 break
                 
             default:

@@ -76,10 +76,10 @@ export default class Geom
                 buffer.init(gl, program)
     }
     
-    draw(gl)
+    draw(gl, program)
     {
         for(const buffer of this.buffers)
-            buffer.draw(gl)
+            buffer.draw(gl, program)
     }
     
     display(gl)

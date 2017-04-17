@@ -107,6 +107,4 @@ export default class Buffer
     {
         gl.bindBuffer(this.arrayType, this.buffer)
     }
-    
-
 }

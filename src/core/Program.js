@@ -49,8 +49,11 @@ const fs = `
 
 export default class Program
 {
-    constructor()
+    constructor(vertexShaderSrc = vs, fragmentShaderSrc = fs)
     {
+        this.vertexShaderSrc = vertexShaderSrc
+        this.fragmentShaderSrc = fragmentShaderSrc
+        
         this.attribLocation = {}
         this.uniformLocation = {}
     }
@@ -81,10 +84,9 @@ export default class Program
     }
     
     init(gl, attributes, uniforms)
-    {
-
-        this.vertexShader = this._createShader(gl, 35633 /* gl.VERTEX_SHADER */, vs)
-        this.fragmentShader = this._createShader(gl, 35632 /* gl.FRAGMENT_SHADER */, fs)
+    {        
+        this.vertexShader = this._createShader(gl, 35633 /* gl.VERTEX_SHADER */, this.vertexShaderSrc)
+        this.fragmentShader = this._createShader(gl, 35632 /* gl.FRAGMENT_SHADER */, this.fragmentShaderSrc)
         
         const program = gl.createProgram()
         gl.attachShader(program, this.vertexShader)
@@ -92,9 +94,7 @@ export default class Program
         gl.linkProgram(program)
         
         if (!gl.getProgramParameter(program, gl.LINK_STATUS))
-        {
-            console.error('Impossible d\'initialiser le shader.')
-        }
+            console.error('Shader initialization error')
         
         gl.useProgram(program)
 
@@ -102,25 +102,23 @@ export default class Program
         // Link buffer / program
         for (const attribute of attributes)
         {
-            const attributePointer = gl.getAttribLocation(program, attribute.label)
-            gl.enableVertexAttribArray(attributePointer)
-            // this.vertexAttribute = vertexAttribute
-            this.attribLocation[attribute.label] = attributePointer
+            const attribLocation = gl.getAttribLocation(program, attribute.label)
+            gl.enableVertexAttribArray(attribLocation)
+            this.attribLocation[attribute.label] = attribLocation
         }
         
         
         // Link uniform / program
         for (const uniform of uniforms)
         {
-            const uniformPointer = gl.getUniformLocation(program, uniform.label)
-            // uniform.pointer = uniformPointer
-            this.uniformLocation[uniform.label] = uniformPointer
+            const uniformLocation = gl.getUniformLocation(program, uniform.label)
+            this.uniformLocation[uniform.label] = uniformLocation
         }
         
         
-        
-        
         this.pointer = program
+        
+        return true
     }
     
     _createShader(gl, type, src)

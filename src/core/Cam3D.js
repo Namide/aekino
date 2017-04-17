@@ -34,17 +34,21 @@ export default class Cam3D extends Uniform
         this.fovy = 45
         this.near = 0.1
         this.far = 100
+        this.position = mat4.create()
+        
+        this.updated = false
     }
     
     translate(...pos)
     {
-        mat4.translate(this.data, this.data, pos)
+        mat4.translate(this.position, this.position, pos)
+        this.updated = true
     }
     
-    init(gl, program)
+    update(w, h)
     {
-        super.init(gl, program)
-        // out, fovy, aspect, near, far
-        mat4.perspective(this.data, this.fovy * Math.PI / 180, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0)
+        mat4.copy(this.data, this.position)
+        mat4.perspective(this.data, this.fovy * Math.PI / 180, w / h, 0.1, 100.0)
+        this.updated = false
     }
 }

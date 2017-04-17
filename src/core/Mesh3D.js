@@ -42,6 +42,12 @@ export default class Mesh3D
         this.matrixU = matrixU
     }
     
+    rotate(rad, ...axe)
+    {
+        const matrix = this.matrixU.data
+        mat4.rotate(matrix, matrix, rad, axe)
+    }
+    
     translate(...pos)
     {
         const matrix = this.matrixU.data
@@ -61,10 +67,6 @@ export default class Mesh3D
         if (!this.geom.isInitialized())
             return false
         
-        for (const uniform of this.uniforms)
-            if (!uniform.isInitialized())
-                return false
-        
         return true
     }
     
@@ -78,23 +80,19 @@ export default class Mesh3D
             
         if (!this.geom.isInitialized())
             this.geom.init(gl, program)
-        
-        
-        for (const uniform of allUniforms)
-            if (!uniform.isInitialized())
-                uniform.init(gl, program)
     }
     
     draw(gl, globalUniforms)
     {
         const allUniforms = [...this.uniforms, ...globalUniforms]
+        const program = this.program
         
-        this.geom.draw(gl)
+        this.geom.draw(gl, program)
             
         for(const uniform of allUniforms)
-            uniform.draw(gl)
+            uniform.draw(gl, program)
         
-        this.geom.display(gl)
+        this.geom.display(gl, program)
         // gl.drawArrays(gl.TRIANGLES, 0, pyramidVertexPositionBuffer.numItems)
     }
 }
