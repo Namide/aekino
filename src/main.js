@@ -56,14 +56,33 @@ const canvas = document.body.querySelector('canvas')
 const cam3D = new Cam3D()
 cam3D.translate(-1.5, 0.0, -7.0)
 
+
 // Scene
 const scene = new Scene(canvas, cam3D)
 
 
 
 
-// Shader
-const program = new Program()
+// Programs
+const colorProgram = new Program()
+
+const fogVertexShader = `      
+    attribute vec3 aVertexPosition;
+    attribute vec4 aVertexColor;
+
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+
+    varying vec4 vColor;
+
+    void main(void) {
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+        float zDepth = 0.2 * (8.0 - gl_Position.z);
+        vec4 modifyColor = vec4(aVertexColor.rgb * zDepth, aVertexColor.a);
+        vColor = modifyColor;
+    }
+`
+const fogProgram = new Program(fogVertexShader)
 
 
 
@@ -120,7 +139,7 @@ const pyramidGeom = new Geom()
 pyramidGeom.addVertices('aVertexPosition', pyramidVertices, 3)
 pyramidGeom.addVertices('aVertexColor', pyramidColors, 4)
     
-const pyramidMesh = new Mesh3D(pyramidGeom, program)
+const pyramidMesh = new Mesh3D(pyramidGeom, colorProgram)
 pyramidMesh.translate(-1.5, -1.5, -8.0)
 scene.addMesh(pyramidMesh)
 
@@ -131,6 +150,7 @@ scene.addMesh(pyramidMesh)
 //      CUBE RAINBOW
 //
 // ----------------------------
+
 
 // Square
 const cubeVertices = [
@@ -188,11 +208,11 @@ const cubeColors = [
 ]
 
 let unpackedCubeColors = []
-for (let i in cubeColors) {
+for (let i in cubeColors)
+{
     var color = cubeColors[i];
-    for (let j = 0; j < 4; j++) {
+    for (let j = 0; j < 4; j++)
         unpackedCubeColors = unpackedCubeColors.concat(color)
-    }
 }
 
 
@@ -201,7 +221,7 @@ cubeGeom.addVertices('aVertexPosition', cubeVertices, 3)
 cubeGeom.addVertices('aVertexColor', unpackedCubeColors, 4)
 cubeGeom.addIndices(cubeIndices)
 
-const cubeMesh = new Mesh3D(cubeGeom, program)
+const cubeMesh = new Mesh3D(cubeGeom, fogProgram)
 cubeMesh.translate(1.5, -1.5, -8.0)
 scene.addMesh(cubeMesh)
 
@@ -296,7 +316,7 @@ scene.addMesh(cubeTexturedMesh)
 refresh()
 function refresh()
 {
-    pyramidMesh.rotate(0.01, 0, 1, 0)
+    pyramidMesh.rotate(0.005, 0, 1, 0)
     cubeMesh.rotate(0.01, 0, 1, 0)
     
     scene.draw()

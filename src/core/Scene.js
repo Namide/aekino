@@ -96,6 +96,9 @@ export default class Scene
             this.cam.update(gl.viewportWidth, gl.viewportHeight)
         
         for (const mesh of this.meshs)
-            mesh.draw(gl, this.uniforms)        
+            if (mesh.isInitialized())
+                mesh.draw(gl, this.uniforms)
+            else
+                mesh.init(gl, this.uniforms)
     }
 }

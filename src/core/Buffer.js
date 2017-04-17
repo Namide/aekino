@@ -101,6 +101,8 @@ export default class Buffer
         
         
         this.buffer = buffer
+        
+        return true
     }
     
     draw(gl)

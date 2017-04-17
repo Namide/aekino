@@ -69,6 +69,7 @@ export default class Texture
         gl.bindTexture(gl.TEXTURE_2D, null)
         
         this.texture = texture
+        
         return true
     }
     

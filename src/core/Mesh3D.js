@@ -38,6 +38,7 @@ export default class Mesh3D
         const matrixU = new Uniform('uMVMatrix', 35676, matrix)
         
         this.uniforms = [matrixU]
+        this.textures = []
         
         this.matrixU = matrixU
     }
@@ -54,10 +55,17 @@ export default class Mesh3D
         mat4.translate(matrix, matrix, pos)
     }
     
+    
     addUniform(uniform)
     {
         this.uniforms.push(uniform)
     }
+    
+    addTexture(texture)
+    {
+        this.textures.push(texture)
+    }
+    
     
     isInitialized()
     {
@@ -65,7 +73,15 @@ export default class Mesh3D
             return false
         
         if (!this.geom.isInitialized())
-            return false
+            return false      
+        
+        for (const texture of this.textures)
+            if (!texture.isInitialized())
+                return false
+                
+        for (const texture of this.textures)
+            if (!texture.isInitialized())
+                return false
         
         return true
     }
@@ -74,12 +90,22 @@ export default class Mesh3D
     {
         const program = this.program
         const allUniforms = [...this.uniforms, ...globalUniforms]
+        let success = true
 
         if (!this.program.isInitialized())
-            this.program.init(gl, this.geom.buffers, allUniforms)
+            if (this.program.init(gl, this.geom.attributes, allUniforms))
+                success = false
             
         if (!this.geom.isInitialized())
-            this.geom.init(gl, program)
+            if (this.geom.init(gl, program))
+                success = false
+            
+        for (const texture of this.textures)
+            if (!texture.isInitialized())
+                if (!texture.init(gl, program))
+                    success = false
+                    
+        return success
     }
     
     draw(gl, globalUniforms)
@@ -87,6 +113,7 @@ export default class Mesh3D
         const allUniforms = [...this.uniforms, ...globalUniforms]
         const program = this.program
         
+        this.program.draw(gl)
         this.geom.draw(gl, program)
             
         for(const uniform of allUniforms)

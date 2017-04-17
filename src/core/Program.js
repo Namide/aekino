@@ -47,6 +47,8 @@ const fs = `
     }
 `
 
+let num = 0
+
 export default class Program
 {
     constructor(vertexShaderSrc = vs, fragmentShaderSrc = fs)
@@ -56,6 +58,8 @@ export default class Program
         
         this.attribLocation = {}
         this.uniformLocation = {}
+        
+        this.id = ++num
     }
     
     isInitialized()
@@ -84,7 +88,7 @@ export default class Program
     }
     
     init(gl, attributes, uniforms)
-    {        
+    {
         this.vertexShader = this._createShader(gl, 35633 /* gl.VERTEX_SHADER */, this.vertexShaderSrc)
         this.fragmentShader = this._createShader(gl, 35632 /* gl.FRAGMENT_SHADER */, this.fragmentShaderSrc)
         
@@ -119,6 +123,11 @@ export default class Program
         this.pointer = program
         
         return true
+    }
+    
+    draw(gl)
+    {
+        gl.useProgram(this.pointer)
     }
     
     _createShader(gl, type, src)

@@ -29,14 +29,16 @@ export default class Geom
 {
     constructor()
     {
+        this.attributes = []
         this.buffers = []
+        
         this.hasIndices = false
         this.numItems = 0
     }
     
     isInitialized()
     {
-        for (const buffer of this.buffers)
+        for (const buffer of this.attributes)
             if (!buffer.isInitialized())
                 return false
         
@@ -45,11 +47,11 @@ export default class Geom
     
     addVertices(label, vertices, dimension)
     {
-        const buffer = new Attribute(label)
-        buffer.setArray(new Float32Array(vertices), 34962 /* gl.ARRAY_BUFFER */)
-        buffer.setItems(5126 /* gl.FLOAT */, dimension)
+        const attribute = new Attribute(label)
+        attribute.setArray(new Float32Array(vertices), 34962 /* gl.ARRAY_BUFFER */)
+        attribute.setItems(5126 /* gl.FLOAT */, dimension)
         
-        this.buffers.push(buffer)
+        this.attributes.push(attribute)
         
         if (this.numItems < 1)
             this.numItems = vertices.length / dimension
@@ -71,14 +73,27 @@ export default class Geom
     
     init(gl, program)
     {
+        const success = true
+        
+        for (const attribute of this.attributes)
+            if (!attribute.isInitialized())
+                if (!attribute.init(gl, program))
+                    success = false
+                    
         for (const buffer of this.buffers)
             if (!buffer.isInitialized())
-                buffer.init(gl, program)
+                if (!buffer.init(gl, program))
+                    success = false      
+                    
+        return success
     }
     
     draw(gl, program)
     {
-        for(const buffer of this.buffers)
+        for(const attribute of this.attributes)
+            attribute.draw(gl, program)
+                    
+        for (const buffer of this.buffers)
             buffer.draw(gl, program)
     }
     
