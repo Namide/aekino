@@ -108,8 +108,8 @@ const pyramidColors = [
     0.0, 1.0, 0.0, 1.0
 ]
 const pyramidGeom = new Geom()
-pyramidGeom.addAttribute('aVertexPosition', pyramidVertices, 3)
-pyramidGeom.addAttribute('aVertexColor', pyramidColors, 4)
+pyramidGeom.addVertices('aVertexPosition', pyramidVertices, 3)
+pyramidGeom.addVertices('aVertexColor', pyramidColors, 4)
     
 const pyramidMesh = new Mesh3D(pyramidGeom, program)
 pyramidMesh.translate(-1.5, 0.0, -8.0)
@@ -297,26 +297,31 @@ const cubeIndices = [
     20, 21, 22,   20, 22, 23  // Left face
 ]
 const cubeColors = [
-    1.0, 0.0, 0.0, 1.0, // Front face
-    1.0, 1.0, 0.0, 1.0, // Back face
-    0.0, 1.0, 0.0, 1.0, // Top face
-    1.0, 0.5, 0.5, 1.0, // Bottom face
-    1.0, 0.0, 1.0, 1.0, // Right face
-    0.0, 0.0, 1.0, 1.0  // Left face
+    [1.0, 0.0, 0.0, 1.0], // Front face
+    [1.0, 1.0, 0.0, 1.0], // Back face
+    [0.0, 1.0, 0.0, 1.0], // Top face
+    [1.0, 0.5, 0.5, 1.0], // Bottom face
+    [1.0, 0.0, 1.0, 1.0], // Right face
+    [0.0, 0.0, 1.0, 1.0]  // Left face
 ]
 
 let unpackedCubeColors = []
-for (const color of cubeColors)
-    for (let j = 0; j < 4; j++)
+for (let i in cubeColors) {
+    var color = cubeColors[i];
+    for (let j = 0; j < 4; j++) {
         unpackedCubeColors = unpackedCubeColors.concat(color)
+    }
+}
+
+console.log(unpackedCubeColors)
 
 const cubeGeom = new Geom()
-cubeGeom.addAttribute('aVertexPosition', cubeVertices, 3)
-cubeGeom.addAttribute('aVertexColor', unpackedCubeColors, 4)
+cubeGeom.addVertices('aVertexPosition', cubeVertices, 3)
+cubeGeom.addVertices('aVertexColor', unpackedCubeColors, 4)
 cubeGeom.addIndices(cubeIndices)
 
 const cubeMesh = new Mesh3D(cubeGeom, program)
-cubeMesh.translate(3.0, 0.0, 0.0)
+cubeMesh.translate(1.5, 0.0, -8.0)
 scene.addMesh(cubeMesh)
 
 

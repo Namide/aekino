@@ -22,108 +22,26 @@
  * THE SOFTWARE.
  */
 
-export default class Attribute
+import Buffer from './Buffer'
+
+export default class Attribute extends Buffer
 {
     constructor(label)
     {
+        super()
         this.label = label
-        this.buffer = null
         this.location = null
-        
-        this.isVertices = null
-    }
-    
-    isInitialized()
-    {
-        return !!this.location
-    }
-    
-    /**
-     * type
-     *      gl.ARRAY_BUFFER         34962
-     *      Buffer containing vertex attributes, such as vertex coordinates,
-     *      texture coordinate data, or vertex color data.
-     *
-     *      gl.ELEMENT_ARRAY_BUFFER 34963
-     *      Buffer used for element indices.
-     *
-     * usage
-     *      gl.STATIC_DRAW          35044
-     *      Contents of the buffer are likely to be used often and not change often.
-     *      Contents are written to the buffer, but not read.
-     *
-     *      gl.DYNAMIC_DRAW         35048
-     *      Contents of the buffer are likely to be used often and change often.
-     *      Contents are written to the buffer, but not read.
-     *      
-     *      gl.STREAM_DRAW          35040
-     *      Contents of the buffer are likely to not be used often.
-     *      Contents are written to the buffer, but not read.
-     */
-    setArray(vertices, type = 34962, usage = 35044)
-    {
-        this.arrayType = type
-        this.vertices = vertices
-        this.arrayUsage = usage
-        
-        this.isVertices = type === 34962
-    }
-    
-    /**
-     * https://gist.github.com/szimek/763999
-     *
-     * itemType
-     *      gl.INT              5124   
-     *      gl.UNSIGNED_INT     5125
-     *      gl.FLOAT            5126  
-     *      gl.FLOAT_VEC2       35664 
-     *      gl.FLOAT_VEC3       35665 
-     *      gl.FLOAT_VEC4       35666 
-     *      gl.INT_VEC2         35667    
-     *      gl.INT_VEC3         35668  
-     *      gl.INT_VEC4         35669 
-     *      gl.BOOL             35670   
-     *      gl.BOOL_VEC2        35671 
-     *      gl.BOOL_VEC3        35672 
-     *      gl.BOOL_VEC4        35673   
-     *      gl.FLOAT_MAT2       35674 
-     *      gl.FLOAT_MAT3       35675 
-     *      gl.FLOAT_MAT4       35676  
-     *      gl.SAMPLER_2D       35678   
-     *      gl.SAMPLER_CUBE     35680 
-     */
-    setItems(type = 5126, size = 3, num = null)
-    {
-        this.itemType = type
-        this.itemSize = size
-        this.numItems = num
     }
     
     init(gl, program)
     {
-        this.numItems = this.numItems || (this.vertices.length / this.itemSize)
-        
-        
-        // Create buffer
-        const buffer = gl.createBuffer()
-        gl.bindBuffer(this.arrayType, buffer)
-        gl.bufferData(this.arrayType, this.vertices, this.arrayUsage)
-        
-        
-        this.buffer = buffer
-        
-        if (this.isVertices)
-            this.location = program.getAttribLocation(this.label)
+        super.init(gl, program)
+        this.location = program.getAttribLocation(this.label)
     }
     
     draw(gl)
     {
-        gl.bindBuffer(this.arrayType, this.buffer)
-        
-        if (this.isVertices)
-            gl.vertexAttribPointer(this.location, this.itemSize, this.itemType, false, 0, 0)
-        // gl.vertexAttribPointer(this.vertexAttribute, this.itemSize, this.itemType, false, 0, 0)
+        super.draw(gl)
+        gl.vertexAttribPointer(this.location, this.itemSize, this.itemType, false, 0, 0)
     }
-    
-
 }

@@ -2337,6 +2337,8 @@ var Attribute = function () {
         this.label = label;
         this.buffer = null;
         this.location = null;
+
+        this.isVertices = null;
     }
 
     _createClass(Attribute, [{
@@ -2372,13 +2374,13 @@ var Attribute = function () {
         key: "setArray",
         value: function setArray(vertices) {
             var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 34962;
-            var indices = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-            var usage = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 35044;
+            var usage = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 35044;
 
             this.arrayType = type;
             this.vertices = vertices;
-            this.indices = indices;
             this.arrayUsage = usage;
+
+            this.isVertices = type === 34962;
         }
 
         /**
@@ -2427,13 +2429,15 @@ var Attribute = function () {
             gl.bufferData(this.arrayType, this.vertices, this.arrayUsage);
 
             this.buffer = buffer;
-            this.location = program.getAttribLocation(this.label);
+
+            if (this.isVertices) this.location = program.getAttribLocation(this.label);
         }
     }, {
         key: "draw",
         value: function draw(gl) {
             gl.bindBuffer(this.arrayType, this.buffer);
-            gl.vertexAttribPointer(this.location, this.itemSize, this.itemType, false, 0, 0);
+
+            if (this.isVertices) gl.vertexAttribPointer(this.location, this.itemSize, this.itemType, false, 0, 0);
             // gl.vertexAttribPointer(this.vertexAttribute, this.itemSize, this.itemType, false, 0, 0)
         }
     }]);
@@ -2617,8 +2621,18 @@ var Geom = function () {
         key: 'addAttribute',
         value: function addAttribute(label, vertices, dimension) {
             var attribute = new _Attribute2.default(label);
-            attribute.setArray(new Float32Array(vertices));
+            attribute.setArray(new Float32Array(vertices), 34962 /* gl.ARRAY_BUFFER */);
             attribute.setItems(5126 /* gl.FLOAT */, dimension);
+
+            this.attributes.push(attribute);
+        }
+    }, {
+        key: 'addIndices',
+        value: function addIndices(indices) {
+            var attribute = new _Attribute2.default();
+
+            attribute.setArray(new Uint16Array(indices), 34963 /* gl.ELEMENT_ARRAY_BUFFER */);
+            attribute.setItems(5125 /* gl.UNSIGNED_INT */, 1 /* dimension */);
 
             this.attributes.push(attribute);
         }
@@ -3316,66 +3330,210 @@ var pyramidMesh = new _Mesh3D2.default(pyramidGeom, program);
 pyramidMesh.translate(-1.5, 0.0, -8.0);
 scene.addMesh(pyramidMesh);
 
+/*    function initBuffers() {
+        pyramidVertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, pyramidVertexPositionBuffer);
+        var vertices = [
+            // Front face
+             0.0,  1.0,  0.0,
+            -1.0, -1.0,  1.0,
+             1.0, -1.0,  1.0,
+
+            // Right face
+             0.0,  1.0,  0.0,
+             1.0, -1.0,  1.0,
+             1.0, -1.0, -1.0,
+
+            // Back face
+             0.0,  1.0,  0.0,
+             1.0, -1.0, -1.0,
+            -1.0, -1.0, -1.0,
+
+            // Left face
+             0.0,  1.0,  0.0,
+            -1.0, -1.0, -1.0,
+            -1.0, -1.0,  1.0
+        ];
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+        pyramidVertexPositionBuffer.itemSize = 3;
+        pyramidVertexPositionBuffer.numItems = 12;
+
+        pyramidVertexColorBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, pyramidVertexColorBuffer);
+        var colors = [
+            // Front face
+            1.0, 0.0, 0.0, 1.0,
+            0.0, 1.0, 0.0, 1.0,
+            0.0, 0.0, 1.0, 1.0,
+
+            // Right face
+            1.0, 0.0, 0.0, 1.0,
+            0.0, 0.0, 1.0, 1.0,
+            0.0, 1.0, 0.0, 1.0,
+
+            // Back face
+            1.0, 0.0, 0.0, 1.0,
+            0.0, 1.0, 0.0, 1.0,
+            0.0, 0.0, 1.0, 1.0,
+
+            // Left face
+            1.0, 0.0, 0.0, 1.0,
+            0.0, 0.0, 1.0, 1.0,
+            0.0, 1.0, 0.0, 1.0
+        ];
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+        pyramidVertexColorBuffer.itemSize = 4;
+        pyramidVertexColorBuffer.numItems = 12;
+
+
+        cubeVertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
+        vertices = [
+            // Front face
+            -1.0, -1.0,  1.0,
+             1.0, -1.0,  1.0,
+             1.0,  1.0,  1.0,
+            -1.0,  1.0,  1.0,
+
+            // Back face
+            -1.0, -1.0, -1.0,
+            -1.0,  1.0, -1.0,
+             1.0,  1.0, -1.0,
+             1.0, -1.0, -1.0,
+
+            // Top face
+            -1.0,  1.0, -1.0,
+            -1.0,  1.0,  1.0,
+             1.0,  1.0,  1.0,
+             1.0,  1.0, -1.0,
+
+            // Bottom face
+            -1.0, -1.0, -1.0,
+             1.0, -1.0, -1.0,
+             1.0, -1.0,  1.0,
+            -1.0, -1.0,  1.0,
+
+            // Right face
+             1.0, -1.0, -1.0,
+             1.0,  1.0, -1.0,
+             1.0,  1.0,  1.0,
+             1.0, -1.0,  1.0,
+
+            // Left face
+            -1.0, -1.0, -1.0,
+            -1.0, -1.0,  1.0,
+            -1.0,  1.0,  1.0,
+            -1.0,  1.0, -1.0
+        ];
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+        cubeVertexPositionBuffer.itemSize = 3;
+        cubeVertexPositionBuffer.numItems = 24;
+
+        cubeVertexColorBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexColorBuffer);
+        colors = [
+            [1.0, 0.0, 0.0, 1.0], // Front face
+            [1.0, 1.0, 0.0, 1.0], // Back face
+            [0.0, 1.0, 0.0, 1.0], // Top face
+            [1.0, 0.5, 0.5, 1.0], // Bottom face
+            [1.0, 0.0, 1.0, 1.0], // Right face
+            [0.0, 0.0, 1.0, 1.0]  // Left face
+        ];
+        var unpackedColors = [];
+        for (var i in colors) {
+            var color = colors[i];
+            for (var j=0; j < 4; j++) {
+                unpackedColors = unpackedColors.concat(color);
+            }
+        }
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(unpackedColors), gl.STATIC_DRAW);
+        cubeVertexColorBuffer.itemSize = 4;
+        cubeVertexColorBuffer.numItems = 24;
+
+        cubeVertexIndexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
+        var cubeVertexIndices = [
+            0, 1, 2,      0, 2, 3,    // Front face
+            4, 5, 6,      4, 6, 7,    // Back face
+            8, 9, 10,     8, 10, 11,  // Top face
+            12, 13, 14,   12, 14, 15, // Bottom face
+            16, 17, 18,   16, 18, 19, // Right face
+            20, 21, 22,   20, 22, 23  // Left face
+        ];
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
+        cubeVertexIndexBuffer.itemSize = 1;
+        cubeVertexIndexBuffer.numItems = 36;*/
+
 // Square
-/*const cubeVertices = [
-    // Front face
-    -1.0, -1.0,  1.0,
-     1.0, -1.0,  1.0,
-     1.0,  1.0,  1.0,
-    -1.0,  1.0,  1.0,
+var cubeVertices = [
+// Front face
+-1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0,
 
-    // Back face
-    -1.0, -1.0, -1.0,
-    -1.0,  1.0, -1.0,
-     1.0,  1.0, -1.0,
-     1.0, -1.0, -1.0,
+// Back face
+-1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0, -1.0,
 
-    // Top face
-    -1.0,  1.0, -1.0,
-    -1.0,  1.0,  1.0,
-     1.0,  1.0,  1.0,
-     1.0,  1.0, -1.0,
+// Top face
+-1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0,
 
-    // Bottom face
-    -1.0, -1.0, -1.0,
-     1.0, -1.0, -1.0,
-     1.0, -1.0,  1.0,
-    -1.0, -1.0,  1.0,
+// Bottom face
+-1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, -1.0, -1.0, 1.0,
 
-    // Right face
-     1.0, -1.0, -1.0,
-     1.0,  1.0, -1.0,
-     1.0,  1.0,  1.0,
-     1.0, -1.0,  1.0,
+// Right face
+1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0,
 
-    // Left face
-    -1.0, -1.0, -1.0,
-    -1.0, -1.0,  1.0,
-    -1.0,  1.0,  1.0,
-    -1.0,  1.0, -1.0
-]
-const cubeGeom = new Geom(cubeVertices)
-const cubeColors = [
-    1.0, 0.0, 0.0, 1.0, // Front face
-    1.0, 1.0, 0.0, 1.0, // Back face
-    0.0, 1.0, 0.0, 1.0, // Top face
-    1.0, 0.5, 0.5, 1.0, // Bottom face
-    1.0, 0.0, 1.0, 1.0, // Right face
-    0.0, 0.0, 1.0, 1.0  // Left face
-]
-let unpackedCubeColors = []
-for (const color of cubeColors)
-    for (let j = 0; j < 4; j++)
-        unpackedCubeColors = unpackedCubeColors.concat(color)
+// Left face
+-1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0];
+var cubeIndices = [0, 1, 2, 0, 2, 3, // Front face
+4, 5, 6, 4, 6, 7, // Back face
+8, 9, 10, 8, 10, 11, // Top face
+12, 13, 14, 12, 14, 15, // Bottom face
+16, 17, 18, 16, 18, 19, // Right face
+20, 21, 22, 20, 22, 23 // Left face
+];
+var cubeColors = [1.0, 0.0, 0.0, 1.0, // Front face
+1.0, 1.0, 0.0, 1.0, // Back face
+0.0, 1.0, 0.0, 1.0, // Top face
+1.0, 0.5, 0.5, 1.0, // Bottom face
+1.0, 0.0, 1.0, 1.0, // Right face
+0.0, 0.0, 1.0, 1.0 // Left face
+];
 
-const cubeAttributeColor = new Attribute('aVertexColor')
-cubeAttributeColor.setArray(new Float32Array(unpackedCubeColors))
-cubeAttributeColor.setItems(5126, 4)
+var unpackedCubeColors = [];
+var _iteratorNormalCompletion = true;
+var _didIteratorError = false;
+var _iteratorError = undefined;
 
-const cubeMesh = new Mesh3D(cubeGeom, program)
-cubeMesh.addAttribute(cubeAttributeColor)
-cubeMesh.translate(3.0, 0.0, 0.0)
-scene.addMesh(cubeMesh)*/
+try {
+    for (var _iterator = cubeColors[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var color = _step.value;
+
+        for (var j = 0; j < 4; j++) {
+            unpackedCubeColors = unpackedCubeColors.concat(color);
+        }
+    }
+} catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+} finally {
+    try {
+        if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+        }
+    } finally {
+        if (_didIteratorError) {
+            throw _iteratorError;
+        }
+    }
+}
+
+var cubeGeom = new _Geom2.default();
+cubeGeom.addAttribute('aVertexPosition', cubeVertices, 3);
+cubeGeom.addAttribute('aVertexColor', unpackedCubeColors, 4);
+cubeGeom.addIndices(cubeIndices);
+
+var cubeMesh = new _Mesh3D2.default(cubeGeom, program);
+cubeMesh.translate(3.0, 0.0, 0.0);
+scene.addMesh(cubeMesh);
 
 scene.draw();
 

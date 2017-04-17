@@ -22,58 +22,71 @@
  * THE SOFTWARE.
  */
 
+import Buffer from './Buffer'
 import Attribute from './Attribute'
 
 export default class Geom
 {
     constructor()
     {
-        this.attributes = []
+        this.buffers = []
+        this.hasIndices = false
+        this.numItems = 0
     }
     
     isInitialized()
     {
-        for (const attribute of this.attributes)
-            if (!attribute.isInitialized())
+        for (const buffer of this.buffers)
+            if (!buffer.isInitialized())
                 return false
         
         return true
     }
     
-    addAttribute(label, vertices, dimension)
+    addVertices(label, vertices, dimension)
     {
-        const attribute = new Attribute(label)
-        attribute.setArray(new Float32Array(vertices), 34962 /* gl.ARRAY_BUFFER */)
-        attribute.setItems(5126 /* gl.FLOAT */, dimension)
+        const buffer = new Attribute(label)
+        buffer.setArray(new Float32Array(vertices), 34962 /* gl.ARRAY_BUFFER */)
+        buffer.setItems(5126 /* gl.FLOAT */, dimension)
         
-        this.attributes.push(attribute)
+        this.buffers.push(buffer)
+        
+        if (this.numItems < 1)
+            this.numItems = vertices.length / dimension
     }
     
     addIndices(indices)
     {
-        const attribute = new Attribute()
+        this.hasIndices = true
         
-        attribute.setArray(new Uint16Array(indices), 34963 /* gl.ELEMENT_ARRAY_BUFFER */)
-        attribute.setItems(5125 /* gl.UNSIGNED_INT */, 1 /* dimension */)
+        const buffer = new Buffer()
         
-        this.attributes.push(attribute)
+        buffer.setArray(new Uint16Array(indices), 34963 /* gl.ELEMENT_ARRAY_BUFFER */)
+        buffer.setItems(5125 /* gl.UNSIGNED_INT */, 1 /* dimension */)
+        
+        this.buffers.push(buffer)
+        
+        this.numItems = indices.length
     }
     
     init(gl, program)
     {
-        for (const attribute of this.attributes)
-            if (!attribute.isInitialized())
-                attribute.init(gl, program)
+        for (const buffer of this.buffers)
+            if (!buffer.isInitialized())
+                buffer.init(gl, program)
     }
     
     draw(gl)
     {
-        for(const attribute of this.attributes)
-            attribute.draw(gl)
+        for(const buffer of this.buffers)
+            buffer.draw(gl)
     }
     
     display(gl)
     {
-        gl.drawArrays(gl.TRIANGLES, 0, this.attributes[0].numItems)
+        if (this.hasIndices)
+            gl.drawElements(gl.TRIANGLES, this.numItems, gl.UNSIGNED_SHORT, 0);
+        else
+            gl.drawArrays(gl.TRIANGLES, 0, this.numItems)
     }   
 }

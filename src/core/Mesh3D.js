@@ -74,7 +74,7 @@ export default class Mesh3D
         const allUniforms = [...this.uniforms, ...globalUniforms]
 
         if (!this.program.isInitialized())
-            this.program.init(gl, this.geom.attributes, allUniforms)
+            this.program.init(gl, this.geom.buffers, allUniforms)
             
         if (!this.geom.isInitialized())
             this.geom.init(gl, program)

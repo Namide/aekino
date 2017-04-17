@@ -2315,6 +2315,8 @@ class Attribute
         this.label = label
         this.buffer = null
         this.location = null
+        
+        this.isVertices = null
     }
     
     isInitialized()
@@ -2344,12 +2346,13 @@ class Attribute
      *      Contents of the buffer are likely to not be used often.
      *      Contents are written to the buffer, but not read.
      */
-    setArray(vertices, type = 34962, indices = null, usage = 35044)
+    setArray(vertices, type = 34962, usage = 35044)
     {
         this.arrayType = type
         this.vertices = vertices
-        this.indices = indices
         this.arrayUsage = usage
+        
+        this.isVertices = type === 34962
     }
     
     /**
@@ -2391,16 +2394,20 @@ class Attribute
         const buffer = gl.createBuffer()
         gl.bindBuffer(this.arrayType, buffer)
         gl.bufferData(this.arrayType, this.vertices, this.arrayUsage)
-                
+        
         
         this.buffer = buffer
-        this.location = program.getAttribLocation(this.label)
+        
+        if (this.isVertices)
+            this.location = program.getAttribLocation(this.label)
     }
     
     draw(gl)
     {
         gl.bindBuffer(this.arrayType, this.buffer)
-        gl.vertexAttribPointer(this.location, this.itemSize, this.itemType, false, 0, 0)
+        
+        if (this.isVertices)
+            gl.vertexAttribPointer(this.location, this.itemSize, this.itemType, false, 0, 0)
         // gl.vertexAttribPointer(this.vertexAttribute, this.itemSize, this.itemType, false, 0, 0)
     }
     
@@ -2521,8 +2528,18 @@ class Geom
     addAttribute(label, vertices, dimension)
     {
         const attribute = new __WEBPACK_IMPORTED_MODULE_0__Attribute__["a" /* default */](label)
-        attribute.setArray(new Float32Array(vertices))
+        attribute.setArray(new Float32Array(vertices), 34962 /* gl.ARRAY_BUFFER */)
         attribute.setItems(5126 /* gl.FLOAT */, dimension)
+        
+        this.attributes.push(attribute)
+    }
+    
+    addIndices(indices)
+    {
+        const attribute = new __WEBPACK_IMPORTED_MODULE_0__Attribute__["a" /* default */]()
+        
+        attribute.setArray(new Uint16Array(indices), 34963 /* gl.ELEMENT_ARRAY_BUFFER */)
+        attribute.setItems(5125 /* gl.UNSIGNED_INT */, 1 /* dimension */)
         
         this.attributes.push(attribute)
     }
@@ -3121,10 +3138,143 @@ const pyramidMesh = new __WEBPACK_IMPORTED_MODULE_5__core_Mesh3D__["a" /* defaul
 pyramidMesh.translate(-1.5, 0.0, -8.0)
 scene.addMesh(pyramidMesh)
 
+/*    function initBuffers() {
+        pyramidVertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, pyramidVertexPositionBuffer);
+        var vertices = [
+            // Front face
+             0.0,  1.0,  0.0,
+            -1.0, -1.0,  1.0,
+             1.0, -1.0,  1.0,
+
+            // Right face
+             0.0,  1.0,  0.0,
+             1.0, -1.0,  1.0,
+             1.0, -1.0, -1.0,
+
+            // Back face
+             0.0,  1.0,  0.0,
+             1.0, -1.0, -1.0,
+            -1.0, -1.0, -1.0,
+
+            // Left face
+             0.0,  1.0,  0.0,
+            -1.0, -1.0, -1.0,
+            -1.0, -1.0,  1.0
+        ];
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+        pyramidVertexPositionBuffer.itemSize = 3;
+        pyramidVertexPositionBuffer.numItems = 12;
+
+        pyramidVertexColorBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, pyramidVertexColorBuffer);
+        var colors = [
+            // Front face
+            1.0, 0.0, 0.0, 1.0,
+            0.0, 1.0, 0.0, 1.0,
+            0.0, 0.0, 1.0, 1.0,
+
+            // Right face
+            1.0, 0.0, 0.0, 1.0,
+            0.0, 0.0, 1.0, 1.0,
+            0.0, 1.0, 0.0, 1.0,
+
+            // Back face
+            1.0, 0.0, 0.0, 1.0,
+            0.0, 1.0, 0.0, 1.0,
+            0.0, 0.0, 1.0, 1.0,
+
+            // Left face
+            1.0, 0.0, 0.0, 1.0,
+            0.0, 0.0, 1.0, 1.0,
+            0.0, 1.0, 0.0, 1.0
+        ];
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+        pyramidVertexColorBuffer.itemSize = 4;
+        pyramidVertexColorBuffer.numItems = 12;
+
+
+        cubeVertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
+        vertices = [
+            // Front face
+            -1.0, -1.0,  1.0,
+             1.0, -1.0,  1.0,
+             1.0,  1.0,  1.0,
+            -1.0,  1.0,  1.0,
+
+            // Back face
+            -1.0, -1.0, -1.0,
+            -1.0,  1.0, -1.0,
+             1.0,  1.0, -1.0,
+             1.0, -1.0, -1.0,
+
+            // Top face
+            -1.0,  1.0, -1.0,
+            -1.0,  1.0,  1.0,
+             1.0,  1.0,  1.0,
+             1.0,  1.0, -1.0,
+
+            // Bottom face
+            -1.0, -1.0, -1.0,
+             1.0, -1.0, -1.0,
+             1.0, -1.0,  1.0,
+            -1.0, -1.0,  1.0,
+
+            // Right face
+             1.0, -1.0, -1.0,
+             1.0,  1.0, -1.0,
+             1.0,  1.0,  1.0,
+             1.0, -1.0,  1.0,
+
+            // Left face
+            -1.0, -1.0, -1.0,
+            -1.0, -1.0,  1.0,
+            -1.0,  1.0,  1.0,
+            -1.0,  1.0, -1.0
+        ];
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+        cubeVertexPositionBuffer.itemSize = 3;
+        cubeVertexPositionBuffer.numItems = 24;
+
+        cubeVertexColorBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexColorBuffer);
+        colors = [
+            [1.0, 0.0, 0.0, 1.0], // Front face
+            [1.0, 1.0, 0.0, 1.0], // Back face
+            [0.0, 1.0, 0.0, 1.0], // Top face
+            [1.0, 0.5, 0.5, 1.0], // Bottom face
+            [1.0, 0.0, 1.0, 1.0], // Right face
+            [0.0, 0.0, 1.0, 1.0]  // Left face
+        ];
+        var unpackedColors = [];
+        for (var i in colors) {
+            var color = colors[i];
+            for (var j=0; j < 4; j++) {
+                unpackedColors = unpackedColors.concat(color);
+            }
+        }
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(unpackedColors), gl.STATIC_DRAW);
+        cubeVertexColorBuffer.itemSize = 4;
+        cubeVertexColorBuffer.numItems = 24;
+
+        cubeVertexIndexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
+        var cubeVertexIndices = [
+            0, 1, 2,      0, 2, 3,    // Front face
+            4, 5, 6,      4, 6, 7,    // Back face
+            8, 9, 10,     8, 10, 11,  // Top face
+            12, 13, 14,   12, 14, 15, // Bottom face
+            16, 17, 18,   16, 18, 19, // Right face
+            20, 21, 22,   20, 22, 23  // Left face
+        ];
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
+        cubeVertexIndexBuffer.itemSize = 1;
+        cubeVertexIndexBuffer.numItems = 36;*/
 
 
 // Square
-/*const cubeVertices = [
+const cubeVertices = [
     // Front face
     -1.0, -1.0,  1.0,
      1.0, -1.0,  1.0,
@@ -3161,7 +3311,14 @@ scene.addMesh(pyramidMesh)
     -1.0,  1.0,  1.0,
     -1.0,  1.0, -1.0
 ]
-const cubeGeom = new Geom(cubeVertices)
+const cubeIndices = [
+    0, 1, 2,      0, 2, 3,    // Front face
+    4, 5, 6,      4, 6, 7,    // Back face
+    8, 9, 10,     8, 10, 11,  // Top face
+    12, 13, 14,   12, 14, 15, // Bottom face
+    16, 17, 18,   16, 18, 19, // Right face
+    20, 21, 22,   20, 22, 23  // Left face
+]
 const cubeColors = [
     1.0, 0.0, 0.0, 1.0, // Front face
     1.0, 1.0, 0.0, 1.0, // Back face
@@ -3170,19 +3327,21 @@ const cubeColors = [
     1.0, 0.0, 1.0, 1.0, // Right face
     0.0, 0.0, 1.0, 1.0  // Left face
 ]
+
 let unpackedCubeColors = []
 for (const color of cubeColors)
     for (let j = 0; j < 4; j++)
         unpackedCubeColors = unpackedCubeColors.concat(color)
 
-const cubeAttributeColor = new Attribute('aVertexColor')
-cubeAttributeColor.setArray(new Float32Array(unpackedCubeColors))
-cubeAttributeColor.setItems(5126, 4)
+const cubeGeom = new __WEBPACK_IMPORTED_MODULE_4__core_Geom__["a" /* default */]()
+cubeGeom.addAttribute('aVertexPosition', cubeVertices, 3)
+cubeGeom.addAttribute('aVertexColor', unpackedCubeColors, 4)
+cubeGeom.addIndices(cubeIndices)
 
-const cubeMesh = new Mesh3D(cubeGeom, program)
-cubeMesh.addAttribute(cubeAttributeColor)
+const cubeMesh = new __WEBPACK_IMPORTED_MODULE_5__core_Mesh3D__["a" /* default */](cubeGeom, program)
 cubeMesh.translate(3.0, 0.0, 0.0)
-scene.addMesh(cubeMesh)*/
+scene.addMesh(cubeMesh)
+
 
 
 
