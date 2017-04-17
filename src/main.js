@@ -231,7 +231,7 @@ scene.addMesh(cubeMesh)
 //      CUBE WOOD
 //
 // ----------------------------
-/*
+
 const vertexTextureShader = `   
     attribute vec3 aVertexPosition;
     attribute vec2 aTextureCoord;
@@ -297,7 +297,7 @@ var cubeUV = [
     0.0, 1.0,
 ]
 
-const cubeTexture = new Texture()
+const cubeTexture = new Texture('uSampler')
 cubeTexture.load('/cube-diffuse.jpg')
 
 const cubeTexturedGeom = new Geom()
@@ -309,7 +309,7 @@ const cubeTexturedMesh = new Mesh3D(cubeTexturedGeom, texturedProgram)
 cubeTexturedMesh.addTexture(cubeTexture)
 cubeTexturedMesh.translate(1.5, 1.5, -8.0)
 scene.addMesh(cubeTexturedMesh)
-*/
+
 
 
 
@@ -318,6 +318,7 @@ function refresh()
 {
     pyramidMesh.rotate(0.005, 0, 1, 0)
     cubeMesh.rotate(0.01, 0, 1, 0)
+    cubeTexturedMesh.rotate(-0.01, 0, 1, 0)
     
     scene.draw()
     requestAnimationFrame(refresh)

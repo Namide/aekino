@@ -58,6 +58,7 @@ export default class Program
         
         this.attribLocation = {}
         this.uniformLocation = {}
+        this.textureLocation = {}
         
         this.id = ++num
     }
@@ -87,7 +88,17 @@ export default class Program
         return null
     }
     
-    init(gl, attributes, uniforms)
+    getTextureLocation(label)
+    {
+        if (this.textureLocation.hasOwnProperty(label))
+            return this.textureLocation[label]
+        else
+            console.error('The texture location ' + label + ' don\'nt exist on this program')
+            
+        return null
+    }
+    
+    init(gl, attributes, uniforms, textures)
     {
         this.vertexShader = this._createShader(gl, 35633 /* gl.VERTEX_SHADER */, this.vertexShaderSrc)
         this.fragmentShader = this._createShader(gl, 35632 /* gl.FRAGMENT_SHADER */, this.fragmentShaderSrc)
@@ -118,6 +129,17 @@ export default class Program
             const uniformLocation = gl.getUniformLocation(program, uniform.label)
             this.uniformLocation[uniform.label] = uniformLocation
         }
+        
+        
+        // Link textures / program
+        for (const texture of textures)
+        {
+            const textureLocation = program.samplerUniform = gl.getUniformLocation(program, texture.label)
+            this.textureLocation[texture.label] = textureLocation
+            console.log(texture.label, textureLocation, textures)
+        }
+        
+        
         
         
         this.pointer = program

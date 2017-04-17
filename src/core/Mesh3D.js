@@ -78,10 +78,6 @@ export default class Mesh3D
         for (const texture of this.textures)
             if (!texture.isInitialized())
                 return false
-                
-        for (const texture of this.textures)
-            if (!texture.isInitialized())
-                return false
         
         return true
     }
@@ -93,7 +89,7 @@ export default class Mesh3D
         let success = true
 
         if (!this.program.isInitialized())
-            if (this.program.init(gl, this.geom.attributes, allUniforms))
+            if (this.program.init(gl, this.geom.attributes, allUniforms, this.textures))
                 success = false
             
         if (!this.geom.isInitialized())
@@ -119,6 +115,9 @@ export default class Mesh3D
         for(const uniform of allUniforms)
             uniform.draw(gl, program)
         
+        for (const texture of this.textures)
+            texture.draw(gl, program)
+            
         this.geom.display(gl, program)
         // gl.drawArrays(gl.TRIANGLES, 0, pyramidVertexPositionBuffer.numItems)
     }
