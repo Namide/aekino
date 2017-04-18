@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 8);
+/******/ 	return __webpack_require__(__webpack_require__.s = 10);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -116,26 +116,17 @@ var Uniform = function () {
         this.label = label;
         this.type = type;
         this.data = data;
-        this.location = null;
+        // this.location = null
     }
 
     _createClass(Uniform, [{
-        key: 'isInitialized',
-        value: function isInitialized() {
-            return !!this.location;
-        }
-    }, {
-        key: 'init',
-        value: function init(gl, program) {
-            this.location = program.getUniformLocation(this.label);
-        }
-    }, {
         key: 'draw',
-        value: function draw(gl, pointer) {
+        value: function draw(gl, program) {
             switch (this.type) {
                 case 35676:
                     // gl.FLOAT_MAT4
-                    gl.uniformMatrix4fv(this.location, false, this.data);
+                    var location = program.getUniformLocation(this.label);
+                    gl.uniformMatrix4fv(location, false, this.data);
                     break;
 
                 default:
@@ -173,7 +164,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. */
 
-var glMatrix = __webpack_require__(9);
+var glMatrix = __webpack_require__(11);
 
 /**
  * @class 4x4 Matrix
@@ -2304,6 +2295,81 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _Buffer2 = __webpack_require__(3);
+
+var _Buffer3 = _interopRequireDefault(_Buffer2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * The MIT License
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Copyright 2017 Damien Doussaud (namide.com).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Permission is hereby granted, free of charge, to any person obtaining a copy
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * of this software and associated documentation files (the "Software"), to deal
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * in the Software without restriction, including without limitation the rights
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * copies of the Software, and to permit persons to whom the Software is
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * furnished to do so, subject to the following conditions:
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * The above copyright notice and this permission notice shall be included in
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * all copies or substantial portions of the Software.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * THE SOFTWARE.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+
+var Attribute = function (_Buffer) {
+    _inherits(Attribute, _Buffer);
+
+    function Attribute(label) {
+        _classCallCheck(this, Attribute);
+
+        var _this = _possibleConstructorReturn(this, (Attribute.__proto__ || Object.getPrototypeOf(Attribute)).call(this));
+
+        _this.label = label;
+        return _this;
+    }
+
+    _createClass(Attribute, [{
+        key: 'draw',
+        value: function draw(gl, program) {
+            _get(Attribute.prototype.__proto__ || Object.getPrototypeOf(Attribute.prototype), 'draw', this).call(this, gl);
+            var location = program.getAttribLocation(this.label);
+            gl.vertexAttribPointer(location, this.itemSize, this.itemType, false, 0, 0);
+        }
+    }]);
+
+    return Attribute;
+}(_Buffer3.default);
+
+exports.default = Attribute;
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /* 
@@ -2330,21 +2396,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * THE SOFTWARE.
  */
 
-var Attribute = function () {
-    function Attribute(label) {
-        _classCallCheck(this, Attribute);
+var Buffer = function () {
+    function Buffer() {
+        _classCallCheck(this, Buffer);
 
-        this.label = label;
         this.buffer = null;
-        this.location = null;
-
-        this.isVertices = null;
     }
 
-    _createClass(Attribute, [{
+    _createClass(Buffer, [{
         key: "isInitialized",
         value: function isInitialized() {
-            return !!this.location;
+            return !!this.buffer;
         }
 
         /**
@@ -2372,15 +2434,13 @@ var Attribute = function () {
 
     }, {
         key: "setArray",
-        value: function setArray(vertices) {
+        value: function setArray(data) {
             var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 34962;
             var usage = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 35044;
 
             this.arrayType = type;
-            this.vertices = vertices;
+            this.data = data;
             this.arrayUsage = usage;
-
-            this.isVertices = type === 34962;
         }
 
         /**
@@ -2416,39 +2476,33 @@ var Attribute = function () {
 
             this.itemType = type;
             this.itemSize = size;
-            this.numItems = num;
         }
     }, {
         key: "init",
         value: function init(gl, program) {
-            this.numItems = this.numItems || this.vertices.length / this.itemSize;
-
             // Create buffer
             var buffer = gl.createBuffer();
             gl.bindBuffer(this.arrayType, buffer);
-            gl.bufferData(this.arrayType, this.vertices, this.arrayUsage);
+            gl.bufferData(this.arrayType, this.data, this.arrayUsage);
 
             this.buffer = buffer;
 
-            if (this.isVertices) this.location = program.getAttribLocation(this.label);
+            return true;
         }
     }, {
         key: "draw",
         value: function draw(gl) {
             gl.bindBuffer(this.arrayType, this.buffer);
-
-            if (this.isVertices) gl.vertexAttribPointer(this.location, this.itemSize, this.itemType, false, 0, 0);
-            // gl.vertexAttribPointer(this.vertexAttribute, this.itemSize, this.itemType, false, 0, 0)
         }
     }]);
 
-    return Attribute;
+    return Buffer;
 }();
 
-exports.default = Attribute;
+exports.default = Buffer;
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2459,8 +2513,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
 var _mat = __webpack_require__(1);
 
@@ -2511,6 +2563,9 @@ var Cam3D = function (_Uniform) {
         _this.fovy = 45;
         _this.near = 0.1;
         _this.far = 100;
+        _this.position = _mat2.default.create();
+
+        _this.updated = false;
         return _this;
     }
 
@@ -2521,14 +2576,15 @@ var Cam3D = function (_Uniform) {
                 pos[_key] = arguments[_key];
             }
 
-            _mat2.default.translate(this.data, this.data, pos);
+            _mat2.default.translate(this.position, this.position, pos);
+            this.updated = true;
         }
     }, {
-        key: 'init',
-        value: function init(gl, program) {
-            _get(Cam3D.prototype.__proto__ || Object.getPrototypeOf(Cam3D.prototype), 'init', this).call(this, gl, program);
-            // out, fovy, aspect, near, far
-            _mat2.default.perspective(this.data, this.fovy * Math.PI / 180, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
+        key: 'update',
+        value: function update(w, h) {
+            _mat2.default.copy(this.data, this.position);
+            _mat2.default.perspective(this.data, this.fovy * Math.PI / 180, w / h, 0.1, 100.0);
+            this.updated = false;
         }
     }]);
 
@@ -2538,7 +2594,7 @@ var Cam3D = function (_Uniform) {
 exports.default = Cam3D;
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2572,6 +2628,10 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       * THE SOFTWARE.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
+var _Buffer = __webpack_require__(3);
+
+var _Buffer2 = _interopRequireDefault(_Buffer);
+
 var _Attribute = __webpack_require__(2);
 
 var _Attribute2 = _interopRequireDefault(_Attribute);
@@ -2585,6 +2645,10 @@ var Geom = function () {
         _classCallCheck(this, Geom);
 
         this.attributes = [];
+        this.buffers = [];
+
+        this.hasIndices = false;
+        this.numItems = 0;
     }
 
     _createClass(Geom, [{
@@ -2596,9 +2660,9 @@ var Geom = function () {
 
             try {
                 for (var _iterator = this.attributes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var attribute = _step.value;
+                    var buffer = _step.value;
 
-                    if (!attribute.isInitialized()) return false;
+                    if (!buffer.isInitialized()) return false;
                 }
             } catch (err) {
                 _didIteratorError = true;
@@ -2618,27 +2682,35 @@ var Geom = function () {
             return true;
         }
     }, {
-        key: 'addAttribute',
-        value: function addAttribute(label, vertices, dimension) {
+        key: 'addVertices',
+        value: function addVertices(label, vertices, dimension) {
             var attribute = new _Attribute2.default(label);
             attribute.setArray(new Float32Array(vertices), 34962 /* gl.ARRAY_BUFFER */);
             attribute.setItems(5126 /* gl.FLOAT */, dimension);
 
             this.attributes.push(attribute);
+
+            if (this.numItems < 1) this.numItems = vertices.length / dimension;
         }
     }, {
         key: 'addIndices',
         value: function addIndices(indices) {
-            var attribute = new _Attribute2.default();
+            this.hasIndices = true;
 
-            attribute.setArray(new Uint16Array(indices), 34963 /* gl.ELEMENT_ARRAY_BUFFER */);
-            attribute.setItems(5125 /* gl.UNSIGNED_INT */, 1 /* dimension */);
+            var buffer = new _Buffer2.default();
 
-            this.attributes.push(attribute);
+            buffer.setArray(new Uint16Array(indices), 34963 /* gl.ELEMENT_ARRAY_BUFFER */);
+            buffer.setItems(5125 /* gl.UNSIGNED_INT */, 1 /* dimension */);
+
+            this.buffers.push(buffer);
+
+            this.numItems = indices.length;
         }
     }, {
         key: 'init',
         value: function init(gl, program) {
+            var success = true;
+
             var _iteratorNormalCompletion2 = true;
             var _didIteratorError2 = false;
             var _iteratorError2 = undefined;
@@ -2647,7 +2719,7 @@ var Geom = function () {
                 for (var _iterator2 = this.attributes[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                     var attribute = _step2.value;
 
-                    if (!attribute.isInitialized()) attribute.init(gl, program);
+                    if (!attribute.isInitialized()) if (!attribute.init(gl, program)) success = false;
                 }
             } catch (err) {
                 _didIteratorError2 = true;
@@ -2663,19 +2735,16 @@ var Geom = function () {
                     }
                 }
             }
-        }
-    }, {
-        key: 'draw',
-        value: function draw(gl) {
+
             var _iteratorNormalCompletion3 = true;
             var _didIteratorError3 = false;
             var _iteratorError3 = undefined;
 
             try {
-                for (var _iterator3 = this.attributes[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                    var attribute = _step3.value;
+                for (var _iterator3 = this.buffers[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                    var buffer = _step3.value;
 
-                    attribute.draw(gl);
+                    if (!buffer.isInitialized()) if (!buffer.init(gl, program)) success = false;
                 }
             } catch (err) {
                 _didIteratorError3 = true;
@@ -2691,11 +2760,66 @@ var Geom = function () {
                     }
                 }
             }
+
+            return success;
+        }
+    }, {
+        key: 'draw',
+        value: function draw(gl, program) {
+            var _iteratorNormalCompletion4 = true;
+            var _didIteratorError4 = false;
+            var _iteratorError4 = undefined;
+
+            try {
+                for (var _iterator4 = this.attributes[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                    var attribute = _step4.value;
+
+                    attribute.draw(gl, program);
+                }
+            } catch (err) {
+                _didIteratorError4 = true;
+                _iteratorError4 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                        _iterator4.return();
+                    }
+                } finally {
+                    if (_didIteratorError4) {
+                        throw _iteratorError4;
+                    }
+                }
+            }
+
+            var _iteratorNormalCompletion5 = true;
+            var _didIteratorError5 = false;
+            var _iteratorError5 = undefined;
+
+            try {
+                for (var _iterator5 = this.buffers[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                    var buffer = _step5.value;
+
+                    buffer.draw(gl, program);
+                }
+            } catch (err) {
+                _didIteratorError5 = true;
+                _iteratorError5 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                        _iterator5.return();
+                    }
+                } finally {
+                    if (_didIteratorError5) {
+                        throw _iteratorError5;
+                    }
+                }
+            }
         }
     }, {
         key: 'display',
         value: function display(gl) {
-            gl.drawArrays(gl.TRIANGLES, 0, this.attributes[0].numItems);
+            if (this.hasIndices) gl.drawElements(gl.TRIANGLES, this.numItems, gl.UNSIGNED_SHORT, 0);else gl.drawArrays(gl.TRIANGLES, 0, this.numItems);
         }
     }]);
 
@@ -2705,7 +2829,7 @@ var Geom = function () {
 exports.default = Geom;
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2766,17 +2890,29 @@ var Mesh3D = function () {
         var matrixU = new _Uniform2.default('uMVMatrix', 35676, matrix);
 
         this.uniforms = [matrixU];
+        this.textures = [];
 
         this.matrixU = matrixU;
     }
 
     _createClass(Mesh3D, [{
+        key: 'rotate',
+        value: function rotate(rad) {
+            var matrix = this.matrixU.data;
+
+            for (var _len = arguments.length, axe = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+                axe[_key - 1] = arguments[_key];
+            }
+
+            _mat2.default.rotate(matrix, matrix, rad, axe);
+        }
+    }, {
         key: 'translate',
         value: function translate() {
             var matrix = this.matrixU.data;
 
-            for (var _len = arguments.length, pos = Array(_len), _key = 0; _key < _len; _key++) {
-                pos[_key] = arguments[_key];
+            for (var _len2 = arguments.length, pos = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+                pos[_key2] = arguments[_key2];
             }
 
             _mat2.default.translate(matrix, matrix, pos);
@@ -2785,6 +2921,11 @@ var Mesh3D = function () {
         key: 'addUniform',
         value: function addUniform(uniform) {
             this.uniforms.push(uniform);
+        }
+    }, {
+        key: 'addTexture',
+        value: function addTexture(texture) {
+            this.textures.push(texture);
         }
     }, {
         key: 'isInitialized',
@@ -2798,10 +2939,10 @@ var Mesh3D = function () {
             var _iteratorError = undefined;
 
             try {
-                for (var _iterator = this.uniforms[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var uniform = _step.value;
+                for (var _iterator = this.textures[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var texture = _step.value;
 
-                    if (!uniform.isInitialized()) return false;
+                    if (!texture.isInitialized()) return false;
                 }
             } catch (err) {
                 _didIteratorError = true;
@@ -2825,20 +2966,21 @@ var Mesh3D = function () {
         value: function init(gl, globalUniforms) {
             var program = this.program;
             var allUniforms = [].concat(_toConsumableArray(this.uniforms), _toConsumableArray(globalUniforms));
+            var success = true;
 
-            if (!this.program.isInitialized()) this.program.init(gl, this.geom.attributes, allUniforms);
+            if (!this.program.isInitialized()) if (this.program.init(gl, this.geom.attributes, allUniforms, this.textures)) success = false;
 
-            if (!this.geom.isInitialized()) this.geom.init(gl, program);
+            if (!this.geom.isInitialized()) if (this.geom.init(gl, program)) success = false;
 
             var _iteratorNormalCompletion2 = true;
             var _didIteratorError2 = false;
             var _iteratorError2 = undefined;
 
             try {
-                for (var _iterator2 = allUniforms[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                    var uniform = _step2.value;
+                for (var _iterator2 = this.textures[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var texture = _step2.value;
 
-                    if (!uniform.isInitialized()) uniform.init(gl, program);
+                    if (!texture.isInitialized()) if (!texture.init(gl, program)) success = false;
                 }
             } catch (err) {
                 _didIteratorError2 = true;
@@ -2854,13 +2996,17 @@ var Mesh3D = function () {
                     }
                 }
             }
+
+            return success;
         }
     }, {
         key: 'draw',
         value: function draw(gl, globalUniforms) {
             var allUniforms = [].concat(_toConsumableArray(this.uniforms), _toConsumableArray(globalUniforms));
+            var program = this.program;
 
-            this.geom.draw(gl);
+            this.program.draw(gl);
+            this.geom.draw(gl, program);
 
             var _iteratorNormalCompletion3 = true;
             var _didIteratorError3 = false;
@@ -2870,7 +3016,7 @@ var Mesh3D = function () {
                 for (var _iterator3 = allUniforms[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
                     var uniform = _step3.value;
 
-                    uniform.draw(gl);
+                    uniform.draw(gl, program);
                 }
             } catch (err) {
                 _didIteratorError3 = true;
@@ -2887,7 +3033,32 @@ var Mesh3D = function () {
                 }
             }
 
-            this.geom.display(gl);
+            var _iteratorNormalCompletion4 = true;
+            var _didIteratorError4 = false;
+            var _iteratorError4 = undefined;
+
+            try {
+                for (var _iterator4 = this.textures[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                    var texture = _step4.value;
+
+                    texture.draw(gl, program);
+                }
+            } catch (err) {
+                _didIteratorError4 = true;
+                _iteratorError4 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                        _iterator4.return();
+                    }
+                } finally {
+                    if (_didIteratorError4) {
+                        throw _iteratorError4;
+                    }
+                }
+            }
+
+            this.geom.display(gl, program);
             // gl.drawArrays(gl.TRIANGLES, 0, pyramidVertexPositionBuffer.numItems)
         }
     }]);
@@ -2898,7 +3069,7 @@ var Mesh3D = function () {
 exports.default = Mesh3D;
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2940,12 +3111,23 @@ var vs = '      \n    attribute vec3 aVertexPosition;\n    attribute vec4 aVerte
 
 var fs = '\n    precision mediump float;\n\n    varying vec4 vColor;\n\n    void main(void) {\n        gl_FragColor = vColor;\n    }\n';
 
+var num = 0;
+
 var Program = function () {
     function Program() {
+        var vertexShaderSrc = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : vs;
+        var fragmentShaderSrc = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : fs;
+
         _classCallCheck(this, Program);
+
+        this.vertexShaderSrc = vertexShaderSrc;
+        this.fragmentShaderSrc = fragmentShaderSrc;
 
         this.attribLocation = {};
         this.uniformLocation = {};
+        this.textureLocation = {};
+
+        this.id = ++num;
     }
 
     _createClass(Program, [{
@@ -2968,20 +3150,24 @@ var Program = function () {
             return null;
         }
     }, {
-        key: 'init',
-        value: function init(gl, attributes, uniforms) {
+        key: 'getTextureLocation',
+        value: function getTextureLocation(label) {
+            if (this.textureLocation.hasOwnProperty(label)) return this.textureLocation[label];else console.error('The texture location ' + label + ' don\'nt exist on this program');
 
-            this.vertexShader = this._createShader(gl, 35633 /* gl.VERTEX_SHADER */, vs);
-            this.fragmentShader = this._createShader(gl, 35632 /* gl.FRAGMENT_SHADER */, fs);
+            return null;
+        }
+    }, {
+        key: 'init',
+        value: function init(gl, attributes, uniforms, textures) {
+            this.vertexShader = this._createShader(gl, 35633 /* gl.VERTEX_SHADER */, this.vertexShaderSrc);
+            this.fragmentShader = this._createShader(gl, 35632 /* gl.FRAGMENT_SHADER */, this.fragmentShaderSrc);
 
             var program = gl.createProgram();
             gl.attachShader(program, this.vertexShader);
             gl.attachShader(program, this.fragmentShader);
             gl.linkProgram(program);
 
-            if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-                console.error('Impossible d\'initialiser le shader.');
-            }
+            if (!gl.getProgramParameter(program, gl.LINK_STATUS)) console.error('Shader initialization error');
 
             gl.useProgram(program);
 
@@ -2994,10 +3180,9 @@ var Program = function () {
                 for (var _iterator = attributes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                     var attribute = _step.value;
 
-                    var attributePointer = gl.getAttribLocation(program, attribute.label);
-                    gl.enableVertexAttribArray(attributePointer);
-                    // this.vertexAttribute = vertexAttribute
-                    this.attribLocation[attribute.label] = attributePointer;
+                    var attribLocation = gl.getAttribLocation(program, attribute.label);
+                    gl.enableVertexAttribArray(attribLocation);
+                    this.attribLocation[attribute.label] = attribLocation;
                 }
 
                 // Link uniform / program
@@ -3024,10 +3209,11 @@ var Program = function () {
                 for (var _iterator2 = uniforms[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                     var uniform = _step2.value;
 
-                    var uniformPointer = gl.getUniformLocation(program, uniform.label);
-                    // uniform.pointer = uniformPointer
-                    this.uniformLocation[uniform.label] = uniformPointer;
+                    var uniformLocation = gl.getUniformLocation(program, uniform.label);
+                    this.uniformLocation[uniform.label] = uniformLocation;
                 }
+
+                // Link textures / program
             } catch (err) {
                 _didIteratorError2 = true;
                 _iteratorError2 = err;
@@ -3043,7 +3229,41 @@ var Program = function () {
                 }
             }
 
+            var _iteratorNormalCompletion3 = true;
+            var _didIteratorError3 = false;
+            var _iteratorError3 = undefined;
+
+            try {
+                for (var _iterator3 = textures[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                    var texture = _step3.value;
+
+                    var textureLocation = program.samplerUniform = gl.getUniformLocation(program, texture.label);
+                    this.textureLocation[texture.label] = textureLocation;
+                    console.log(texture.label, textureLocation, textures);
+                }
+            } catch (err) {
+                _didIteratorError3 = true;
+                _iteratorError3 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                        _iterator3.return();
+                    }
+                } finally {
+                    if (_didIteratorError3) {
+                        throw _iteratorError3;
+                    }
+                }
+            }
+
             this.pointer = program;
+
+            return true;
+        }
+    }, {
+        key: 'draw',
+        value: function draw(gl) {
+            gl.useProgram(this.pointer);
         }
     }, {
         key: '_createShader',
@@ -3066,7 +3286,7 @@ var Program = function () {
 exports.default = Program;
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3170,6 +3390,8 @@ var Scene = function () {
             gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+            if (this.cam.updated) this.cam.update(gl.viewportWidth, gl.viewportHeight);
+
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
             var _iteratorError = undefined;
@@ -3178,7 +3400,7 @@ var Scene = function () {
                 for (var _iterator = this.meshs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                     var mesh = _step.value;
 
-                    mesh.draw(gl, this.uniforms);
+                    if (mesh.isInitialized()) mesh.draw(gl, this.uniforms);else mesh.init(gl, this.uniforms);
                 }
             } catch (err) {
                 _didIteratorError = true;
@@ -3203,7 +3425,165 @@ var Scene = function () {
 exports.default = Scene;
 
 /***/ }),
-/* 8 */
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/* 
+ * The MIT License
+ *
+ * Copyright 2017 Damien Doussaud (namide.com).
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+var Texture = function () {
+    function Texture(label) {
+        _classCallCheck(this, Texture);
+
+        this.label = label;
+
+        this.onLoaded = function (texture) {
+            console.log('Texture loaded:', texture.src);
+        };
+
+        this.pointer = null;
+        this.parameters = {
+            9729: 9987
+        };
+    }
+
+    /*
+        target
+            3553    gl.TEXTURE_2D           A two-dimensional texture.
+            34067   gl.TEXTURE_CUBE_MAP     A cube-mapped texture.
+    
+        pname
+            10240   gl.TEXTURE_MAG_FILTER	Texture magnification filter
+                        - 9729 gl.LINEAR (default value),
+                        - 9728 gl.NEAREST.
+        
+            10241   gl.TEXTURE_MIN_FILTER	Texture minification filter
+                        - 9729 gl.LINEAR,
+                        - 9728 gl.NEAREST,
+                        - 9984 gl.NEAREST_MIPMAP_NEAREST,
+                        - 9985 gl.LINEAR_MIPMAP_NEAREST,
+                        - 9986 gl.NEAREST_MIPMAP_LINEAR (default value),
+                        - 9987 gl.LINEAR_MIPMAP_LINEAR.
+            
+            10242   gl.TEXTURE_WRAP_S	    Wrapping function for texture coordinate s
+                        - 10497 gl.REPEAT (default value),
+                        - 33071 gl.CLAMP_TO_EDGE,
+                        - 33648 gl.MIRRORED_REPEAT.
+                        
+            10243   gl.TEXTURE_WRAP_T	      Wrapping function for texture coordinate t
+                        - 10497 gl.REPEAT (default value),
+                        - 33071 gl.CLAMP_TO_EDGE,
+                        - 33648 gl.MIRRORED_REPEAT.
+        
+        param
+    */
+
+
+    _createClass(Texture, [{
+        key: 'setParameters',
+        value: function setParameters(target, pName, param) {}
+    }, {
+        key: 'isInitialized',
+        value: function isInitialized() {
+            return !!this.pointer;
+        }
+    }, {
+        key: 'load',
+        value: function load(URL, callback) {
+            var _this = this;
+
+            this.src = URL;
+
+            var img = new Image();
+            img.onload = function () {
+                _this.img = img;
+                _this.onLoaded(_this);
+            };
+            img.src = URL;
+        }
+    }, {
+        key: '_isPowerOf2',
+        value: function _isPowerOf2(val) {
+            return (val & val - 1) == 0;
+        }
+    }, {
+        key: 'init',
+        value: function init(gl, program) {
+            var texture = this.pointer || gl.createTexture();
+
+            var img = this.img;
+            if (!img) return false;
+
+            // Loaded
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+            if (this._isPowerOf2(img.width) && this._isPowerOf2(img.height)) {
+                gl.generateMipmap(gl.TEXTURE_2D);
+                // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+            } else {
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            }
+
+            gl.bindTexture(gl.TEXTURE_2D, null);
+
+            this.pointer = texture;
+
+            return true;
+        }
+    }, {
+        key: 'draw',
+        value: function draw(gl, program) {
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, this.pointer);
+            gl.uniform1i(program.getTextureLocation(this.label), 0);
+        }
+    }]);
+
+    return Texture;
+}();
+
+exports.default = Texture;
+
+/***/ }),
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3221,28 +3601,45 @@ var _Uniform = __webpack_require__(0);
 
 var _Uniform2 = _interopRequireDefault(_Uniform);
 
-var _Program = __webpack_require__(6);
+var _Program = __webpack_require__(7);
 
 var _Program2 = _interopRequireDefault(_Program);
 
-var _Geom = __webpack_require__(4);
+var _Geom = __webpack_require__(5);
 
 var _Geom2 = _interopRequireDefault(_Geom);
 
-var _Mesh3D = __webpack_require__(5);
+var _Mesh3D = __webpack_require__(6);
 
 var _Mesh3D2 = _interopRequireDefault(_Mesh3D);
 
-var _Cam3D = __webpack_require__(3);
+var _Cam3D = __webpack_require__(4);
 
 var _Cam3D2 = _interopRequireDefault(_Cam3D);
 
-var _Scene = __webpack_require__(7);
+var _Scene = __webpack_require__(8);
 
 var _Scene2 = _interopRequireDefault(_Scene);
 
+var _Texture = __webpack_require__(9);
+
+var _Texture2 = _interopRequireDefault(_Texture);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/*exports.glMatrix = require("./gl-matrix/common.js");
+exports.mat2 = require("./gl-matrix/mat2.js");
+exports.mat2d = require("./gl-matrix/mat2d.js");
+exports.mat3 = require("./gl-matrix/mat3.js");
+exports.mat4 = require("./gl-matrix/mat4.js");
+exports.quat = require("./gl-matrix/quat.js");
+exports.vec2 = require("./gl-matrix/vec2.js");
+exports.vec3 = require("./gl-matrix/vec3.js");
+exports.vec4 = require("./gl-matrix/vec4.js");*/
+
+var canvas = document.body.querySelector('canvas');
+
+// Camera
 /* 
  * The MIT License
  *
@@ -3274,30 +3671,25 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // http://learningwebgl.com/blog/?p=370
 
 
-var canvas = document.body.querySelector('canvas');
-
-// Camera
-
-/*exports.glMatrix = require("./gl-matrix/common.js");
-exports.mat2 = require("./gl-matrix/mat2.js");
-exports.mat2d = require("./gl-matrix/mat2d.js");
-exports.mat3 = require("./gl-matrix/mat3.js");
-exports.mat4 = require("./gl-matrix/mat4.js");
-exports.quat = require("./gl-matrix/quat.js");
-exports.vec2 = require("./gl-matrix/vec2.js");
-exports.vec3 = require("./gl-matrix/vec3.js");
-exports.vec4 = require("./gl-matrix/vec4.js");*/
-
 var cam3D = new _Cam3D2.default();
 cam3D.translate(-1.5, 0.0, -7.0);
 
 // Scene
 var scene = new _Scene2.default(canvas, cam3D);
 
-// Shader
-var program = new _Program2.default();
+// Programs
+var colorProgram = new _Program2.default();
 
-// Trianle
+var fogVertexShader = '      \n    attribute vec3 aVertexPosition;\n    attribute vec4 aVertexColor;\n\n    uniform mat4 uMVMatrix;\n    uniform mat4 uPMatrix;\n\n    varying vec4 vColor;\n\n    void main(void) {\n        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n        float zDepth = 0.2 * (8.0 - gl_Position.z);\n        vec4 modifyColor = vec4(aVertexColor.rgb * zDepth, aVertexColor.a);\n        vColor = modifyColor;\n    }\n';
+var fogProgram = new _Program2.default(fogVertexShader);
+
+// ----------------------------
+//
+//      PYRAMID RAINBOW
+//
+// ----------------------------
+
+// Pyramid
 var pyramidVertices = [
 // Front face
 0.0, 1.0, 0.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0,
@@ -3323,146 +3715,19 @@ var pyramidColors = [
 // Left face
 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0];
 var pyramidGeom = new _Geom2.default();
-pyramidGeom.addAttribute('aVertexPosition', pyramidVertices, 3);
-pyramidGeom.addAttribute('aVertexColor', pyramidColors, 4);
+pyramidGeom.addVertices('aVertexPosition', pyramidVertices, 3);
+pyramidGeom.addVertices('aVertexColor', pyramidColors, 4);
 
-var pyramidMesh = new _Mesh3D2.default(pyramidGeom, program);
-pyramidMesh.translate(-1.5, 0.0, -8.0);
+var pyramidMesh = new _Mesh3D2.default(pyramidGeom, colorProgram);
+pyramidMesh.translate(-1.5, -1.5, -8.0);
 scene.addMesh(pyramidMesh);
 
-/*    function initBuffers() {
-        pyramidVertexPositionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, pyramidVertexPositionBuffer);
-        var vertices = [
-            // Front face
-             0.0,  1.0,  0.0,
-            -1.0, -1.0,  1.0,
-             1.0, -1.0,  1.0,
+// ----------------------------
+//
+//      CUBE RAINBOW
+//
+// ----------------------------
 
-            // Right face
-             0.0,  1.0,  0.0,
-             1.0, -1.0,  1.0,
-             1.0, -1.0, -1.0,
-
-            // Back face
-             0.0,  1.0,  0.0,
-             1.0, -1.0, -1.0,
-            -1.0, -1.0, -1.0,
-
-            // Left face
-             0.0,  1.0,  0.0,
-            -1.0, -1.0, -1.0,
-            -1.0, -1.0,  1.0
-        ];
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-        pyramidVertexPositionBuffer.itemSize = 3;
-        pyramidVertexPositionBuffer.numItems = 12;
-
-        pyramidVertexColorBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, pyramidVertexColorBuffer);
-        var colors = [
-            // Front face
-            1.0, 0.0, 0.0, 1.0,
-            0.0, 1.0, 0.0, 1.0,
-            0.0, 0.0, 1.0, 1.0,
-
-            // Right face
-            1.0, 0.0, 0.0, 1.0,
-            0.0, 0.0, 1.0, 1.0,
-            0.0, 1.0, 0.0, 1.0,
-
-            // Back face
-            1.0, 0.0, 0.0, 1.0,
-            0.0, 1.0, 0.0, 1.0,
-            0.0, 0.0, 1.0, 1.0,
-
-            // Left face
-            1.0, 0.0, 0.0, 1.0,
-            0.0, 0.0, 1.0, 1.0,
-            0.0, 1.0, 0.0, 1.0
-        ];
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-        pyramidVertexColorBuffer.itemSize = 4;
-        pyramidVertexColorBuffer.numItems = 12;
-
-
-        cubeVertexPositionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
-        vertices = [
-            // Front face
-            -1.0, -1.0,  1.0,
-             1.0, -1.0,  1.0,
-             1.0,  1.0,  1.0,
-            -1.0,  1.0,  1.0,
-
-            // Back face
-            -1.0, -1.0, -1.0,
-            -1.0,  1.0, -1.0,
-             1.0,  1.0, -1.0,
-             1.0, -1.0, -1.0,
-
-            // Top face
-            -1.0,  1.0, -1.0,
-            -1.0,  1.0,  1.0,
-             1.0,  1.0,  1.0,
-             1.0,  1.0, -1.0,
-
-            // Bottom face
-            -1.0, -1.0, -1.0,
-             1.0, -1.0, -1.0,
-             1.0, -1.0,  1.0,
-            -1.0, -1.0,  1.0,
-
-            // Right face
-             1.0, -1.0, -1.0,
-             1.0,  1.0, -1.0,
-             1.0,  1.0,  1.0,
-             1.0, -1.0,  1.0,
-
-            // Left face
-            -1.0, -1.0, -1.0,
-            -1.0, -1.0,  1.0,
-            -1.0,  1.0,  1.0,
-            -1.0,  1.0, -1.0
-        ];
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-        cubeVertexPositionBuffer.itemSize = 3;
-        cubeVertexPositionBuffer.numItems = 24;
-
-        cubeVertexColorBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexColorBuffer);
-        colors = [
-            [1.0, 0.0, 0.0, 1.0], // Front face
-            [1.0, 1.0, 0.0, 1.0], // Back face
-            [0.0, 1.0, 0.0, 1.0], // Top face
-            [1.0, 0.5, 0.5, 1.0], // Bottom face
-            [1.0, 0.0, 1.0, 1.0], // Right face
-            [0.0, 0.0, 1.0, 1.0]  // Left face
-        ];
-        var unpackedColors = [];
-        for (var i in colors) {
-            var color = colors[i];
-            for (var j=0; j < 4; j++) {
-                unpackedColors = unpackedColors.concat(color);
-            }
-        }
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(unpackedColors), gl.STATIC_DRAW);
-        cubeVertexColorBuffer.itemSize = 4;
-        cubeVertexColorBuffer.numItems = 24;
-
-        cubeVertexIndexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
-        var cubeVertexIndices = [
-            0, 1, 2,      0, 2, 3,    // Front face
-            4, 5, 6,      4, 6, 7,    // Back face
-            8, 9, 10,     8, 10, 11,  // Top face
-            12, 13, 14,   12, 14, 15, // Bottom face
-            16, 17, 18,   16, 18, 19, // Right face
-            20, 21, 22,   20, 22, 23  // Left face
-        ];
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
-        cubeVertexIndexBuffer.itemSize = 1;
-        cubeVertexIndexBuffer.numItems = 36;*/
 
 // Square
 var cubeVertices = [
@@ -3490,55 +3755,87 @@ var cubeIndices = [0, 1, 2, 0, 2, 3, // Front face
 16, 17, 18, 16, 18, 19, // Right face
 20, 21, 22, 20, 22, 23 // Left face
 ];
-var cubeColors = [1.0, 0.0, 0.0, 1.0, // Front face
-1.0, 1.0, 0.0, 1.0, // Back face
-0.0, 1.0, 0.0, 1.0, // Top face
-1.0, 0.5, 0.5, 1.0, // Bottom face
-1.0, 0.0, 1.0, 1.0, // Right face
-0.0, 0.0, 1.0, 1.0 // Left face
+var cubeColors = [[1.0, 0.0, 0.0, 1.0], // Front face
+[1.0, 1.0, 0.0, 1.0], // Back face
+[0.0, 1.0, 0.0, 1.0], // Top face
+[1.0, 0.5, 0.5, 1.0], // Bottom face
+[1.0, 0.0, 1.0, 1.0], // Right face
+[0.0, 0.0, 1.0, 1.0] // Left face
 ];
 
 var unpackedCubeColors = [];
-var _iteratorNormalCompletion = true;
-var _didIteratorError = false;
-var _iteratorError = undefined;
-
-try {
-    for (var _iterator = cubeColors[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-        var color = _step.value;
-
-        for (var j = 0; j < 4; j++) {
-            unpackedCubeColors = unpackedCubeColors.concat(color);
-        }
-    }
-} catch (err) {
-    _didIteratorError = true;
-    _iteratorError = err;
-} finally {
-    try {
-        if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-        }
-    } finally {
-        if (_didIteratorError) {
-            throw _iteratorError;
-        }
+for (var i in cubeColors) {
+    var color = cubeColors[i];
+    for (var j = 0; j < 4; j++) {
+        unpackedCubeColors = unpackedCubeColors.concat(color);
     }
 }
 
 var cubeGeom = new _Geom2.default();
-cubeGeom.addAttribute('aVertexPosition', cubeVertices, 3);
-cubeGeom.addAttribute('aVertexColor', unpackedCubeColors, 4);
+cubeGeom.addVertices('aVertexPosition', cubeVertices, 3);
+cubeGeom.addVertices('aVertexColor', unpackedCubeColors, 4);
 cubeGeom.addIndices(cubeIndices);
 
-var cubeMesh = new _Mesh3D2.default(cubeGeom, program);
-cubeMesh.translate(3.0, 0.0, 0.0);
+var cubeMesh = new _Mesh3D2.default(cubeGeom, fogProgram);
+cubeMesh.translate(1.5, -1.5, -8.0);
 scene.addMesh(cubeMesh);
 
-scene.draw();
+// ----------------------------
+//
+//      CUBE WOOD
+//
+// ----------------------------
+
+var vertexTextureShader = '   \n    attribute vec3 aVertexPosition;\n    attribute vec2 aTextureCoord;\n\n    uniform mat4 uMVMatrix;\n    uniform mat4 uPMatrix;\n\n    varying vec2 vTextureCoord;\n\n    void main(void) {\n        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n        vTextureCoord = aTextureCoord;\n    }';
+
+var fragmentTextureShader = '\n    precision mediump float;\n\n    varying vec2 vTextureCoord;\n\n    uniform sampler2D uSampler;\n\n    void main(void) {\n        gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));\n    }';
+
+var texturedProgram = new _Program2.default(vertexTextureShader, fragmentTextureShader);
+
+var cubeUV = [
+// Front face
+0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+
+// Back face
+1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,
+
+// Top face
+0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0,
+
+// Bottom face
+1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
+
+// Right face
+1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,
+
+// Left face
+0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0];
+
+var cubeTexture = new _Texture2.default('uSampler');
+cubeTexture.load('/cube-diffuse.jpg');
+
+var cubeTexturedGeom = new _Geom2.default();
+cubeTexturedGeom.addVertices('aVertexPosition', cubeVertices, 3);
+cubeTexturedGeom.addVertices('aTextureCoord', cubeUV, 2);
+cubeTexturedGeom.addIndices(cubeIndices);
+
+var cubeTexturedMesh = new _Mesh3D2.default(cubeTexturedGeom, texturedProgram);
+cubeTexturedMesh.addTexture(cubeTexture);
+cubeTexturedMesh.translate(1.5, 1.5, -8.0);
+scene.addMesh(cubeTexturedMesh);
+
+refresh();
+function refresh() {
+    pyramidMesh.rotate(0.005, 0, 1, 0);
+    cubeMesh.rotate(0.01, 0, 1, 0);
+    cubeTexturedMesh.rotate(-0.01, 0, 1, 0);
+
+    scene.draw();
+    requestAnimationFrame(refresh);
+}
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ (function(module, exports) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.

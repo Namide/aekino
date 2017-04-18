@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 9);
+/******/ 	return __webpack_require__(__webpack_require__.s = 11);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -90,7 +90,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. */
 
-var glMatrix = __webpack_require__(8);
+var glMatrix = __webpack_require__(10);
 
 /**
  * @class 4x4 Matrix
@@ -2248,25 +2248,16 @@ class Uniform
         this.label = label
         this.type = type
         this.data = data
-        this.location = null
+        // this.location = null
     }
     
-    isInitialized()
-    {
-        return !!this.location
-    }
-    
-    init(gl, program)
-    {
-        this.location = program.getUniformLocation(this.label)
-    }
-    
-    draw(gl, pointer)
+    draw(gl, program)
     {
         switch(this.type)
         {
             case 35676: // gl.FLOAT_MAT4
-                gl.uniformMatrix4fv(this.location, false, this.data)
+                const location = program.getUniformLocation(this.label)
+                gl.uniformMatrix4fv(location, false, this.data)
                 break
                 
             default:
@@ -2281,6 +2272,56 @@ class Uniform
 
 /***/ }),
 /* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Buffer__ = __webpack_require__(3);
+/* 
+ * The MIT License
+ *
+ * Copyright 2017 Damien Doussaud (namide.com).
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+
+
+class Attribute extends __WEBPACK_IMPORTED_MODULE_0__Buffer__["a" /* default */]
+{
+    constructor(label)
+    {
+        super()
+        this.label = label
+    }
+    
+    draw(gl, program)
+    {
+        super.draw(gl)
+        const location = program.getAttribLocation(this.label)
+        gl.vertexAttribPointer(location, this.itemSize, this.itemType, false, 0, 0)
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Attribute;
+
+
+/***/ }),
+/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2308,20 +2349,16 @@ class Uniform
  * THE SOFTWARE.
  */
 
-class Attribute
+class Buffer
 {
-    constructor(label)
+    constructor()
     {
-        this.label = label
         this.buffer = null
-        this.location = null
-        
-        this.isVertices = null
     }
     
     isInitialized()
     {
-        return !!this.location
+        return !!this.buffer
     }
     
     /**
@@ -2346,13 +2383,11 @@ class Attribute
      *      Contents of the buffer are likely to not be used often.
      *      Contents are written to the buffer, but not read.
      */
-    setArray(vertices, type = 34962, usage = 35044)
+    setArray(data, type = 34962, usage = 35044)
     {
         this.arrayType = type
-        this.vertices = vertices
+        this.data = data
         this.arrayUsage = usage
-        
-        this.isVertices = type === 34962
     }
     
     /**
@@ -2382,42 +2417,31 @@ class Attribute
     {
         this.itemType = type
         this.itemSize = size
-        this.numItems = num
     }
     
     init(gl, program)
     {
-        this.numItems = this.numItems || (this.vertices.length / this.itemSize)
-        
-        
         // Create buffer
         const buffer = gl.createBuffer()
         gl.bindBuffer(this.arrayType, buffer)
-        gl.bufferData(this.arrayType, this.vertices, this.arrayUsage)
+        gl.bufferData(this.arrayType, this.data, this.arrayUsage)
         
         
         this.buffer = buffer
         
-        if (this.isVertices)
-            this.location = program.getAttribLocation(this.label)
+        return true
     }
     
     draw(gl)
     {
         gl.bindBuffer(this.arrayType, this.buffer)
-        
-        if (this.isVertices)
-            gl.vertexAttribPointer(this.location, this.itemSize, this.itemType, false, 0, 0)
-        // gl.vertexAttribPointer(this.vertexAttribute, this.itemSize, this.itemType, false, 0, 0)
     }
-    
-
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = Attribute;
+/* harmony export (immutable) */ __webpack_exports__["a"] = Buffer;
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2460,29 +2484,34 @@ class Cam3D extends __WEBPACK_IMPORTED_MODULE_1__Uniform__["a" /* default */]
         this.fovy = 45
         this.near = 0.1
         this.far = 100
+        this.position = __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_mat4_js___default.a.create()
+        
+        this.updated = false
     }
     
     translate(...pos)
     {
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_mat4_js___default.a.translate(this.data, this.data, pos)
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_mat4_js___default.a.translate(this.position, this.position, pos)
+        this.updated = true
     }
     
-    init(gl, program)
+    update(w, h)
     {
-        super.init(gl, program)
-        // out, fovy, aspect, near, far
-        __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_mat4_js___default.a.perspective(this.data, this.fovy * Math.PI / 180, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0)
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_mat4_js___default.a.copy(this.data, this.position)
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_mat4_js___default.a.perspective(this.data, this.fovy * Math.PI / 180, w / h, 0.1, 100.0)
+        this.updated = false
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Cam3D;
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Attribute__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Buffer__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Attribute__ = __webpack_require__(2);
 /* 
  * The MIT License
  *
@@ -2509,64 +2538,92 @@ class Cam3D extends __WEBPACK_IMPORTED_MODULE_1__Uniform__["a" /* default */]
 
 
 
+
 class Geom
 {
     constructor()
     {
         this.attributes = []
+        this.buffers = []
+        
+        this.hasIndices = false
+        this.numItems = 0
     }
     
     isInitialized()
     {
-        for (const attribute of this.attributes)
-            if (!attribute.isInitialized())
+        for (const buffer of this.attributes)
+            if (!buffer.isInitialized())
                 return false
         
         return true
     }
     
-    addAttribute(label, vertices, dimension)
+    addVertices(label, vertices, dimension)
     {
-        const attribute = new __WEBPACK_IMPORTED_MODULE_0__Attribute__["a" /* default */](label)
+        const attribute = new __WEBPACK_IMPORTED_MODULE_1__Attribute__["a" /* default */](label)
         attribute.setArray(new Float32Array(vertices), 34962 /* gl.ARRAY_BUFFER */)
         attribute.setItems(5126 /* gl.FLOAT */, dimension)
         
         this.attributes.push(attribute)
+        
+        if (this.numItems < 1)
+            this.numItems = vertices.length / dimension
     }
     
     addIndices(indices)
     {
-        const attribute = new __WEBPACK_IMPORTED_MODULE_0__Attribute__["a" /* default */]()
+        this.hasIndices = true
         
-        attribute.setArray(new Uint16Array(indices), 34963 /* gl.ELEMENT_ARRAY_BUFFER */)
-        attribute.setItems(5125 /* gl.UNSIGNED_INT */, 1 /* dimension */)
+        const buffer = new __WEBPACK_IMPORTED_MODULE_0__Buffer__["a" /* default */]()
         
-        this.attributes.push(attribute)
+        buffer.setArray(new Uint16Array(indices), 34963 /* gl.ELEMENT_ARRAY_BUFFER */)
+        buffer.setItems(5125 /* gl.UNSIGNED_INT */, 1 /* dimension */)
+        
+        this.buffers.push(buffer)
+        
+        this.numItems = indices.length
     }
     
     init(gl, program)
     {
+        let success = true
+        
         for (const attribute of this.attributes)
             if (!attribute.isInitialized())
-                attribute.init(gl, program)
+                if (!attribute.init(gl, program))
+                    success = false
+                    
+        for (const buffer of this.buffers)
+            if (!buffer.isInitialized())
+                if (!buffer.init(gl, program))
+                    success = false      
+                    
+        return success
     }
     
-    draw(gl)
+    draw(gl, program)
     {
         for(const attribute of this.attributes)
-            attribute.draw(gl)
+            attribute.draw(gl, program)
+                    
+        for (const buffer of this.buffers)
+            buffer.draw(gl, program)
     }
     
     display(gl)
     {
-        gl.drawArrays(gl.TRIANGLES, 0, this.attributes[0].numItems)
+        if (this.hasIndices)
+            gl.drawElements(gl.TRIANGLES, this.numItems, gl.UNSIGNED_SHORT, 0);
+        else
+            gl.drawArrays(gl.TRIANGLES, 0, this.numItems)
     }   
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Geom;
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2613,8 +2670,15 @@ class Mesh3D
         const matrixU = new __WEBPACK_IMPORTED_MODULE_1__Uniform__["a" /* default */]('uMVMatrix', 35676, matrix)
         
         this.uniforms = [matrixU]
+        this.textures = []
         
         this.matrixU = matrixU
+    }
+    
+    rotate(rad, ...axe)
+    {
+        const matrix = this.matrixU.data
+        __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_mat4_js___default.a.rotate(matrix, matrix, rad, axe)
     }
     
     translate(...pos)
@@ -2623,10 +2687,17 @@ class Mesh3D
         __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_mat4_js___default.a.translate(matrix, matrix, pos)
     }
     
+    
     addUniform(uniform)
     {
         this.uniforms.push(uniform)
     }
+    
+    addTexture(texture)
+    {
+        this.textures.push(texture)
+    }
+    
     
     isInitialized()
     {
@@ -2634,10 +2705,10 @@ class Mesh3D
             return false
         
         if (!this.geom.isInitialized())
-            return false
+            return false      
         
-        for (const uniform of this.uniforms)
-            if (!uniform.isInitialized())
+        for (const texture of this.textures)
+            if (!texture.isInitialized())
                 return false
         
         return true
@@ -2647,29 +2718,39 @@ class Mesh3D
     {
         const program = this.program
         const allUniforms = [...this.uniforms, ...globalUniforms]
+        let success = true
 
         if (!this.program.isInitialized())
-            this.program.init(gl, this.geom.attributes, allUniforms)
+            if (this.program.init(gl, this.geom.attributes, allUniforms, this.textures))
+                success = false
             
         if (!this.geom.isInitialized())
-            this.geom.init(gl, program)
-        
-        
-        for (const uniform of allUniforms)
-            if (!uniform.isInitialized())
-                uniform.init(gl, program)
+            if (this.geom.init(gl, program))
+                success = false
+            
+        for (const texture of this.textures)
+            if (!texture.isInitialized())
+                if (!texture.init(gl, program))
+                    success = false
+                    
+        return success
     }
     
     draw(gl, globalUniforms)
     {
         const allUniforms = [...this.uniforms, ...globalUniforms]
+        const program = this.program
         
-        this.geom.draw(gl)
+        this.program.draw(gl)
+        this.geom.draw(gl, program)
             
         for(const uniform of allUniforms)
-            uniform.draw(gl)
+            uniform.draw(gl, program)
         
-        this.geom.display(gl)
+        for (const texture of this.textures)
+            texture.draw(gl, program)
+            
+        this.geom.display(gl, program)
         // gl.drawArrays(gl.TRIANGLES, 0, pyramidVertexPositionBuffer.numItems)
     }
 }
@@ -2678,7 +2759,7 @@ class Mesh3D
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2731,12 +2812,20 @@ const fs = `
     }
 `
 
+let num = 0
+
 class Program
 {
-    constructor()
+    constructor(vertexShaderSrc = vs, fragmentShaderSrc = fs)
     {
+        this.vertexShaderSrc = vertexShaderSrc
+        this.fragmentShaderSrc = fragmentShaderSrc
+        
         this.attribLocation = {}
         this.uniformLocation = {}
+        this.textureLocation = {}
+        
+        this.id = ++num
     }
     
     isInitialized()
@@ -2764,11 +2853,20 @@ class Program
         return null
     }
     
-    init(gl, attributes, uniforms)
+    getTextureLocation(label)
     {
-
-        this.vertexShader = this._createShader(gl, 35633 /* gl.VERTEX_SHADER */, vs)
-        this.fragmentShader = this._createShader(gl, 35632 /* gl.FRAGMENT_SHADER */, fs)
+        if (this.textureLocation.hasOwnProperty(label))
+            return this.textureLocation[label]
+        else
+            console.error('The texture location ' + label + ' don\'nt exist on this program')
+            
+        return null
+    }
+    
+    init(gl, attributes, uniforms, textures)
+    {
+        this.vertexShader = this._createShader(gl, 35633 /* gl.VERTEX_SHADER */, this.vertexShaderSrc)
+        this.fragmentShader = this._createShader(gl, 35632 /* gl.FRAGMENT_SHADER */, this.fragmentShaderSrc)
         
         const program = gl.createProgram()
         gl.attachShader(program, this.vertexShader)
@@ -2776,9 +2874,7 @@ class Program
         gl.linkProgram(program)
         
         if (!gl.getProgramParameter(program, gl.LINK_STATUS))
-        {
-            console.error('Impossible d\'initialiser le shader.')
-        }
+            console.error('Shader initialization error')
         
         gl.useProgram(program)
 
@@ -2786,25 +2882,39 @@ class Program
         // Link buffer / program
         for (const attribute of attributes)
         {
-            const attributePointer = gl.getAttribLocation(program, attribute.label)
-            gl.enableVertexAttribArray(attributePointer)
-            // this.vertexAttribute = vertexAttribute
-            this.attribLocation[attribute.label] = attributePointer
+            const attribLocation = gl.getAttribLocation(program, attribute.label)
+            gl.enableVertexAttribArray(attribLocation)
+            this.attribLocation[attribute.label] = attribLocation
         }
         
         
         // Link uniform / program
         for (const uniform of uniforms)
         {
-            const uniformPointer = gl.getUniformLocation(program, uniform.label)
-            // uniform.pointer = uniformPointer
-            this.uniformLocation[uniform.label] = uniformPointer
+            const uniformLocation = gl.getUniformLocation(program, uniform.label)
+            this.uniformLocation[uniform.label] = uniformLocation
+        }
+        
+        
+        // Link textures / program
+        for (const texture of textures)
+        {
+            const textureLocation = program.samplerUniform = gl.getUniformLocation(program, texture.label)
+            this.textureLocation[texture.label] = textureLocation
+            console.log(texture.label, textureLocation, textures)
         }
         
         
         
         
         this.pointer = program
+        
+        return true
+    }
+    
+    draw(gl)
+    {
+        gl.useProgram(this.pointer)
     }
     
     _createShader(gl, type, src)
@@ -2825,7 +2935,7 @@ class Program
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2923,15 +3033,173 @@ class Scene
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
         
+        if (this.cam.updated)
+            this.cam.update(gl.viewportWidth, gl.viewportHeight)
+        
         for (const mesh of this.meshs)
-            mesh.draw(gl, this.uniforms)        
+            if (mesh.isInitialized())
+                mesh.draw(gl, this.uniforms)
+            else
+                mesh.init(gl, this.uniforms)
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Scene;
 
 
 /***/ }),
-/* 8 */
+/* 9 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* 
+ * The MIT License
+ *
+ * Copyright 2017 Damien Doussaud (namide.com).
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+class Texture
+{
+    constructor(label)
+    {
+        this.label = label
+        
+        this.onLoaded = texture =>
+        {
+            console.log('Texture loaded:', texture.src)
+        }
+        
+        this.pointer = null
+        this.parameters = {
+            9729: 9987
+        }
+    }
+    
+    /*
+        target
+            3553    gl.TEXTURE_2D           A two-dimensional texture.
+            34067   gl.TEXTURE_CUBE_MAP     A cube-mapped texture.
+    
+        pname
+            10240   gl.TEXTURE_MAG_FILTER	Texture magnification filter
+                        - 9729 gl.LINEAR (default value),
+                        - 9728 gl.NEAREST.
+        
+            10241   gl.TEXTURE_MIN_FILTER	Texture minification filter
+                        - 9729 gl.LINEAR,
+                        - 9728 gl.NEAREST,
+                        - 9984 gl.NEAREST_MIPMAP_NEAREST,
+                        - 9985 gl.LINEAR_MIPMAP_NEAREST,
+                        - 9986 gl.NEAREST_MIPMAP_LINEAR (default value),
+                        - 9987 gl.LINEAR_MIPMAP_LINEAR.
+            
+            10242   gl.TEXTURE_WRAP_S	    Wrapping function for texture coordinate s
+                        - 10497 gl.REPEAT (default value),
+                        - 33071 gl.CLAMP_TO_EDGE,
+                        - 33648 gl.MIRRORED_REPEAT.
+                        
+            10243   gl.TEXTURE_WRAP_T	      Wrapping function for texture coordinate t
+                        - 10497 gl.REPEAT (default value),
+                        - 33071 gl.CLAMP_TO_EDGE,
+                        - 33648 gl.MIRRORED_REPEAT.
+        
+        param
+    */
+    setParameters(target, pName, param)
+    {
+        
+    }
+    
+    isInitialized()
+    {
+        return !!this.pointer
+    }
+    
+    load(URL, callback)
+    {
+        this.src = URL
+        
+        const img = new Image()
+        img.onload = () =>
+        {
+            this.img = img
+            this.onLoaded(this)
+        }
+        img.src = URL
+        
+    }
+    
+    _isPowerOf2(val)
+    {
+        return (val & (val - 1)) == 0
+    }
+    
+    init(gl, program)
+    {
+        const texture = this.pointer || gl.createTexture()
+        
+        const img = this.img
+        if (!img)
+            return false
+        
+            
+        // Loaded
+        gl.bindTexture(gl.TEXTURE_2D, texture)
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
+        
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img)
+        if (this._isPowerOf2(img.width) && this._isPowerOf2(img.height))
+        {
+            gl.generateMipmap(gl.TEXTURE_2D)
+            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
+        }
+        else
+        {
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+        }
+        
+           
+        gl.bindTexture(gl.TEXTURE_2D, null)
+        
+        
+        this.pointer = texture
+        
+        return true
+    }
+    
+    draw(gl, program)
+    {
+        gl.activeTexture(gl.TEXTURE0)
+        gl.bindTexture(gl.TEXTURE_2D, this.pointer)
+        gl.uniform1i(program.getTextureLocation(this.label), 0)
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Texture;
+
+
+/***/ }),
+/* 10 */
 /***/ (function(module, exports) {
 
 /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
@@ -3007,7 +3275,7 @@ module.exports = glMatrix;
 
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3016,11 +3284,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_mat4_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_gl_matrix_src_gl_matrix_mat4_js__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_Attribute__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_Uniform__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_Program__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_Geom__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_Mesh3D__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_Cam3D__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_Scene__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_Program__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_Geom__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_Mesh3D__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_Cam3D__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_Scene__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_Texture__ = __webpack_require__(9);
 /* 
  * The MIT License
  *
@@ -3071,6 +3340,7 @@ exports.vec4 = require("./gl-matrix/vec4.js");*/
 
 
 
+
 const canvas = document.body.querySelector('canvas')
 
 
@@ -3078,16 +3348,43 @@ const canvas = document.body.querySelector('canvas')
 const cam3D = new __WEBPACK_IMPORTED_MODULE_6__core_Cam3D__["a" /* default */]()
 cam3D.translate(-1.5, 0.0, -7.0)
 
+
 // Scene
 const scene = new __WEBPACK_IMPORTED_MODULE_7__core_Scene__["a" /* default */](canvas, cam3D)
 
 
 
 
-// Shader
-const program = new __WEBPACK_IMPORTED_MODULE_3__core_Program__["a" /* default */]()
+// Programs
+const colorProgram = new __WEBPACK_IMPORTED_MODULE_3__core_Program__["a" /* default */]()
 
-// Trianle
+const fogVertexShader = `      
+    attribute vec3 aVertexPosition;
+    attribute vec4 aVertexColor;
+
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+
+    varying vec4 vColor;
+
+    void main(void) {
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+        float zDepth = 0.2 * (8.0 - gl_Position.z);
+        vec4 modifyColor = vec4(aVertexColor.rgb * zDepth, aVertexColor.a);
+        vColor = modifyColor;
+    }
+`
+const fogProgram = new __WEBPACK_IMPORTED_MODULE_3__core_Program__["a" /* default */](fogVertexShader)
+
+
+
+// ----------------------------
+//
+//      PYRAMID RAINBOW
+//
+// ----------------------------
+
+// Pyramid
 const pyramidVertices = [
     // Front face
     0.0,  1.0,  0.0,
@@ -3131,146 +3428,20 @@ const pyramidColors = [
     0.0, 1.0, 0.0, 1.0
 ]
 const pyramidGeom = new __WEBPACK_IMPORTED_MODULE_4__core_Geom__["a" /* default */]()
-pyramidGeom.addAttribute('aVertexPosition', pyramidVertices, 3)
-pyramidGeom.addAttribute('aVertexColor', pyramidColors, 4)
+pyramidGeom.addVertices('aVertexPosition', pyramidVertices, 3)
+pyramidGeom.addVertices('aVertexColor', pyramidColors, 4)
     
-const pyramidMesh = new __WEBPACK_IMPORTED_MODULE_5__core_Mesh3D__["a" /* default */](pyramidGeom, program)
-pyramidMesh.translate(-1.5, 0.0, -8.0)
+const pyramidMesh = new __WEBPACK_IMPORTED_MODULE_5__core_Mesh3D__["a" /* default */](pyramidGeom, colorProgram)
+pyramidMesh.translate(-1.5, -1.5, -8.0)
 scene.addMesh(pyramidMesh)
 
-/*    function initBuffers() {
-        pyramidVertexPositionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, pyramidVertexPositionBuffer);
-        var vertices = [
-            // Front face
-             0.0,  1.0,  0.0,
-            -1.0, -1.0,  1.0,
-             1.0, -1.0,  1.0,
-
-            // Right face
-             0.0,  1.0,  0.0,
-             1.0, -1.0,  1.0,
-             1.0, -1.0, -1.0,
-
-            // Back face
-             0.0,  1.0,  0.0,
-             1.0, -1.0, -1.0,
-            -1.0, -1.0, -1.0,
-
-            // Left face
-             0.0,  1.0,  0.0,
-            -1.0, -1.0, -1.0,
-            -1.0, -1.0,  1.0
-        ];
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-        pyramidVertexPositionBuffer.itemSize = 3;
-        pyramidVertexPositionBuffer.numItems = 12;
-
-        pyramidVertexColorBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, pyramidVertexColorBuffer);
-        var colors = [
-            // Front face
-            1.0, 0.0, 0.0, 1.0,
-            0.0, 1.0, 0.0, 1.0,
-            0.0, 0.0, 1.0, 1.0,
-
-            // Right face
-            1.0, 0.0, 0.0, 1.0,
-            0.0, 0.0, 1.0, 1.0,
-            0.0, 1.0, 0.0, 1.0,
-
-            // Back face
-            1.0, 0.0, 0.0, 1.0,
-            0.0, 1.0, 0.0, 1.0,
-            0.0, 0.0, 1.0, 1.0,
-
-            // Left face
-            1.0, 0.0, 0.0, 1.0,
-            0.0, 0.0, 1.0, 1.0,
-            0.0, 1.0, 0.0, 1.0
-        ];
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-        pyramidVertexColorBuffer.itemSize = 4;
-        pyramidVertexColorBuffer.numItems = 12;
 
 
-        cubeVertexPositionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
-        vertices = [
-            // Front face
-            -1.0, -1.0,  1.0,
-             1.0, -1.0,  1.0,
-             1.0,  1.0,  1.0,
-            -1.0,  1.0,  1.0,
-
-            // Back face
-            -1.0, -1.0, -1.0,
-            -1.0,  1.0, -1.0,
-             1.0,  1.0, -1.0,
-             1.0, -1.0, -1.0,
-
-            // Top face
-            -1.0,  1.0, -1.0,
-            -1.0,  1.0,  1.0,
-             1.0,  1.0,  1.0,
-             1.0,  1.0, -1.0,
-
-            // Bottom face
-            -1.0, -1.0, -1.0,
-             1.0, -1.0, -1.0,
-             1.0, -1.0,  1.0,
-            -1.0, -1.0,  1.0,
-
-            // Right face
-             1.0, -1.0, -1.0,
-             1.0,  1.0, -1.0,
-             1.0,  1.0,  1.0,
-             1.0, -1.0,  1.0,
-
-            // Left face
-            -1.0, -1.0, -1.0,
-            -1.0, -1.0,  1.0,
-            -1.0,  1.0,  1.0,
-            -1.0,  1.0, -1.0
-        ];
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-        cubeVertexPositionBuffer.itemSize = 3;
-        cubeVertexPositionBuffer.numItems = 24;
-
-        cubeVertexColorBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexColorBuffer);
-        colors = [
-            [1.0, 0.0, 0.0, 1.0], // Front face
-            [1.0, 1.0, 0.0, 1.0], // Back face
-            [0.0, 1.0, 0.0, 1.0], // Top face
-            [1.0, 0.5, 0.5, 1.0], // Bottom face
-            [1.0, 0.0, 1.0, 1.0], // Right face
-            [0.0, 0.0, 1.0, 1.0]  // Left face
-        ];
-        var unpackedColors = [];
-        for (var i in colors) {
-            var color = colors[i];
-            for (var j=0; j < 4; j++) {
-                unpackedColors = unpackedColors.concat(color);
-            }
-        }
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(unpackedColors), gl.STATIC_DRAW);
-        cubeVertexColorBuffer.itemSize = 4;
-        cubeVertexColorBuffer.numItems = 24;
-
-        cubeVertexIndexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
-        var cubeVertexIndices = [
-            0, 1, 2,      0, 2, 3,    // Front face
-            4, 5, 6,      4, 6, 7,    // Back face
-            8, 9, 10,     8, 10, 11,  // Top face
-            12, 13, 14,   12, 14, 15, // Bottom face
-            16, 17, 18,   16, 18, 19, // Right face
-            20, 21, 22,   20, 22, 23  // Left face
-        ];
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
-        cubeVertexIndexBuffer.itemSize = 1;
-        cubeVertexIndexBuffer.numItems = 36;*/
+// ----------------------------
+//
+//      CUBE RAINBOW
+//
+// ----------------------------
 
 
 // Square
@@ -3320,32 +3491,131 @@ const cubeIndices = [
     20, 21, 22,   20, 22, 23  // Left face
 ]
 const cubeColors = [
-    1.0, 0.0, 0.0, 1.0, // Front face
-    1.0, 1.0, 0.0, 1.0, // Back face
-    0.0, 1.0, 0.0, 1.0, // Top face
-    1.0, 0.5, 0.5, 1.0, // Bottom face
-    1.0, 0.0, 1.0, 1.0, // Right face
-    0.0, 0.0, 1.0, 1.0  // Left face
+    [1.0, 0.0, 0.0, 1.0], // Front face
+    [1.0, 1.0, 0.0, 1.0], // Back face
+    [0.0, 1.0, 0.0, 1.0], // Top face
+    [1.0, 0.5, 0.5, 1.0], // Bottom face
+    [1.0, 0.0, 1.0, 1.0], // Right face
+    [0.0, 0.0, 1.0, 1.0]  // Left face
 ]
 
 let unpackedCubeColors = []
-for (const color of cubeColors)
+for (let i in cubeColors)
+{
+    var color = cubeColors[i];
     for (let j = 0; j < 4; j++)
         unpackedCubeColors = unpackedCubeColors.concat(color)
+}
+
 
 const cubeGeom = new __WEBPACK_IMPORTED_MODULE_4__core_Geom__["a" /* default */]()
-cubeGeom.addAttribute('aVertexPosition', cubeVertices, 3)
-cubeGeom.addAttribute('aVertexColor', unpackedCubeColors, 4)
+cubeGeom.addVertices('aVertexPosition', cubeVertices, 3)
+cubeGeom.addVertices('aVertexColor', unpackedCubeColors, 4)
 cubeGeom.addIndices(cubeIndices)
 
-const cubeMesh = new __WEBPACK_IMPORTED_MODULE_5__core_Mesh3D__["a" /* default */](cubeGeom, program)
-cubeMesh.translate(3.0, 0.0, 0.0)
+const cubeMesh = new __WEBPACK_IMPORTED_MODULE_5__core_Mesh3D__["a" /* default */](cubeGeom, fogProgram)
+cubeMesh.translate(1.5, -1.5, -8.0)
 scene.addMesh(cubeMesh)
 
 
+// ----------------------------
+//
+//      CUBE WOOD
+//
+// ----------------------------
+
+const vertexTextureShader = `   
+    attribute vec3 aVertexPosition;
+    attribute vec2 aTextureCoord;
+
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+
+    varying vec2 vTextureCoord;
+
+    void main(void) {
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+        vTextureCoord = aTextureCoord;
+    }`
+
+const fragmentTextureShader = `
+    precision mediump float;
+
+    varying vec2 vTextureCoord;
+
+    uniform sampler2D uSampler;
+
+    void main(void) {
+        gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+    }`
+
+const texturedProgram = new __WEBPACK_IMPORTED_MODULE_3__core_Program__["a" /* default */](vertexTextureShader, fragmentTextureShader)
+
+var cubeUV = [
+    // Front face
+    0.0, 0.0,
+    1.0, 0.0,
+    1.0, 1.0,
+    0.0, 1.0,
+
+    // Back face
+    1.0, 0.0,
+    1.0, 1.0,
+    0.0, 1.0,
+    0.0, 0.0,
+
+    // Top face
+    0.0, 1.0,
+    0.0, 0.0,
+    1.0, 0.0,
+    1.0, 1.0,
+
+    // Bottom face
+    1.0, 1.0,
+    0.0, 1.0,
+    0.0, 0.0,
+    1.0, 0.0,
+
+    // Right face
+    1.0, 0.0,
+    1.0, 1.0,
+    0.0, 1.0,
+    0.0, 0.0,
+
+    // Left face
+    0.0, 0.0,
+    1.0, 0.0,
+    1.0, 1.0,
+    0.0, 1.0,
+]
+
+const cubeTexture = new __WEBPACK_IMPORTED_MODULE_8__core_Texture__["a" /* default */]('uSampler')
+cubeTexture.load('/cube-diffuse.jpg')
+
+const cubeTexturedGeom = new __WEBPACK_IMPORTED_MODULE_4__core_Geom__["a" /* default */]()
+cubeTexturedGeom.addVertices('aVertexPosition', cubeVertices, 3)
+cubeTexturedGeom.addVertices('aTextureCoord', cubeUV, 2)
+cubeTexturedGeom.addIndices(cubeIndices)
+
+const cubeTexturedMesh = new __WEBPACK_IMPORTED_MODULE_5__core_Mesh3D__["a" /* default */](cubeTexturedGeom, texturedProgram)
+cubeTexturedMesh.addTexture(cubeTexture)
+cubeTexturedMesh.translate(1.5, 1.5, -8.0)
+scene.addMesh(cubeTexturedMesh)
 
 
-scene.draw()
+
+
+refresh()
+function refresh()
+{
+    pyramidMesh.rotate(0.005, 0, 1, 0)
+    cubeMesh.rotate(0.01, 0, 1, 0)
+    cubeTexturedMesh.rotate(-0.01, 0, 1, 0)
+    
+    scene.draw()
+    requestAnimationFrame(refresh)
+}
+
 
 
 /***/ })

@@ -73,7 +73,7 @@ export default class Geom
     
     init(gl, program)
     {
-        const success = true
+        let success = true
         
         for (const attribute of this.attributes)
             if (!attribute.isInitialized())
