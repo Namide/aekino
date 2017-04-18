@@ -298,7 +298,7 @@ var cubeUV = [
 ]
 
 const cubeTexture = new Texture('uSampler')
-cubeTexture.load('/cube-diffuse.jpg')
+cubeTexture.load('cube-diffuse.jpg')
 
 const cubeTexturedGeom = new Geom()
 cubeTexturedGeom.addVertices('aVertexPosition', cubeVertices, 3)

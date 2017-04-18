@@ -3812,7 +3812,7 @@ var cubeUV = [
 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0];
 
 var cubeTexture = new _Texture2.default('uSampler');
-cubeTexture.load('/cube-diffuse.jpg');
+cubeTexture.load('cube-diffuse.jpg');
 
 var cubeTexturedGeom = new _Geom2.default();
 cubeTexturedGeom.addVertices('aVertexPosition', cubeVertices, 3);

@@ -3590,7 +3590,7 @@ var cubeUV = [
 ]
 
 const cubeTexture = new __WEBPACK_IMPORTED_MODULE_8__core_Texture__["a" /* default */]('uSampler')
-cubeTexture.load('/cube-diffuse.jpg')
+cubeTexture.load('cube-diffuse.jpg')
 
 const cubeTexturedGeom = new __WEBPACK_IMPORTED_MODULE_4__core_Geom__["a" /* default */]()
 cubeTexturedGeom.addVertices('aVertexPosition', cubeVertices, 3)
