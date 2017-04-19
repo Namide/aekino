@@ -1579,10 +1579,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Cam3D = function (_Uniform) {
     _inherits(Cam3D, _Uniform);
 
-    function Cam3D() {
+    function Cam3D(label) {
         _classCallCheck(this, Cam3D);
 
-        var _this = _possibleConstructorReturn(this, (Cam3D.__proto__ || Object.getPrototypeOf(Cam3D)).call(this, 'uPMatrix', 35676, new _Matrix4x2.default()));
+        var _this = _possibleConstructorReturn(this, (Cam3D.__proto__ || Object.getPrototypeOf(Cam3D)).call(this, label, 35676, new _Matrix4x2.default()));
 
         _this.fovy = 45;
         _this.near = 0.1;
@@ -2670,7 +2670,7 @@ exports.vec4 = require("./gl-matrix/vec4.js");*/
 var canvas = document.body.querySelector('canvas');
 
 // Camera
-var cam3D = new _Cam3D2.default();
+var cam3D = new _Cam3D2.default('uPMatrix');
 cam3D.matrix.translate([-1.5, 0.0, -7.0]);
 
 // Scene

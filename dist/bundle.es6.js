@@ -1315,9 +1315,9 @@ class Matrix4x4 extends Float32Array
 
 class Cam3D extends __WEBPACK_IMPORTED_MODULE_1__Uniform__["a" /* default */]
 {
-    constructor()
+    constructor(label)
     {
-        super('uPMatrix', 35676, new __WEBPACK_IMPORTED_MODULE_0__math_Matrix4x4__["a" /* default */]())
+        super(label, 35676, new __WEBPACK_IMPORTED_MODULE_0__math_Matrix4x4__["a" /* default */]())
        
         this.fovy = 45
         this.near = 0.1
@@ -2097,7 +2097,7 @@ const canvas = document.body.querySelector('canvas')
 
 
 // Camera
-const cam3D = new __WEBPACK_IMPORTED_MODULE_5__core_Cam3D__["a" /* default */]()
+const cam3D = new __WEBPACK_IMPORTED_MODULE_5__core_Cam3D__["a" /* default */]('uPMatrix')
 cam3D.matrix.translate([-1.5, 0.0, -7.0])
 
 

@@ -53,7 +53,7 @@ const canvas = document.body.querySelector('canvas')
 
 
 // Camera
-const cam3D = new Cam3D()
+const cam3D = new Cam3D('uPMatrix')
 cam3D.matrix.translate([-1.5, 0.0, -7.0])
 
 
