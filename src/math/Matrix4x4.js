@@ -372,7 +372,7 @@ class Matrix4x4 extends Float32Array
         return this
     }
 
-    fromTranslation = function(vec3)
+    fromTranslation(vec3)
     {
         this[0] = 1
         this.fill(0, 1, 4)
@@ -436,4 +436,268 @@ class Matrix4x4 extends Float32Array
 
         return this
     }
+
+    fromXRotation(rad)
+    {
+        const s = Math.sin(rad)
+        const c = Math.cos(rad)
+
+        // Perform axis-specific matrix multiplication
+        this[0] = 1
+        this.fill(0, 1, 4)
+        this[5] = c
+        this[6] = s
+        this.fill(0, 7, 8)
+        this[9] = -s
+        this[10] = c
+        this.fill(0, 11, 14)
+        this[15] = 1
+
+        return this
+    }
+
+    fromYRotation(rad)
+    {
+        const s = Math.sin(rad)
+        const c = Math.cos(rad)
+
+        // Perform axis-specific matrix multiplication
+        this[0] = c
+        this[1] = 0
+        this[2] = -s
+        this.fill(0, 3, 4)
+        this[5] = 1
+        this.fill(0, 6, 7)
+        this[8] = s
+        this[9] = 0
+        this[10] = c
+        this.fill(0, 11, 14)
+        this[15] = 1
+
+        return this
+    }
+
+    fromZRotation(rad)
+    {
+        const s = Math.sin(rad)
+        const c = Math.cos(rad)
+
+        // Perform axis-specific matrix multiplication
+        this[0] = c
+        this[1] = s
+        this.fill(0, 2, 3)
+        this[4] = -s
+        this[5] = c
+        this.fill(0, 6, 9)
+        this[10] = 1
+        this.fill(0, 11, 14)
+        this[15] = 1
+
+        return this
+    }
+
+    fromQuat(quat)
+    {
+        const [x, y, z, w] = quat
+        const x2 = x + x
+        const y2 = y + y
+        const z2 = z + z
+
+        const xx = x * x2
+        const yx = y * x2
+        const yy = y * y2
+        const zx = z * x2
+        const zy = z * y2
+        const zz = z * z2
+        const wx = w * x2
+        const wy = w * y2
+        const wz = w * z2
+
+        this[0] = 1 - yy - zz
+        this[1] = yx + wz
+        this[2] = zx - wy
+        this[3] = 0
+        this[4] = yx - wz
+        this[5] = 1 - xx - zz
+        this[6] = zy + wx
+        this[7] = 0
+        this[8] = zx + wy
+        this[9] = zy - wx
+        this[10] = 1 - xx - yy
+        this.fill(0, 11, 14)
+        this[15] = 1
+
+        return this
+    }
+
+    fromRotationTranslation(quat, vec3)
+    {
+        // Quaternion math
+        const [x, y, z, w] = quat
+
+        const x2 = x + x
+        const y2 = y + y
+        const z2 = z + z
+
+        const xx = x * x2
+        const xy = x * y2
+        const xz = x * z2
+        const yy = y * y2
+        const yz = y * z2
+        const zz = z * z2
+        const wx = w * x2
+        const wy = w * y2
+        const wz = w * z2
+
+        this[0] = 1 - (yy + zz)
+        this[1] = xy + wz
+        this[2] = xz - wy
+        this[3] = 0
+        this[4] = xy - wz
+        this[5] = 1 - (xx + zz)
+        this[6] = yz + wx
+        this[7] = 0
+        this[8] = xz + wy
+        this[9] = yz - wx
+        this[10] = 1 - (xx + yy)
+        this[11] = 0
+        this[12] = vec3[0]
+        this[13] = vec3[1]
+        this[14] = vec3[2]
+        this[15] = 1
+
+        return this
+    }
+
+    fromRotationTranslationScale(quat, vec3, scale)
+    {
+        // Quaternion math
+        const [x, y, z, w] = quat
+        const x2 = x + x
+        const y2 = y + y
+        const z2 = z + z
+
+        const xx = x * x2
+        const xy = x * y2
+        const xz = x * z2
+        const yy = y * y2
+        const yz = y * z2
+        const zz = z * z2
+        const wx = w * x2
+        const wy = w * y2
+        const wz = w * z2
+        const [sx, sy, sz] = scale
+
+        this[0] = (1 - (yy + zz)) * sx
+        this[1] = (xy + wz) * sx
+        this[2] = (xz - wy) * sx
+        this[3] = 0
+        this[4] = (xy - wz) * sy
+        this[5] = (1 - (xx + zz)) * sy
+        this[6] = (yz + wx) * sy
+        this[7] = 0
+        this[8] = (xz + wy) * sz
+        this[9] = (yz - wx) * sz
+        this[10] = (1 - (xx + yy)) * sz
+        this[11] = 0
+        this[12] = vec3[0]
+        this[13] = vec3[1]
+        this[14] = vec3[2]
+        this[15] = 1
+
+        return this
+    }
+
+    fromRotationTranslationScaleOrigin(rotation, translation, scale, origin)
+    {
+        // Quaternion math
+        const [x, y, z, w] = rotation
+        const x2 = x + x
+        const y2 = y + y
+        const z2 = z + z
+
+        const xx = x * x2
+        const xy = x * y2
+        const xz = x * z2
+        const yy = y * y2
+        const yz = y * z2
+        const zz = z * z2
+        const wx = w * x2
+        const wy = w * y2
+        const wz = w * z2
+
+        const [sx, sy, sz] = scale
+        const [ox, oy, oz] = origin
+
+        this[0] = (1 - (yy + zz)) * sx
+        this[1] = (xy + wz) * sx
+        this[2] = (xz - wy) * sx
+        this[3] = 0
+        this[4] = (xy - wz) * sy
+        this[5] = (1 - (xx + zz)) * sy
+        this[6] = (yz + wx) * sy
+        this[7] = 0
+        this[8] = (xz + wy) * sz
+        this[9] = (yz - wx) * sz
+        this[10] = (1 - (xx + yy)) * sz
+        this[11] = 0
+        this[12] = translation[0] + ox - (this[0] * ox + this[4] * oy + this[8] * oz)
+        this[13] = translation[1] + oy - (this[1] * ox + this[5] * oy + this[9] * oz)
+        this[14] = translation[2] + oz - (this[2] * ox + this[6] * oy + this[10] * oz)
+        this[15] = 1
+
+        return this
+    }
+
+    getTranslation(mat, vec3 = new Float32Array(3))
+    {
+        vec3[0] = this[12]
+        vec3[1] = this[13]
+        vec3[2] = this[14]
+
+        return vec3
+    }
+
+    getRotation(quat = new Float32Array(4))
+    {
+        // Algorithm taken from http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
+        var trace = this[0] + this[5] + this[10]
+
+        if (trace > 0)
+        {
+            const S = Math.sqrt(trace + 1.0) * 2
+            quat[0] = (this[6] - this[9]) / S
+            quat[1] = (this[8] - this[2]) / S
+            quat[2] = (this[1] - this[4]) / S
+            quat[3] = 0.25 * S
+        }
+        else if (this[0] > this[5] & this[0] > this[10])
+        {
+            const S = Math.sqrt(1.0 + this[0] - this[5] - this[10]) * 2
+            quat[0] = 0.25 * S
+            quat[1] = (this[1] + this[4]) / S
+            quat[2] = (this[8] + this[2]) / S
+            quat[3] = (this[6] - this[9]) / S
+        }
+        else if (this[5] > this[10])
+        {
+            const S = Math.sqrt(1.0 + this[5] - this[0] - this[10])
+            quat[0] = (this[1] + this[4]) / S * 2
+            quat[1] = 0.25 * S
+            quat[2] = (this[6] + this[9]) / S
+            quat[3] = (this[8] - this[2]) / S
+        }
+        else
+        {
+            const S = Math.sqrt(1.0 + this[10] - this[0] - this[5]) * 2
+            quat[0] = (this[8] + this[2]) / S
+            quat[1] = (this[6] + this[9]) / S
+            quat[2] = 0.25 * S
+            quat[3] = (this[1] - this[4]) / S
+        }
+
+        return quat
+    }
+
+
 }
