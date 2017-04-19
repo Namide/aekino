@@ -1,6 +1,8 @@
 
 // polyfill -> fill, 
 
+const EPSILON = 0.000001
+
 class Matrix4x4 extends Float32Array
 {
     constructor()
@@ -37,6 +39,107 @@ class Matrix4x4 extends Float32Array
         this[15] = 1
 
         return this
+    }
+
+    add(mat4)
+    {
+        this[0] += mat4[0]
+        this[1] += mat4[1]
+        this[2] += mat4[2]
+        this[3] += mat4[3]
+        this[4] += mat4[4]
+        this[5] += mat4[5]
+        this[6] += mat4[6]
+        this[7] += mat4[7]
+        this[8] += mat4[8]
+        this[9] += mat4[9]
+        this[10] += mat4[10]
+        this[11] += mat4[11]
+        this[12] += mat4[12]
+        this[13] += mat4[13]
+        this[14] += mat4[14]
+        this[15] += mat4[15]
+
+        return this
+    }
+
+    subtract(mat4)
+    {
+        this[0] -= mat4[0]
+        this[1] -= mat4[1]
+        this[2] -= mat4[2]
+        this[3] -= mat4[3]
+        this[4] -= mat4[4]
+        this[5] -= mat4[5]
+        this[6] -= mat4[6]
+        this[7] -= mat4[7]
+        this[8] -= mat4[8]
+        this[9] -= mat4[9]
+        this[10] -= mat4[10]
+        this[11] -= mat4[11]
+        this[12] -= mat4[12]
+        this[13] -= mat4[13]
+        this[14] -= mat4[14]
+        this[15] -= mat4[15]
+
+        return this
+    }
+
+    multiplyScalar(mat4)
+    {
+        this[0] *= mat4
+        this[1] *= mat4
+        this[2] *= mat4
+        this[3] *= mat4
+        this[4] *= mat4
+        this[5] *= mat4
+        this[6] *= mat4
+        this[7] *= mat4
+        this[8] *= mat4
+        this[9] *= mat4
+        this[10] *= mat4
+        this[11] *= mat4
+        this[12] *= mat4
+        this[13] *= mat4
+        this[14] *= mat4
+        this[15] *= mat4
+
+        return this
+    }
+
+    multiplyScalarAndAdd(mat4, scale)
+    {
+        this[0] += mat4[0] * scale
+        this[1] += mat4[1] * scale
+        this[2] += mat4[2] * scale
+        this[3] += mat4[3] * scale
+        this[4] += mat4[4] * scale
+        this[5] += mat4[5] * scale
+        this[6] += mat4[6] * scale
+        this[7] += mat4[7] * scale
+        this[8] += mat4[8] * scale
+        this[9] += mat4[9] * scale
+        this[10] += mat4[10] * scale
+        this[11] += mat4[11] * scale
+        this[12] += mat4[12] * scale
+        this[13] += mat4[13] * scale
+        this[14] += mat4[14] * scale
+        this[15] += mat4[15] * scale
+
+        return this
+    }
+
+    exactEquals(mat4)
+    {
+        return this[0] === mat4[0] && this[1] === mat4[1] && this[2] === mat4[2] && this[3] === mat4[3] && this[4] === mat4[4] && this[5] === mat4[5] && this[6] === mat4[6] && this[7] === mat4[7] && this[8] === mat4[8] && this[9] === mat4[9] && this[10] === mat4[10] && this[11] === mat4[11] && this[12] === mat4[12] && this[13] === mat4[13] && this[14] === mat4[14] && this[15] === mat4[15]
+    }
+
+    equals(mat4)
+    {
+        const [a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15] = this
+        const [b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13, b14, b15] = mat4
+
+        return (Math.abs(a0 - b0) <= EPSILON * Math.max(1.0, Math.abs(a0), Math.abs(b0)) && Math.abs(a1 - b1) <= EPSILON * Math.max(1.0, Math.abs(a1), Math.abs(b1)) && Math.abs(a2 - b2) <= EPSILON * Math.max(1.0, Math.abs(a2), Math.abs(b2)) && Math.abs(a3 - b3) <= EPSILON * Math.max(1.0, Math.abs(a3), Math.abs(b3)) && Math.abs(a4 - b4) <= EPSILON * Math.max(1.0, Math.abs(a4), Math.abs(b4)) && Math.abs(a5 - b5) <= EPSILON * Math.max(1.0, Math.abs(a5), Math.abs(b5)) && Math.abs(a6 - b6) <= EPSILON * Math.max(1.0, Math.abs(a6), Math.abs(b6)) && Math.abs(a7 - b7) <= EPSILON * Math.max(1.0, Math.abs(a7), Math.abs(b7)) && Math.abs(a8 - b8) <= EPSILON * Math.max(1.0, Math.abs(a8), Math.abs(b8)) && Math.abs(a9 - b9) <= EPSILON * Math.max(1.0, Math.abs(a9), Math.abs(b9)) && Math.abs(a10 - b10) <= EPSILON * Math.max(1.0, Math.abs(a10), Math.abs(b10)) && Math.abs(a11 - b11) <= EPSILON * Math.max(1.0, Math.abs(a11), Math.abs(b11)) && Math.abs(a12 - b12) <= EPSILON * Math.max(1.0, Math.abs(a12), Math.abs(b12)) && Math.abs(a13 - b13) <= EPSILON * Math.max(1.0, Math.abs(a13), Math.abs(b13)) && Math.abs(a14 - b14) <= EPSILON * Math.max(1.0, Math.abs(a14), Math.abs(b14)) && Math.abs(a15 - b15) <= EPSILON * Math.max(1.0, Math.abs(a15), Math.abs(b15)))
     }
 
     transpose(mat4)
@@ -256,7 +359,7 @@ class Matrix4x4 extends Float32Array
         let [x, y, z] = axis
         let len = Math.sqrt(x * x + y * y + z * z)
 
-        if (Math.abs(len) > 0.000001)
+        if (Math.abs(len) > EPSILON)
         {
             len = 1 / len
             x *= len
@@ -407,7 +510,7 @@ class Matrix4x4 extends Float32Array
         let len = Math.sqrt(x * x + y * y + z * z)
 
 
-        if (Math.abs(len) > 0.000001)
+        if (Math.abs(len) > EPSILON)
         {
             len = 1 / len
             x *= len
@@ -699,5 +802,171 @@ class Matrix4x4 extends Float32Array
         return quat
     }
 
+    frustrum(left, right, bottom, top, near, far)
+    {
+        const rl = 1 / (right - left)
+        const tb = 1 / (top - bottom)
+        const nf = 1 / (near - far)
 
+        this[0] = (near * 2) * rl
+        this.fill(0, 1, 4)
+        this[5] = (near * 2) * tb
+        this.fill(0, 6, 7)
+        this[8] = (right + left) * rl
+        this[9] = (top + bottom) * tb
+        this[10] = (far + near) * nf
+        this[11] = -1
+        this.fill(0, 12, 13)
+        this[14] = (far * near * 2) * nf
+        this[15] = 0
+
+        return this
+    }
+
+    perspective(fovy, aspect, near, far)
+    {
+        const f = 1.0 / Math.tan(fovy / 2)
+        const nf = 1 / (near - far)
+
+        this[0] = f / aspect
+        this.fill(0, 1, 4)
+        this[5] = f
+        this.fill(0, 6, 9)
+        this[10] = (far + near) * nf
+        this[11] = -1
+        this.fill(0, 12, 13)
+        this[14] = (2 * far * near) * nf
+        this[15] = 0
+
+        return this
+    }
+
+    perspectiveFromFieldOfView(fov, near, far)
+    {
+        const upTan = Math.tan(fov.upDegrees * Math.PI / 180)
+        const downTan = Math.tan(fov.downDegrees * Math.PI / 180)
+        const leftTan = Math.tan(fov.leftDegrees * Math.PI / 180)
+        const rightTan = Math.tan(fov.rightDegrees * Math.PI / 180)
+        const xScale = 2 / (leftTan + rightTan)
+        const yScale = 2 / (upTan + downTan)
+
+        this[0] = xScale
+        this.fill(0, 1, 4)
+        this[5] = yScale
+        this.fill(0, 6, 7)
+        this[8] = -(leftTan - rightTan) * xScale * 0.5
+        this[9] = (upTan - downTan) * yScale * 0.5
+        this[10] = far / (near - far)
+        this[11] = -1.0
+        this.fill(0, 12, 13)
+        this[14] = (far * near) / (near - far)
+        this[15] = 0
+
+        return this
+    }
+
+    ortho(left, right, bottom, top, near, far)
+    {
+        const lr = 1 / (left - right)
+        const bt = 1 / (bottom - top)
+        const nf = 1 / (near - far)
+
+        this[0] = -2 * lr
+        this.fill(0, 1, 4)
+        this[5] = -2 * bt
+        this.fill(0, 6, 9)
+        this[10] = 2 * nf
+        this[11] = 0
+        this[12] = (left + right) * lr
+        this[13] = (top + bottom) * bt
+        this[14] = (far + near) * nf
+        this[15] = 1
+
+        return this
+    }
+
+    lookAt(eye, center, up)
+    {
+        const [eyex, eyey, eyez] = eye
+        const [upx, upy, upz] = up
+        const [centerx, centery, centerz] = center
+
+        if (Math.abs(eyex - centerx) < EPSILON &&
+            Math.abs(eyey - centery) < EPSILON &&
+            Math.abs(eyez - centerz) < EPSILON)
+        {
+            return this.identity()
+        }
+
+        let z0 = eyex - centerx
+        let z1 = eyey - centery
+        let z2 = eyez - centerz
+
+        let len = 1 / Math.sqrt(z0 * z0 + z1 * z1 + z2 * z2)
+        z0 *= len
+        z1 *= len
+        z2 *= len
+
+        const x0 = upy * z2 - upz * z1
+        const x1 = upz * z0 - upx * z2
+        const x2 = upx * z1 - upy * z0
+
+        len = Math.sqrt(x0 * x0 + x1 * x1 + x2 * x2)
+        if (!len)
+        {
+            x0 = 0
+            x1 = 0
+            x2 = 0
+        }
+        else
+        {
+            len = 1 / len
+            x0 *= len
+            x1 *= len
+            x2 *= len
+        }
+
+        let y0 = z1 * x2 - z2 * x1
+        let y1 = z2 * x0 - z0 * x2
+        let y2 = z0 * x1 - z1 * x0
+
+        len = Math.sqrt(y0 * y0 + y1 * y1 + y2 * y2)
+        if (!len)
+        {
+            y0 = 0
+            y1 = 0
+            y2 = 0
+        }
+        else
+        {
+            len = 1 / len
+            y0 *= len
+            y1 *= len
+            y2 *= len
+        }
+
+        this[0] = x0
+        this[1] = y0
+        this[2] = z0
+        this[3] = 0
+        this[4] = x1
+        this[5] = y1
+        this[6] = z1
+        this[7] = 0
+        this[8] = x2
+        this[9] = y2
+        this[10] = z2
+        this[11] = 0
+        this[12] = -(x0 * eyex + x1 * eyey + x2 * eyez)
+        this[13] = -(y0 * eyex + y1 * eyey + y2 * eyez)
+        this[14] = -(z0 * eyex + z1 * eyey + z2 * eyez)
+        this[15] = 1
+
+        return this
+    }
+
+    frob()
+    {
+        return (Math.sqrt(Math.pow(this[0], 2) + Math.pow(this[1], 2) + Math.pow(this[2], 2) + Math.pow(this[3], 2) + Math.pow(this[4], 2) + Math.pow(this[5], 2) + Math.pow(this[6], 2) + Math.pow(this[7], 2) + Math.pow(this[8], 2) + Math.pow(this[9], 2) + Math.pow(this[10], 2) + Math.pow(this[11], 2) + Math.pow(this[12], 2) + Math.pow(this[13], 2) + Math.pow(this[14], 2) + Math.pow(this[15], 2)))
+    }
 }
