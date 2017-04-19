@@ -3,7 +3,7 @@
 
 const EPSILON = 0.000001
 
-class Matrix4x4 extends Float32Array
+export default class Matrix4x4 extends Float32Array
 {
     constructor()
     {
@@ -907,9 +907,9 @@ class Matrix4x4 extends Float32Array
         z1 *= len
         z2 *= len
 
-        const x0 = upy * z2 - upz * z1
-        const x1 = upz * z0 - upx * z2
-        const x2 = upx * z1 - upy * z0
+        let x0 = upy * z2 - upz * z1
+        let x1 = upz * z0 - upx * z2
+        let x2 = upx * z1 - upy * z0
 
         len = Math.sqrt(x0 * x0 + x1 * x1 + x2 * x2)
         if (!len)

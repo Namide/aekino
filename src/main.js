@@ -29,7 +29,7 @@
 // http://learningwebgl.com/blog/?p=370
 
 
-import mat from 'gl-matrix/src/gl-matrix/mat4.js'
+// import mat from 'gl-matrix/src/gl-matrix/mat4.js'
 /*exports.glMatrix = require("./gl-matrix/common.js");
 exports.mat2 = require("./gl-matrix/mat2.js");
 exports.mat2d = require("./gl-matrix/mat2d.js");
@@ -54,7 +54,7 @@ const canvas = document.body.querySelector('canvas')
 
 // Camera
 const cam3D = new Cam3D()
-cam3D.translate(-1.5, 0.0, -7.0)
+cam3D.matrix.translate([-1.5, 0.0, -7.0])
 
 
 // Scene
@@ -66,7 +66,7 @@ const scene = new Scene(canvas, cam3D)
 // Programs
 const colorProgram = new Program()
 
-const fogVertexShader = `      
+const fogVertexShader = `
     attribute vec3 aVertexPosition;
     attribute vec4 aVertexColor;
 
@@ -140,7 +140,7 @@ pyramidGeom.addVertices('aVertexPosition', pyramidVertices, 3)
 pyramidGeom.addVertices('aVertexColor', pyramidColors, 4)
     
 const pyramidMesh = new Mesh3D(pyramidGeom, colorProgram)
-pyramidMesh.translate(-1.5, -1.5, -8.0)
+pyramidMesh.matrix.translate([-1.5, -1.5, -8.0])
 scene.addMesh(pyramidMesh)
 
 
@@ -222,7 +222,7 @@ cubeGeom.addVertices('aVertexColor', unpackedCubeColors, 4)
 cubeGeom.addIndices(cubeIndices)
 
 const cubeMesh = new Mesh3D(cubeGeom, fogProgram)
-cubeMesh.translate(1.5, -1.5, -8.0)
+cubeMesh.matrix.translate([1.5, -1.5, -8.0])
 scene.addMesh(cubeMesh)
 
 
@@ -307,7 +307,7 @@ cubeTexturedGeom.addIndices(cubeIndices)
 
 const cubeTexturedMesh = new Mesh3D(cubeTexturedGeom, texturedProgram)
 cubeTexturedMesh.addTexture(cubeTexture)
-cubeTexturedMesh.translate(1.5, 1.5, -8.0)
+cubeTexturedMesh.matrix.translate([1.5, 1.5, -8.0])
 scene.addMesh(cubeTexturedMesh)
 
 
@@ -316,9 +316,9 @@ scene.addMesh(cubeTexturedMesh)
 refresh()
 function refresh()
 {
-    pyramidMesh.rotate(0.005, 0, 1, 0)
-    cubeMesh.rotate(0.01, 0, 1, 0)
-    cubeTexturedMesh.rotate(-0.01, 0, 1, 0)
+    pyramidMesh.matrix.rotate(0.005, [0, 1, 0])
+    cubeMesh.matrix.rotate(0.01, [0, 1, 0])
+    cubeTexturedMesh.matrix.rotate(-0.01, [0, 1, 0])
     
     scene.draw()
     requestAnimationFrame(refresh)

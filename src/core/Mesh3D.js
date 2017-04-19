@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-import mat4 from 'gl-matrix/src/gl-matrix/mat4.js'
+import Matrix4x4 from '../math/Matrix4x4'
 import Uniform from './Uniform'
 
 export default class Mesh3D
@@ -31,30 +31,21 @@ export default class Mesh3D
     {
         this.geom = geom
         this.program = program
-        
-        // position, rotation, scale -> uniform
-        const matrix = mat4.create()
-        mat4.identity(matrix)
+
+        const matrix = new Matrix4x4().identity()
         const matrixU = new Uniform('uMVMatrix', 35676, matrix)
-        
+
         this.uniforms = [matrixU]
         this.textures = []
-        
+
         this.matrixU = matrixU
     }
     
-    rotate(rad, ...axe)
+    get matrix()
     {
-        const matrix = this.matrixU.data
-        mat4.rotate(matrix, matrix, rad, axe)
+        return this.matrixU.data
     }
-    
-    translate(...pos)
-    {
-        const matrix = this.matrixU.data
-        mat4.translate(matrix, matrix, pos)
-    }
-    
+
     
     addUniform(uniform)
     {

@@ -22,33 +22,35 @@
  * THE SOFTWARE.
  */
 
-import mat4 from 'gl-matrix/src/gl-matrix/mat4.js'
+import Matrix4x4 from '../math/Matrix4x4'
 import Uniform from './Uniform'
 
 export default class Cam3D extends Uniform
 {
     constructor()
     {
-        super('uPMatrix', 35676, mat4.create())
+        super('uPMatrix', 35676, new Matrix4x4())
        
         this.fovy = 45
         this.near = 0.1
         this.far = 100
-        this.position = mat4.create()
+        this._matrix = new Matrix4x4()
         
-        this.updated = false
-    }
-    
-    translate(...pos)
-    {
-        mat4.translate(this.position, this.position, pos)
         this.updated = true
+    }
+
+    get matrix()
+    {
+        this.updated = true
+        return this._matrix
     }
     
     update(w, h)
     {
-        mat4.copy(this.data, this.position)
-        mat4.perspective(this.data, this.fovy * Math.PI / 180, w / h, 0.1, 100.0)
+        this.data.set(this._matrix)
+        this.data.perspective(this.fovy * Math.PI / 180, w / h, 0.1, 100.0)
+
+
         this.updated = false
     }
 }
