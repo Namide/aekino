@@ -23,7 +23,7 @@
  */
 
 import Matrix4x4 from '../math/Matrix4x4'
-import Uniform from './Uniform'
+import Uniform from '../uniform/Uniform'
 
 export default class Mesh3D
 {
@@ -32,20 +32,19 @@ export default class Mesh3D
         this.geom = geom
         this.program = program
 
-        const matrix = new Matrix4x4().identity()
-        const matrixU = new Uniform('uMVMatrix', 35676, matrix)
+        /*const matrix = new Matrix4x4().identity()
+        const matrixU = new Uniform('uMVMatrix', 35676, matrix)*/
 
-        this.uniforms = [matrixU]
+        this.uniforms = []
         this.textures = []
 
-        this.matrixU = matrixU
+        //this.matrixU = matrixU
     }
     
-    get matrix()
+    /* get matrix()
     {
         return this.matrixU.data
-    }
-
+    }*/
     
     addUniform(uniform)
     {

@@ -25,32 +25,11 @@
 import Matrix4x4 from '../math/Matrix4x4'
 import Uniform from './Uniform'
 
-export default class Cam3D extends Uniform
+
+export default class UMat3D extends Uniform
 {
     constructor(label)
     {
-        super(label, 35676, new Matrix4x4())
-       
-        this.fovy = 45
-        this.near = 0.1
-        this.far = 100
-        this._matrix = new Matrix4x4()
-        
-        this.updated = true
-    }
-
-    get matrix()
-    {
-        this.updated = true
-        return this._matrix
-    }
-    
-    update(w, h)
-    {
-        this.data.set(this._matrix)
-        this.data.perspective(this.fovy * Math.PI / 180, w / h, 0.1, 100.0)
-
-
-        this.updated = false
+        super(label, 35676 /* gl.FLOAT_MAT4 */, new Matrix4x4().identity())
     }
 }

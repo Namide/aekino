@@ -40,14 +40,18 @@ exports.vec2 = require("./gl-matrix/vec2.js");
 exports.vec3 = require("./gl-matrix/vec3.js");
 exports.vec4 = require("./gl-matrix/vec4.js");*/
 
+import Uniform from './uniform/Uniform'
+import UMat3D from './uniform/UMat3D'
+
 import Attribute from './core/Attribute'
-import Uniform from './core/Uniform'
 import Program from './core/Program'
 import Geom from './core/Geom'
-import Mesh3D from './core/Mesh3D'
-import Cam3D from './core/Cam3D'
-import Scene from './core/Scene'
 import Texture from './core/Texture'
+
+import Mesh3D from './object/Mesh3D'
+import Cam3D from './object/Cam3D'
+import Scene from './object/Scene'
+
 
 const canvas = document.body.querySelector('canvas')
 
@@ -140,6 +144,9 @@ pyramidGeom.addVertices('aVertexPosition', pyramidVertices, 3)
 pyramidGeom.addVertices('aVertexColor', pyramidColors, 4)
     
 const pyramidMesh = new Mesh3D(pyramidGeom, colorProgram)
+const pyramidUniformMatrix = new UMat3D('uMVMatrix')
+pyramidMesh.addUniform(pyramidUniformMatrix)
+pyramidMesh.matrix = pyramidUniformMatrix.data
 pyramidMesh.matrix.translate([-1.5, -1.5, -8.0])
 scene.addMesh(pyramidMesh)
 
@@ -222,6 +229,9 @@ cubeGeom.addVertices('aVertexColor', unpackedCubeColors, 4)
 cubeGeom.addIndices(cubeIndices)
 
 const cubeMesh = new Mesh3D(cubeGeom, fogProgram)
+const cubeUniformMatrix = new UMat3D('uMVMatrix')
+cubeMesh.addUniform(cubeUniformMatrix)
+cubeMesh.matrix = cubeUniformMatrix.data
 cubeMesh.matrix.translate([1.5, -1.5, -8.0])
 scene.addMesh(cubeMesh)
 
@@ -306,6 +316,9 @@ cubeTexturedGeom.addVertices('aTextureCoord', cubeUV, 2)
 cubeTexturedGeom.addIndices(cubeIndices)
 
 const cubeTexturedMesh = new Mesh3D(cubeTexturedGeom, texturedProgram)
+const cubeTexturedUniformMatrix = new UMat3D('uMVMatrix')
+cubeTexturedMesh.addUniform(cubeTexturedUniformMatrix)
+cubeTexturedMesh.matrix = cubeTexturedUniformMatrix.data
 cubeTexturedMesh.addTexture(cubeTexture)
 cubeTexturedMesh.matrix.translate([1.5, 1.5, -8.0])
 scene.addMesh(cubeTexturedMesh)
