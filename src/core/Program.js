@@ -134,12 +134,9 @@ export default class Program
         // Link textures / program
         for (const texture of textures)
         {
-            const textureLocation = program.samplerUniform = gl.getUniformLocation(program, texture.label)
+            const textureLocation = gl.getUniformLocation(program, texture.label)
             this.textureLocation[texture.label] = textureLocation
-            console.log(texture.label, textureLocation, textures)
         }
-        
-        
         
         
         this.pointer = program

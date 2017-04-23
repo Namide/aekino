@@ -22,29 +22,16 @@
  * THE SOFTWARE.
  */
 
-import Matrix4x4 from '../math/Matrix4x4'
-import Uniform from '../uniform/Uniform'
-
-export default class Mesh3D
+export default class Mesh
 {
     constructor(geom, program)
     {
         this.geom = geom
         this.program = program
 
-        /*const matrix = new Matrix4x4().identity()
-        const matrixU = new Uniform('uMVMatrix', 35676, matrix)*/
-
         this.uniforms = []
         this.textures = []
-
-        //this.matrixU = matrixU
     }
-    
-    /* get matrix()
-    {
-        return this.matrixU.data
-    }*/
     
     addUniform(uniform)
     {
@@ -96,19 +83,20 @@ export default class Mesh3D
     
     draw(gl, globalUniforms)
     {
-        const allUniforms = [...this.uniforms, ...globalUniforms]
         const program = this.program
         
         this.program.draw(gl)
         this.geom.draw(gl, program)
             
-        for(const uniform of allUniforms)
+        for(const uniform of this.uniforms)
+            uniform.draw(gl, program)
+        
+        for(const uniform of globalUniforms)
             uniform.draw(gl, program)
         
         for (const texture of this.textures)
             texture.draw(gl, program)
             
         this.geom.display(gl, program)
-        // gl.drawArrays(gl.TRIANGLES, 0, pyramidVertexPositionBuffer.numItems)
     }
 }

@@ -31,6 +31,8 @@ export default class Scene
         this.meshs = []
         this.cam = cam
         this.uniforms = [cam]
+        
+        this.depthTest = true
     }
     
     _addCamToMeshs()
@@ -79,10 +81,37 @@ export default class Scene
             console.error('Could not initialise WebGL')
         }
 
-        gl.clearColor(0.0, 0.0, 0.0, 1.0)
-        gl.enable(gl.DEPTH_TEST)
+        
 
         this.gl = gl
+    }
+    
+    set depthTest(depthTest)
+    {
+        const gl = this.gl
+        
+        if (!!depthTest)
+            gl.enable(gl.DEPTH_TEST)
+        else
+            gl.disable(gl.DEPTH_TEST)
+        
+        this._depthTest = !!depthTest
+    }
+    
+    get depthTest()
+    {
+        return this._depthTest
+    }
+    
+    set bgColor([r, g, b, a = 1])
+    {
+        this.gl.clearColor(r, g, b, a)
+        this._bgColor = [r, g, b, a]
+    }
+    
+    get bgColor()
+    {
+        return this._bgColor
     }
     
     draw()

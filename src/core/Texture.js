@@ -30,7 +30,7 @@ export default class Texture
         
         this.onLoaded = texture =>
         {
-            console.log('Texture loaded:', texture.src)
+            // console.log('Texture loaded:', texture.src)
         }
         
         this.pointer = null

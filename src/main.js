@@ -48,7 +48,7 @@ import Program from './core/Program'
 import Geom from './core/Geom'
 import Texture from './core/Texture'
 
-import Mesh3D from './object/Mesh3D'
+import Mesh from './object/Mesh'
 import Cam3D from './object/Cam3D'
 import Scene from './object/Scene'
 
@@ -63,7 +63,8 @@ cam3D.matrix.translate([-1.5, 0.0, -7.0])
 
 // Scene
 const scene = new Scene(canvas, cam3D)
-
+scene.bgColor = [0.0, 0.0, 0.1, 1.0]
+scene.depthTest = true
 
 
 
@@ -118,6 +119,7 @@ const pyramidVertices = [
    -1.0, -1.0, -1.0,
    -1.0, -1.0,  1.0
 ]
+
 const pyramidColors = [
     // Front face
     1.0, 0.0, 0.0, 1.0,
@@ -139,11 +141,12 @@ const pyramidColors = [
     0.0, 0.0, 1.0, 1.0,
     0.0, 1.0, 0.0, 1.0
 ]
+
 const pyramidGeom = new Geom()
 pyramidGeom.addVertices('aVertexPosition', pyramidVertices, 3)
 pyramidGeom.addVertices('aVertexColor', pyramidColors, 4)
     
-const pyramidMesh = new Mesh3D(pyramidGeom, colorProgram)
+const pyramidMesh = new Mesh(pyramidGeom, colorProgram)
 const pyramidUniformMatrix = new UMat3D('uMVMatrix')
 pyramidMesh.addUniform(pyramidUniformMatrix)
 pyramidMesh.matrix = pyramidUniformMatrix.data
@@ -228,7 +231,7 @@ cubeGeom.addVertices('aVertexPosition', cubeVertices, 3)
 cubeGeom.addVertices('aVertexColor', unpackedCubeColors, 4)
 cubeGeom.addIndices(cubeIndices)
 
-const cubeMesh = new Mesh3D(cubeGeom, fogProgram)
+const cubeMesh = new Mesh(cubeGeom, fogProgram)
 const cubeUniformMatrix = new UMat3D('uMVMatrix')
 cubeMesh.addUniform(cubeUniformMatrix)
 cubeMesh.matrix = cubeUniformMatrix.data
@@ -315,7 +318,7 @@ cubeTexturedGeom.addVertices('aVertexPosition', cubeVertices, 3)
 cubeTexturedGeom.addVertices('aTextureCoord', cubeUV, 2)
 cubeTexturedGeom.addIndices(cubeIndices)
 
-const cubeTexturedMesh = new Mesh3D(cubeTexturedGeom, texturedProgram)
+const cubeTexturedMesh = new Mesh(cubeTexturedGeom, texturedProgram)
 const cubeTexturedUniformMatrix = new UMat3D('uMVMatrix')
 cubeTexturedMesh.addUniform(cubeTexturedUniformMatrix)
 cubeTexturedMesh.matrix = cubeTexturedUniformMatrix.data
