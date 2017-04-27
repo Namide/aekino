@@ -30,13 +30,25 @@ export default class Texture
         
         this.onLoaded = texture =>
         {
-            // console.log('Texture loaded:', texture.src)
+            console.log('Texture loaded:', texture.src)
         }
         
         this.pointer = null
         this.parameters = {
             9729: 9987
         }
+        
+        this.setFormat()
+    }
+    
+    /*
+        6407    gl.RGB
+        6408    gl.RGBA
+    */
+    setFormat(internalformat = 6408, format = 6408)
+    {
+        this.internalformat = internalformat
+        this.format = format
     }
     
     /*
@@ -100,18 +112,17 @@ export default class Texture
     
     init(gl, program)
     {
-        const texture = this.pointer || gl.createTexture()
-        
         const img = this.img
         if (!img)
             return false
         
+        const texture = this.pointer || gl.createTexture()
             
         // Loaded
         gl.bindTexture(gl.TEXTURE_2D, texture)
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
         
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img)
+        gl.texImage2D(gl.TEXTURE_2D, 0, this.internalformat, this.format, gl.UNSIGNED_BYTE, img)
         if (this._isPowerOf2(img.width) && this._isPowerOf2(img.height))
         {
             gl.generateMipmap(gl.TEXTURE_2D)

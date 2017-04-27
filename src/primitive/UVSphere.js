@@ -22,34 +22,12 @@
  * THE SOFTWARE.
  */
 
-import Matrix4x4 from '../math/Matrix4x4'
-import Uniform from '../uniform/Uniform'
+import Geom from '../core/Geom'
 
-export default class Cam3D extends Uniform
+export default class UVSphere extends Geom
 {
-    constructor(label)
+    constructor()
     {
-        super(label, 35676, new Matrix4x4())
-       
-        this.fovy = 45
-        this.near = 0.1
-        this.far = 1000
-        this._matrix = new Matrix4x4()
-        
-        this.updated = true
-    }
-
-    get matrix()
-    {
-        this.updated = true
-        return this._matrix
-    }
-    
-    update(w, h)
-    {
-        this.data.perspective(this.fovy * Math.PI / 180, w / h, 0.1, 100.0)
-        this.data.multiply(this._matrix)
-        this.updated = false
-        console.log(this.data)
+        // Todo
     }
 }
