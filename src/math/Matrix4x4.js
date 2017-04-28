@@ -1,6 +1,4 @@
 
-// polyfill -> fill, 
-
 const EPSILON = 0.000001
 
 export default class Matrix4x4 extends Float32Array
@@ -32,10 +30,21 @@ export default class Matrix4x4 extends Float32Array
 
     identity()
     {
-        this.fill(0)
         this[0] = 1
+        this[1] = 0
+        this[2] = 0
+        this[3] = 0
+        this[4] = 0
         this[5] = 1
+        this[6] = 0
+        this[7] = 0
+        this[8] = 0
+        this[9] = 0
         this[10] = 1
+        this[11] = 0
+        this[12] = 0
+        this[13] = 0
+        this[14] = 0
         this[15] = 1
 
         return this
@@ -478,9 +487,15 @@ export default class Matrix4x4 extends Float32Array
     fromTranslation(vec3)
     {
         this[0] = 1
-        this.fill(0, 1, 4)
+        this[1] = 0
+        this[2] = 0
+        this[3] = 0
+        this[4] = 0
         this[5] = 1
-        this.fill(0, 6, 9)
+        this[6] = 0
+        this[7] = 0
+        this[8] = 0
+        this[9] = 0
         this[10] = 1
         this[11] = 0
         this[12] = vec3[0]
@@ -494,11 +509,20 @@ export default class Matrix4x4 extends Float32Array
     fromScaling(vec3)
     {
         this[0] = vec3[0]
-        this.fill(0, 1, 4)
+        this[1] = 0
+        this[2] = 0
+        this[3] = 0
+        this[4] = 0
         this[5] = vec3[1]
-        this.fill(0, 6, 9)
+        this[6] = 0
+        this[7] = 0
+        this[8] = 0
+        this[9] = 0
         this[10] = vec3[2]
-        this.fill(0, 11, 14)
+        this[11] = 0
+        this[12] = 0
+        this[13] = 0
+        this[14] = 0
         this[15] = 1
 
         return this
@@ -533,7 +557,10 @@ export default class Matrix4x4 extends Float32Array
             this[8] = x * z * t + y * s
             this[9] = y * z * t - x * s
             this[10] = z * z * t + c
-            this.fill(0, 11, 14)
+            this[11] = 0
+            this[12] = 0
+            this[13] = 0
+            this[14] = 0
             this[15] = 1
         }
 
@@ -547,13 +574,20 @@ export default class Matrix4x4 extends Float32Array
 
         // Perform axis-specific matrix multiplication
         this[0] = 1
-        this.fill(0, 1, 4)
+        this[1] = 0
+        this[2] = 0
+        this[3] = 0
+        this[4] = 0
         this[5] = c
         this[6] = s
-        this.fill(0, 7, 8)
+        this[7] = 0
+        this[8] = 0
         this[9] = -s
         this[10] = c
-        this.fill(0, 11, 14)
+        this[11] = 0
+        this[12] = 0
+        this[13] = 0
+        this[14] = 0
         this[15] = 1
 
         return this
@@ -568,13 +602,18 @@ export default class Matrix4x4 extends Float32Array
         this[0] = c
         this[1] = 0
         this[2] = -s
-        this.fill(0, 3, 4)
+        this[3] = 0
+        this[4] = 0
         this[5] = 1
-        this.fill(0, 6, 7)
+        this[6] = 0
+        this[7] = 0
         this[8] = s
         this[9] = 0
         this[10] = c
-        this.fill(0, 11, 14)
+        this[11] = 0
+        this[12] = 0
+        this[13] = 0
+        this[14] = 0
         this[15] = 1
 
         return this
@@ -588,12 +627,19 @@ export default class Matrix4x4 extends Float32Array
         // Perform axis-specific matrix multiplication
         this[0] = c
         this[1] = s
-        this.fill(0, 2, 3)
+        this[2] = 0
+        this[3] = 0
         this[4] = -s
         this[5] = c
-        this.fill(0, 6, 9)
+        this[6] = 0
+        this[7] = 0
+        this[8] = 0
+        this[9] = 0
         this[10] = 1
-        this.fill(0, 11, 14)
+        this[11] = 0
+        this[12] = 0
+        this[13] = 0
+        this[14] = 0
         this[15] = 1
 
         return this
@@ -627,7 +673,10 @@ export default class Matrix4x4 extends Float32Array
         this[8] = zx + wy
         this[9] = zy - wx
         this[10] = 1 - xx - yy
-        this.fill(0, 11, 14)
+        this[11] = 0
+        this[12] = 0
+        this[13] = 0
+        this[14] = 0
         this[15] = 1
 
         return this
@@ -809,14 +858,19 @@ export default class Matrix4x4 extends Float32Array
         const nf = 1 / (near - far)
 
         this[0] = (near * 2) * rl
-        this.fill(0, 1, 4)
+        this[1] = 0
+        this[2] = 0
+        this[3] = 0
+        this[4] = 0
         this[5] = (near * 2) * tb
-        this.fill(0, 6, 7)
+        this[6] = 0
+        this[7] = 0
         this[8] = (right + left) * rl
         this[9] = (top + bottom) * tb
         this[10] = (far + near) * nf
         this[11] = -1
-        this.fill(0, 12, 13)
+        this[12] = 0
+        this[13] = 0
         this[14] = (far * near * 2) * nf
         this[15] = 0
 
@@ -829,12 +883,19 @@ export default class Matrix4x4 extends Float32Array
         const nf = 1 / (near - far)
 
         this[0] = f / aspect
-        this.fill(0, 1, 4)
+        this[1] = 0
+        this[2] = 0
+        this[3] = 0
+        this[4] = 0
         this[5] = f
-        this.fill(0, 6, 9)
+        this[6] = 0
+        this[7] = 0
+        this[8] = 0
+        this[9] = 0
         this[10] = (far + near) * nf
         this[11] = -1
-        this.fill(0, 12, 13)
+        this[12] = 0
+        this[13] = 0
         this[14] = (2 * far * near) * nf
         this[15] = 0
 
@@ -851,14 +912,19 @@ export default class Matrix4x4 extends Float32Array
         const yScale = 2 / (upTan + downTan)
 
         this[0] = xScale
-        this.fill(0, 1, 4)
+        this[1] = 0
+        this[2] = 0
+        this[3] = 0
+        this[4] = 0
         this[5] = yScale
-        this.fill(0, 6, 7)
+        this[6] = 0
+        this[7] = 0
         this[8] = -(leftTan - rightTan) * xScale * 0.5
         this[9] = (upTan - downTan) * yScale * 0.5
         this[10] = far / (near - far)
         this[11] = -1.0
-        this.fill(0, 12, 13)
+        this[12] = 0
+        this[13] = 0
         this[14] = (far * near) / (near - far)
         this[15] = 0
 
@@ -872,9 +938,15 @@ export default class Matrix4x4 extends Float32Array
         const nf = 1 / (near - far)
 
         this[0] = -2 * lr
-        this.fill(0, 1, 4)
+        this[1] = 0
+        this[2] = 0
+        this[3] = 0
+        this[4] = 0
         this[5] = -2 * bt
-        this.fill(0, 6, 9)
+        this[6] = 0
+        this[7] = 0
+        this[8] = 0
+        this[9] = 0
         this[10] = 2 * nf
         this[11] = 0
         this[12] = (left + right) * lr
