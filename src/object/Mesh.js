@@ -46,17 +46,19 @@ export default class Mesh
     
     isInitialized()
     {
+        let success = true
+        
         if (!this.program.isInitialized())
-            return false
+            success = false
         
         if (!this.geom.isInitialized())
-            return false      
+            success = false      
         
         for (const texture of this.textures)
             if (!texture.isInitialized())
-                return false
+                success = false
         
-        return true
+        return success
     }
     
     init(gl, globalUniforms)

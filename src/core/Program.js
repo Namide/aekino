@@ -59,6 +59,8 @@ export default class Program
         this.attribLocation = {}
         this.uniformLocation = {}
         this.textureLocation = {}
+        this.textureIndex = {}
+        this.textureNum = 0
         
         this.id = ++num
     }
@@ -94,6 +96,16 @@ export default class Program
             return this.textureLocation[label]
         else
             console.error('The texture location ' + label + ' don\'nt exist on this program')
+            
+        return null
+    }
+    
+    getTextureIndex(label)
+    {
+        if (this.textureIndex.hasOwnProperty(label))
+            return this.textureIndex[label]
+        else
+            console.error('The texture index ' + label + ' don\'nt exist on this program')
             
         return null
     }
@@ -136,6 +148,8 @@ export default class Program
         {
             const textureLocation = gl.getUniformLocation(program, texture.label)
             this.textureLocation[texture.label] = textureLocation
+            this.textureIndex[texture.label] = this.textureNum
+            this.textureNum++
         }
         
         

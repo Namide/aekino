@@ -100,9 +100,13 @@ export default class Texture
         {
             this.img = img
             this.onLoaded(this)
+            
+            if (this._changeImg)
+            {
+                this._changeImg(img)
+            }
         }
         img.src = URL
-        
     }
     
     _isPowerOf2(val)
@@ -110,19 +114,8 @@ export default class Texture
         return (val & (val - 1)) == 0
     }
     
-    init(gl, program)
+    _setupFilterAndMipmap(gl, img)
     {
-        const img = this.img
-        if (!img)
-            return false
-        
-        const texture = this.pointer || gl.createTexture()
-            
-        // Loaded
-        gl.bindTexture(gl.TEXTURE_2D, texture)
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
-        
-        gl.texImage2D(gl.TEXTURE_2D, 0, this.internalformat, this.format, gl.UNSIGNED_BYTE, img)
         if (this._isPowerOf2(img.width) && this._isPowerOf2(img.height))
         {
             gl.generateMipmap(gl.TEXTURE_2D)
@@ -136,10 +129,38 @@ export default class Texture
             // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
         }
+    }
+    
+    init(gl, program)
+    {
+        const texture = gl.createTexture()
         
-           
-        gl.bindTexture(gl.TEXTURE_2D, null)
+        const changeImg = newImg =>
+        {
+            gl.bindTexture(gl.TEXTURE_2D, texture)
+            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
+
+            gl.texImage2D(gl.TEXTURE_2D, 0, this.internalformat, this.format, gl.UNSIGNED_BYTE, newImg)
+            this._setupFilterAndMipmap(gl, newImg)
+            // gl.bindTexture(gl.TEXTURE_2D, null)
+        }
         
+        if (!this.img)
+        {
+            gl.bindTexture(gl.TEXTURE_2D, texture)
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+              new Uint8Array([255, 255, 255, 255]))
+            
+            this._changeImg = changeImg
+        }
+        else
+        {
+            changeImg(this.img)
+        }
+        
+        const location = program.getTextureLocation(this.label)
+        const index = program.getTextureIndex(this.label)
+        gl.uniform1i(location, index)
         
         this.pointer = texture
         
@@ -148,8 +169,10 @@ export default class Texture
     
     draw(gl, program)
     {
-        gl.activeTexture(gl.TEXTURE0)
+        const index = program.getTextureIndex(this.label)
+        
+        gl.activeTexture(gl.TEXTURE0 + index)
         gl.bindTexture(gl.TEXTURE_2D, this.pointer)
-        gl.uniform1i(program.getTextureLocation(this.label), 0)
+        // gl.uniform1i(program.getTextureLocation(this.label), 0)
     }
 }
