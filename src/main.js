@@ -46,7 +46,7 @@ import UMat3D from './uniform/UMat3D'
 import Attribute from './core/Attribute'
 import Program from './core/Program'
 import Geom from './core/Geom'
-import Texture from './core/Texture'
+import SmartTexture from './texture/SmartTexture'
 
 import Mesh from './object/Mesh'
 import Cam3D from './object/Cam3D'
@@ -310,7 +310,7 @@ var cubeUV = [
     0.0, 1.0,
 ]
 
-const cubeTexture = new Texture('uSampler')
+const cubeTexture = new SmartTexture('uSampler')
 cubeTexture.addURL('cube-diffuse.jpg')
 
 const cubeTexturedGeom = new Geom()
