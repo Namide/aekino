@@ -50,6 +50,5 @@ export default class Cam3D extends Uniform
         this.data.perspective(this.fovy * Math.PI / 180, w / h, 0.1, 100.0)
         this.data.multiply(this._matrix)
         this.updated = false
-        console.log(this.data)
     }
 }

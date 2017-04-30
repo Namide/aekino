@@ -61,6 +61,13 @@ export default class Scene
             this.meshs.splice(id, 1)
     }
     
+    resize(w, h)
+    {
+        const gl = this.gl
+        gl.viewportWidth = w
+        gl.viewportHeight = h
+    }
+    
     init(canvas)
     {
         let gl

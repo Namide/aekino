@@ -6,9 +6,9 @@
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 10);
+/******/ 	return __webpack_require__(__webpack_require__.s = 11);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -78,6 +78,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -125,10 +127,18 @@ var Uniform = function () {
             switch (this.type) {
                 case 35676:
                     // gl.FLOAT_MAT4
-                    var location = program.getUniformLocation(this.label);
-                    gl.uniformMatrix4fv(location, false, this.data);
-                    break;
-
+                    {
+                        var location = program.getUniformLocation(this.label);
+                        gl.uniformMatrix4fv(location, false, this.data);
+                        break;
+                    }
+                case 35665:
+                    // gl.FLOAT_VEC3
+                    {
+                        var _location = program.getUniformLocation(this.label);
+                        gl.uniform3f.apply(gl, [_location].concat(_toConsumableArray(this.data)));
+                        break;
+                    }
                 default:
                     console.error('Uniform type unknow: {label:', this.label, ', type:', this.type, '}');
             }
@@ -380,8 +390,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-// polyfill -> fill, 
-
 var EPSILON = 0.000001;
 
 var Matrix4x4 = function (_Float32Array) {
@@ -417,10 +425,21 @@ var Matrix4x4 = function (_Float32Array) {
     }, {
         key: "identity",
         value: function identity() {
-            this.fill(0);
             this[0] = 1;
+            this[1] = 0;
+            this[2] = 0;
+            this[3] = 0;
+            this[4] = 0;
             this[5] = 1;
+            this[6] = 0;
+            this[7] = 0;
+            this[8] = 0;
+            this[9] = 0;
             this[10] = 1;
+            this[11] = 0;
+            this[12] = 0;
+            this[13] = 0;
+            this[14] = 0;
             this[15] = 1;
 
             return this;
@@ -996,9 +1015,15 @@ var Matrix4x4 = function (_Float32Array) {
         key: "fromTranslation",
         value: function fromTranslation(vec3) {
             this[0] = 1;
-            this.fill(0, 1, 4);
+            this[1] = 0;
+            this[2] = 0;
+            this[3] = 0;
+            this[4] = 0;
             this[5] = 1;
-            this.fill(0, 6, 9);
+            this[6] = 0;
+            this[7] = 0;
+            this[8] = 0;
+            this[9] = 0;
             this[10] = 1;
             this[11] = 0;
             this[12] = vec3[0];
@@ -1012,11 +1037,20 @@ var Matrix4x4 = function (_Float32Array) {
         key: "fromScaling",
         value: function fromScaling(vec3) {
             this[0] = vec3[0];
-            this.fill(0, 1, 4);
+            this[1] = 0;
+            this[2] = 0;
+            this[3] = 0;
+            this[4] = 0;
             this[5] = vec3[1];
-            this.fill(0, 6, 9);
+            this[6] = 0;
+            this[7] = 0;
+            this[8] = 0;
+            this[9] = 0;
             this[10] = vec3[2];
-            this.fill(0, 11, 14);
+            this[11] = 0;
+            this[12] = 0;
+            this[13] = 0;
+            this[14] = 0;
             this[15] = 1;
 
             return this;
@@ -1053,7 +1087,10 @@ var Matrix4x4 = function (_Float32Array) {
                 this[8] = x * z * t + y * s;
                 this[9] = y * z * t - x * s;
                 this[10] = z * z * t + c;
-                this.fill(0, 11, 14);
+                this[11] = 0;
+                this[12] = 0;
+                this[13] = 0;
+                this[14] = 0;
                 this[15] = 1;
             }
 
@@ -1067,13 +1104,20 @@ var Matrix4x4 = function (_Float32Array) {
 
             // Perform axis-specific matrix multiplication
             this[0] = 1;
-            this.fill(0, 1, 4);
+            this[1] = 0;
+            this[2] = 0;
+            this[3] = 0;
+            this[4] = 0;
             this[5] = c;
             this[6] = s;
-            this.fill(0, 7, 8);
+            this[7] = 0;
+            this[8] = 0;
             this[9] = -s;
             this[10] = c;
-            this.fill(0, 11, 14);
+            this[11] = 0;
+            this[12] = 0;
+            this[13] = 0;
+            this[14] = 0;
             this[15] = 1;
 
             return this;
@@ -1088,13 +1132,18 @@ var Matrix4x4 = function (_Float32Array) {
             this[0] = c;
             this[1] = 0;
             this[2] = -s;
-            this.fill(0, 3, 4);
+            this[3] = 0;
+            this[4] = 0;
             this[5] = 1;
-            this.fill(0, 6, 7);
+            this[6] = 0;
+            this[7] = 0;
             this[8] = s;
             this[9] = 0;
             this[10] = c;
-            this.fill(0, 11, 14);
+            this[11] = 0;
+            this[12] = 0;
+            this[13] = 0;
+            this[14] = 0;
             this[15] = 1;
 
             return this;
@@ -1108,12 +1157,19 @@ var Matrix4x4 = function (_Float32Array) {
             // Perform axis-specific matrix multiplication
             this[0] = c;
             this[1] = s;
-            this.fill(0, 2, 3);
+            this[2] = 0;
+            this[3] = 0;
             this[4] = -s;
             this[5] = c;
-            this.fill(0, 6, 9);
+            this[6] = 0;
+            this[7] = 0;
+            this[8] = 0;
+            this[9] = 0;
             this[10] = 1;
-            this.fill(0, 11, 14);
+            this[11] = 0;
+            this[12] = 0;
+            this[13] = 0;
+            this[14] = 0;
             this[15] = 1;
 
             return this;
@@ -1152,7 +1208,10 @@ var Matrix4x4 = function (_Float32Array) {
             this[8] = zx + wy;
             this[9] = zy - wx;
             this[10] = 1 - xx - yy;
-            this.fill(0, 11, 14);
+            this[11] = 0;
+            this[12] = 0;
+            this[13] = 0;
+            this[14] = 0;
             this[15] = 1;
 
             return this;
@@ -1356,14 +1415,19 @@ var Matrix4x4 = function (_Float32Array) {
             var nf = 1 / (near - far);
 
             this[0] = near * 2 * rl;
-            this.fill(0, 1, 4);
+            this[1] = 0;
+            this[2] = 0;
+            this[3] = 0;
+            this[4] = 0;
             this[5] = near * 2 * tb;
-            this.fill(0, 6, 7);
+            this[6] = 0;
+            this[7] = 0;
             this[8] = (right + left) * rl;
             this[9] = (top + bottom) * tb;
             this[10] = (far + near) * nf;
             this[11] = -1;
-            this.fill(0, 12, 13);
+            this[12] = 0;
+            this[13] = 0;
             this[14] = far * near * 2 * nf;
             this[15] = 0;
 
@@ -1376,12 +1440,19 @@ var Matrix4x4 = function (_Float32Array) {
             var nf = 1 / (near - far);
 
             this[0] = f / aspect;
-            this.fill(0, 1, 4);
+            this[1] = 0;
+            this[2] = 0;
+            this[3] = 0;
+            this[4] = 0;
             this[5] = f;
-            this.fill(0, 6, 9);
+            this[6] = 0;
+            this[7] = 0;
+            this[8] = 0;
+            this[9] = 0;
             this[10] = (far + near) * nf;
             this[11] = -1;
-            this.fill(0, 12, 13);
+            this[12] = 0;
+            this[13] = 0;
             this[14] = 2 * far * near * nf;
             this[15] = 0;
 
@@ -1398,14 +1469,19 @@ var Matrix4x4 = function (_Float32Array) {
             var yScale = 2 / (upTan + downTan);
 
             this[0] = xScale;
-            this.fill(0, 1, 4);
+            this[1] = 0;
+            this[2] = 0;
+            this[3] = 0;
+            this[4] = 0;
             this[5] = yScale;
-            this.fill(0, 6, 7);
+            this[6] = 0;
+            this[7] = 0;
             this[8] = -(leftTan - rightTan) * xScale * 0.5;
             this[9] = (upTan - downTan) * yScale * 0.5;
             this[10] = far / (near - far);
             this[11] = -1.0;
-            this.fill(0, 12, 13);
+            this[12] = 0;
+            this[13] = 0;
             this[14] = far * near / (near - far);
             this[15] = 0;
 
@@ -1419,9 +1495,15 @@ var Matrix4x4 = function (_Float32Array) {
             var nf = 1 / (near - far);
 
             this[0] = -2 * lr;
-            this.fill(0, 1, 4);
+            this[1] = 0;
+            this[2] = 0;
+            this[3] = 0;
+            this[4] = 0;
             this[5] = -2 * bt;
-            this.fill(0, 6, 9);
+            this[6] = 0;
+            this[7] = 0;
+            this[8] = 0;
+            this[9] = 0;
             this[10] = 2 * nf;
             this[11] = 0;
             this[12] = (left + right) * lr;
@@ -1527,95 +1609,6 @@ exports.default = Matrix4x4;
 
 /***/ }),
 /* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _Matrix4x = __webpack_require__(3);
-
-var _Matrix4x2 = _interopRequireDefault(_Matrix4x);
-
-var _Uniform2 = __webpack_require__(0);
-
-var _Uniform3 = _interopRequireDefault(_Uniform2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * The MIT License
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Copyright 2017 Damien Doussaud (namide.com).
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Permission is hereby granted, free of charge, to any person obtaining a copy
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * of this software and associated documentation files (the "Software"), to deal
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * in the Software without restriction, including without limitation the rights
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * copies of the Software, and to permit persons to whom the Software is
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * furnished to do so, subject to the following conditions:
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * The above copyright notice and this permission notice shall be included in
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * all copies or substantial portions of the Software.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * THE SOFTWARE.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
-
-var Cam3D = function (_Uniform) {
-    _inherits(Cam3D, _Uniform);
-
-    function Cam3D(label) {
-        _classCallCheck(this, Cam3D);
-
-        var _this = _possibleConstructorReturn(this, (Cam3D.__proto__ || Object.getPrototypeOf(Cam3D)).call(this, label, 35676, new _Matrix4x2.default()));
-
-        _this.fovy = 45;
-        _this.near = 0.1;
-        _this.far = 100;
-        _this._matrix = new _Matrix4x2.default();
-
-        _this.updated = true;
-        return _this;
-    }
-
-    _createClass(Cam3D, [{
-        key: 'update',
-        value: function update(w, h) {
-            this.data.set(this._matrix);
-            this.data.perspective(this.fovy * Math.PI / 180, w / h, 0.1, 100.0);
-
-            this.updated = false;
-        }
-    }, {
-        key: 'matrix',
-        get: function get() {
-            this.updated = true;
-            return this._matrix;
-        }
-    }]);
-
-    return Cam3D;
-}(_Uniform3.default);
-
-exports.default = Cam3D;
-
-/***/ }),
-/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1850,228 +1843,7 @@ var Geom = function () {
 exports.default = Geom;
 
 /***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * The MIT License
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Copyright 2017 Damien Doussaud (namide.com).
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Permission is hereby granted, free of charge, to any person obtaining a copy
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * of this software and associated documentation files (the "Software"), to deal
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * in the Software without restriction, including without limitation the rights
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * copies of the Software, and to permit persons to whom the Software is
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * furnished to do so, subject to the following conditions:
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * The above copyright notice and this permission notice shall be included in
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * all copies or substantial portions of the Software.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * THE SOFTWARE.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
-
-var _Matrix4x = __webpack_require__(3);
-
-var _Matrix4x2 = _interopRequireDefault(_Matrix4x);
-
-var _Uniform = __webpack_require__(0);
-
-var _Uniform2 = _interopRequireDefault(_Uniform);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Mesh3D = function () {
-    function Mesh3D(geom, program) {
-        _classCallCheck(this, Mesh3D);
-
-        this.geom = geom;
-        this.program = program;
-
-        var matrix = new _Matrix4x2.default().identity();
-        var matrixU = new _Uniform2.default('uMVMatrix', 35676, matrix);
-
-        this.uniforms = [matrixU];
-        this.textures = [];
-
-        this.matrixU = matrixU;
-    }
-
-    _createClass(Mesh3D, [{
-        key: 'addUniform',
-        value: function addUniform(uniform) {
-            this.uniforms.push(uniform);
-        }
-    }, {
-        key: 'addTexture',
-        value: function addTexture(texture) {
-            this.textures.push(texture);
-        }
-    }, {
-        key: 'isInitialized',
-        value: function isInitialized() {
-            if (!this.program.isInitialized()) return false;
-
-            if (!this.geom.isInitialized()) return false;
-
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
-
-            try {
-                for (var _iterator = this.textures[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var texture = _step.value;
-
-                    if (!texture.isInitialized()) return false;
-                }
-            } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
-                    }
-                } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
-                    }
-                }
-            }
-
-            return true;
-        }
-    }, {
-        key: 'init',
-        value: function init(gl, globalUniforms) {
-            var program = this.program;
-            var allUniforms = [].concat(_toConsumableArray(this.uniforms), _toConsumableArray(globalUniforms));
-            var success = true;
-
-            if (!this.program.isInitialized()) if (this.program.init(gl, this.geom.attributes, allUniforms, this.textures)) success = false;
-
-            if (!this.geom.isInitialized()) if (this.geom.init(gl, program)) success = false;
-
-            var _iteratorNormalCompletion2 = true;
-            var _didIteratorError2 = false;
-            var _iteratorError2 = undefined;
-
-            try {
-                for (var _iterator2 = this.textures[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                    var texture = _step2.value;
-
-                    if (!texture.isInitialized()) if (!texture.init(gl, program)) success = false;
-                }
-            } catch (err) {
-                _didIteratorError2 = true;
-                _iteratorError2 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                        _iterator2.return();
-                    }
-                } finally {
-                    if (_didIteratorError2) {
-                        throw _iteratorError2;
-                    }
-                }
-            }
-
-            return success;
-        }
-    }, {
-        key: 'draw',
-        value: function draw(gl, globalUniforms) {
-            var allUniforms = [].concat(_toConsumableArray(this.uniforms), _toConsumableArray(globalUniforms));
-            var program = this.program;
-
-            this.program.draw(gl);
-            this.geom.draw(gl, program);
-
-            var _iteratorNormalCompletion3 = true;
-            var _didIteratorError3 = false;
-            var _iteratorError3 = undefined;
-
-            try {
-                for (var _iterator3 = allUniforms[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                    var uniform = _step3.value;
-
-                    uniform.draw(gl, program);
-                }
-            } catch (err) {
-                _didIteratorError3 = true;
-                _iteratorError3 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                        _iterator3.return();
-                    }
-                } finally {
-                    if (_didIteratorError3) {
-                        throw _iteratorError3;
-                    }
-                }
-            }
-
-            var _iteratorNormalCompletion4 = true;
-            var _didIteratorError4 = false;
-            var _iteratorError4 = undefined;
-
-            try {
-                for (var _iterator4 = this.textures[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                    var texture = _step4.value;
-
-                    texture.draw(gl, program);
-                }
-            } catch (err) {
-                _didIteratorError4 = true;
-                _iteratorError4 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                        _iterator4.return();
-                    }
-                } finally {
-                    if (_didIteratorError4) {
-                        throw _iteratorError4;
-                    }
-                }
-            }
-
-            this.geom.display(gl, program);
-            // gl.drawArrays(gl.TRIANGLES, 0, pyramidVertexPositionBuffer.numItems)
-        }
-    }, {
-        key: 'matrix',
-        get: function get() {
-            return this.matrixU.data;
-        }
-    }]);
-
-    return Mesh3D;
-}();
-
-exports.default = Mesh3D;
-
-/***/ }),
-/* 7 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2128,6 +1900,8 @@ var Program = function () {
         this.attribLocation = {};
         this.uniformLocation = {};
         this.textureLocation = {};
+        this.textureIndex = {};
+        this.textureNum = 0;
 
         this.id = ++num;
     }
@@ -2155,6 +1929,13 @@ var Program = function () {
         key: 'getTextureLocation',
         value: function getTextureLocation(label) {
             if (this.textureLocation.hasOwnProperty(label)) return this.textureLocation[label];else console.error('The texture location ' + label + ' don\'nt exist on this program');
+
+            return null;
+        }
+    }, {
+        key: 'getTextureIndex',
+        value: function getTextureIndex(label) {
+            if (this.textureIndex.hasOwnProperty(label)) return this.textureIndex[label];else console.error('The texture index ' + label + ' don\'nt exist on this program');
 
             return null;
         }
@@ -2239,9 +2020,10 @@ var Program = function () {
                 for (var _iterator3 = textures[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
                     var texture = _step3.value;
 
-                    var textureLocation = program.samplerUniform = gl.getUniformLocation(program, texture.label);
+                    var textureLocation = gl.getUniformLocation(program, texture.label);
                     this.textureLocation[texture.label] = textureLocation;
-                    console.log(texture.label, textureLocation, textures);
+                    this.textureIndex[texture.label] = this.textureNum;
+                    this.textureNum++;
                 }
             } catch (err) {
                 _didIteratorError3 = true;
@@ -2288,146 +2070,7 @@ var Program = function () {
 exports.default = Program;
 
 /***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/* 
- * The MIT License
- *
- * Copyright 2017 Damien Doussaud (namide.com).
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
-var Scene = function () {
-    function Scene(canvas, cam) {
-        _classCallCheck(this, Scene);
-
-        this.canvas = canvas;
-        this.init(canvas);
-        this.meshs = [];
-        this.cam = cam;
-        this.uniforms = [cam];
-    }
-
-    _createClass(Scene, [{
-        key: '_addCamToMeshs',
-        value: function _addCamToMeshs() {
-            var cam = this.cam;
-            this.uniforms.push(cam);
-        }
-
-        /*addCam(cam)
-        {
-            this.cam = cam
-        }*/
-
-    }, {
-        key: 'addMesh',
-        value: function addMesh(mesh) {
-            this.meshs.push(mesh);
-
-            if (!mesh.isInitialized()) mesh.init(this.gl, this.uniforms);
-        }
-    }, {
-        key: 'rmMesh',
-        value: function rmMesh(mesh) {
-            var id = this.meshs.indexOf(mesh);
-            if (id > -1) this.meshs.splice(id, 1);
-        }
-    }, {
-        key: 'init',
-        value: function init(canvas) {
-            var gl = void 0;
-
-            try {
-                gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-                gl.viewportWidth = canvas.width;
-                gl.viewportHeight = canvas.height;
-            } catch (e) {
-                console.error('Could not initialise WebGL:', e.message);
-            }
-
-            if (!gl) {
-                console.error('Could not initialise WebGL');
-            }
-
-            gl.clearColor(0.0, 0.0, 0.0, 1.0);
-            gl.enable(gl.DEPTH_TEST);
-
-            this.gl = gl;
-        }
-    }, {
-        key: 'draw',
-        value: function draw() {
-            var gl = this.gl;
-
-            gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-            if (this.cam.updated) this.cam.update(gl.viewportWidth, gl.viewportHeight);
-
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
-
-            try {
-                for (var _iterator = this.meshs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var mesh = _step.value;
-
-                    if (mesh.isInitialized()) mesh.draw(gl, this.uniforms);else mesh.init(gl, this.uniforms);
-                }
-            } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
-                    }
-                } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
-                    }
-                }
-            }
-        }
-    }]);
-
-    return Scene;
-}();
-
-exports.default = Scene;
-
-/***/ }),
-/* 9 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2470,50 +2113,64 @@ var Texture = function () {
         _classCallCheck(this, Texture);
 
         this.label = label;
+        this.color = [255, 255, 255, 255];
 
-        this.onLoaded = function (texture) {
-            console.log('Texture loaded:', texture.src);
-        };
-
+        this.srcs = [];
         this.pointer = null;
         this.parameters = {
             9729: 9987
         };
+
+        this.setFormat();
     }
 
     /*
-        target
-            3553    gl.TEXTURE_2D           A two-dimensional texture.
-            34067   gl.TEXTURE_CUBE_MAP     A cube-mapped texture.
-    
-        pname
-            10240   gl.TEXTURE_MAG_FILTER	Texture magnification filter
-                        - 9729 gl.LINEAR (default value),
-                        - 9728 gl.NEAREST.
-        
-            10241   gl.TEXTURE_MIN_FILTER	Texture minification filter
-                        - 9729 gl.LINEAR,
-                        - 9728 gl.NEAREST,
-                        - 9984 gl.NEAREST_MIPMAP_NEAREST,
-                        - 9985 gl.LINEAR_MIPMAP_NEAREST,
-                        - 9986 gl.NEAREST_MIPMAP_LINEAR (default value),
-                        - 9987 gl.LINEAR_MIPMAP_LINEAR.
-            
-            10242   gl.TEXTURE_WRAP_S	    Wrapping function for texture coordinate s
-                        - 10497 gl.REPEAT (default value),
-                        - 33071 gl.CLAMP_TO_EDGE,
-                        - 33648 gl.MIRRORED_REPEAT.
-                        
-            10243   gl.TEXTURE_WRAP_T	      Wrapping function for texture coordinate t
-                        - 10497 gl.REPEAT (default value),
-                        - 33071 gl.CLAMP_TO_EDGE,
-                        - 33648 gl.MIRRORED_REPEAT.
-        
-        param
+        6407    gl.RGB
+        6408    gl.RGBA
     */
 
 
     _createClass(Texture, [{
+        key: 'setFormat',
+        value: function setFormat() {
+            var format = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 6408;
+
+            // this.internalformat = internalformat
+            this.format = format;
+        }
+
+        /*
+            target
+                3553    gl.TEXTURE_2D           A two-dimensional texture.
+                34067   gl.TEXTURE_CUBE_MAP     A cube-mapped texture.
+        
+            pname
+                10240   gl.TEXTURE_MAG_FILTER	Texture magnification filter
+                            - 9729 gl.LINEAR (default value),
+                            - 9728 gl.NEAREST.
+            
+                10241   gl.TEXTURE_MIN_FILTER	Texture minification filter
+                            - 9729 gl.LINEAR,
+                            - 9728 gl.NEAREST,
+                            - 9984 gl.NEAREST_MIPMAP_NEAREST,
+                            - 9985 gl.LINEAR_MIPMAP_NEAREST,
+                            - 9986 gl.NEAREST_MIPMAP_LINEAR (default value),
+                            - 9987 gl.LINEAR_MIPMAP_LINEAR.
+                
+                10242   gl.TEXTURE_WRAP_S	    Wrapping function for texture coordinate s
+                            - 10497 gl.REPEAT (default value),
+                            - 33071 gl.CLAMP_TO_EDGE,
+                            - 33648 gl.MIRRORED_REPEAT.
+                            
+                10243   gl.TEXTURE_WRAP_T	      Wrapping function for texture coordinate t
+                            - 10497 gl.REPEAT (default value),
+                            - 33071 gl.CLAMP_TO_EDGE,
+                            - 33648 gl.MIRRORED_REPEAT.
+            
+            param
+        */
+
+    }, {
         key: 'setParameters',
         value: function setParameters(target, pName, param) {}
     }, {
@@ -2521,19 +2178,94 @@ var Texture = function () {
         value: function isInitialized() {
             return !!this.pointer;
         }
+
+        // https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/
+
     }, {
-        key: 'load',
-        value: function load(URL, callback) {
+        key: 'addDxt5URL',
+        value: function addDxt5URL(_ref) {
+            var src = _ref.src,
+                width = _ref.width,
+                height = _ref.height,
+                format = _ref.format,
+                priority = _ref.priority;
+
+
+            var byteLength = floor((width + 3) * 0.25) * floor((height + 3) * 0.25) * 16;
+            var level = this._isMultOf(width, 4) && this._isMultOf(height, 4) ? 0 : 1;
+
+            // var formats = gl.getParameter(gl.COMPRESSED_TEXTURE_FORMATS)
+        }
+    }, {
+        key: 'addURL',
+        value: function addURL(URL) {
+            var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+            this.srcs.push({
+                size: size,
+                src: URL,
+                internalformat: 6408 /* gl.RGBA */
+                , img: null,
+                priority: 0,
+                custom: false
+            });
+        }
+
+        /*load(URL, callback)
+        {
+            this.src = URL
+            
+            const img = new Image()
+            img.onload = () =>
+            {
+                this.img = img            
+                if (this._changeImg)
+                    this._changeImg(img)
+            }
+            img.src = URL
+        }*/
+
+    }, {
+        key: '_startLoad',
+        value: function _startLoad(callback) {
             var _this = this;
 
-            this.src = URL;
+            var srcs = this.srcs;
+            if (srcs.length > 0) {
+                srcs.sort(function (a, b) {
+                    return a.size === b.size ? a.size - b.size : a.priority - b.priority;
+                });
+                var srcsValid = this.srcs.filter(function (o) {
+                    return o.size >= Texture.MAX_SIZE;
+                });
 
+                if (srcs.length > 1) {
+                    var first = srcs[0];
+                    var last = srcs[srcs.length - 1];
+
+                    this._load(first, function (data) {
+                        callback(data);
+                        _this._load(last, callback);
+                    });
+                } else if (srcs.length > 0) {
+                    this._load(srcs[0], callback);
+                } else {
+                    console.warn('The GPU can\'nt load a texture with size > ', Texture.MAX_SIZE);
+                }
+            } else {
+                console.warn('URL of your texture', this.label, 'not found: texture.addURL(URL, size = 0)');
+            }
+        }
+    }, {
+        key: '_load',
+        value: function _load(data, callback) {
             var img = new Image();
             img.onload = function () {
-                _this.img = img;
-                _this.onLoaded(_this);
+                callback(data);
             };
-            img.src = URL;
+            data.img = img;
+
+            img.src = data.src;
         }
     }, {
         key: '_isPowerOf2',
@@ -2541,18 +2273,13 @@ var Texture = function () {
             return (val & val - 1) == 0;
         }
     }, {
-        key: 'init',
-        value: function init(gl, program) {
-            var texture = this.pointer || gl.createTexture();
-
-            var img = this.img;
-            if (!img) return false;
-
-            // Loaded
-            gl.bindTexture(gl.TEXTURE_2D, texture);
-            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+        key: '_isMultOf',
+        value: function _isMultOf(val, mult) {
+            return Number.isInteger(val / mult);
+        }
+    }, {
+        key: '_setupFilterAndMipmap',
+        value: function _setupFilterAndMipmap(gl, img) {
             if (this._isPowerOf2(img.width) && this._isPowerOf2(img.height)) {
                 gl.generateMipmap(gl.TEXTURE_2D);
                 // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
@@ -2563,19 +2290,73 @@ var Texture = function () {
                 // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
             }
+        }
+    }, {
+        key: 'setData',
+        value: function setData(gl) {
+            Texture.MAX_SIZE = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+            Texture.FORMAT = {};
 
-            gl.bindTexture(gl.TEXTURE_2D, null);
+            /*
+            https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_compressed_texture_s3tc
+            */
+            console.log(gl.COMPRESSED_TEXTURE_FORMATS);
+            var formats = gl.getParameter(gl.COMPRESSED_TEXTURE_FORMATS);
+            for (var i = 0; i < formats.length; i++) {
+                Texture.FORMAT[formats[i]] = true;
+                console.log(formats[i]);
+            }
+
+            Texture._DATA_INITIALIZED = true;
+        }
+    }, {
+        key: 'init',
+        value: function init(gl, program) {
+            var _this2 = this;
+
+            var texture = gl.createTexture();
+
+            if (!Texture._DATA_INITIALIZED) {
+                this.setData(gl);
+            }
+
+            /*
+            gl.getParameter(gl.MAX_TEXTURE_SIZE)
+            gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS)
+            gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS)
+            */
+
+            var changeImg = function changeImg(newImg) {
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+                gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
+                gl.texImage2D(gl.TEXTURE_2D, 0, newImg.internalformat, _this2.format, gl.UNSIGNED_BYTE, newImg.img);
+                _this2._setupFilterAndMipmap(gl, newImg.img);
+                // gl.bindTexture(gl.TEXTURE_2D, null)
+            };
+
+            // Temporary ptexture (1 pixel)
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE, new Uint8Array(this.color));
+
+            var location = program.getTextureLocation(this.label);
+            var index = program.getTextureIndex(this.label);
+            gl.uniform1i(location, index);
 
             this.pointer = texture;
+
+            this._startLoad(changeImg);
 
             return true;
         }
     }, {
         key: 'draw',
         value: function draw(gl, program) {
-            gl.activeTexture(gl.TEXTURE0);
+            var index = program.getTextureIndex(this.label);
+
+            gl.activeTexture(gl.TEXTURE0 + index);
             gl.bindTexture(gl.TEXTURE_2D, this.pointer);
-            gl.uniform1i(program.getTextureLocation(this.label), 0);
+            // gl.uniform1i(program.getTextureLocation(this.label), 0)
         }
     }]);
 
@@ -2585,46 +2366,607 @@ var Texture = function () {
 exports.default = Texture;
 
 /***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Matrix4x = __webpack_require__(3);
+
+var _Matrix4x2 = _interopRequireDefault(_Matrix4x);
+
+var _Uniform2 = __webpack_require__(0);
+
+var _Uniform3 = _interopRequireDefault(_Uniform2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * The MIT License
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Copyright 2017 Damien Doussaud (namide.com).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Permission is hereby granted, free of charge, to any person obtaining a copy
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * of this software and associated documentation files (the "Software"), to deal
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * in the Software without restriction, including without limitation the rights
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * copies of the Software, and to permit persons to whom the Software is
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * furnished to do so, subject to the following conditions:
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * The above copyright notice and this permission notice shall be included in
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * all copies or substantial portions of the Software.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * THE SOFTWARE.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+
+var Cam3D = function (_Uniform) {
+    _inherits(Cam3D, _Uniform);
+
+    function Cam3D(label) {
+        _classCallCheck(this, Cam3D);
+
+        var _this = _possibleConstructorReturn(this, (Cam3D.__proto__ || Object.getPrototypeOf(Cam3D)).call(this, label, 35676, new _Matrix4x2.default()));
+
+        _this.fovy = 45;
+        _this.near = 0.1;
+        _this.far = 1000;
+        _this._matrix = new _Matrix4x2.default();
+
+        _this.updated = true;
+        return _this;
+    }
+
+    _createClass(Cam3D, [{
+        key: 'update',
+        value: function update(w, h) {
+            this.data.perspective(this.fovy * Math.PI / 180, w / h, 0.1, 100.0);
+            this.data.multiply(this._matrix);
+            this.updated = false;
+        }
+    }, {
+        key: 'matrix',
+        get: function get() {
+            this.updated = true;
+            return this._matrix;
+        }
+    }]);
+
+    return Cam3D;
+}(_Uniform3.default);
+
+exports.default = Cam3D;
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/* 
+ * The MIT License
+ *
+ * Copyright 2017 Damien Doussaud (namide.com).
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+var Mesh = function () {
+    function Mesh(geom, program) {
+        _classCallCheck(this, Mesh);
+
+        this.geom = geom;
+        this.program = program;
+
+        this.uniforms = [];
+        this.textures = [];
+    }
+
+    _createClass(Mesh, [{
+        key: "addUniform",
+        value: function addUniform(uniform) {
+            this.uniforms.push(uniform);
+        }
+    }, {
+        key: "addTexture",
+        value: function addTexture(texture) {
+            this.textures.push(texture);
+        }
+    }, {
+        key: "isInitialized",
+        value: function isInitialized() {
+            var success = true;
+
+            if (!this.program.isInitialized()) success = false;
+
+            if (!this.geom.isInitialized()) success = false;
+
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = this.textures[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var texture = _step.value;
+
+                    if (!texture.isInitialized()) success = false;
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+
+            return success;
+        }
+    }, {
+        key: "init",
+        value: function init(gl, globalUniforms) {
+            var program = this.program;
+            var allUniforms = [].concat(_toConsumableArray(this.uniforms), _toConsumableArray(globalUniforms));
+            var success = true;
+
+            if (!this.program.isInitialized()) if (this.program.init(gl, this.geom.attributes, allUniforms, this.textures)) success = false;
+
+            if (!this.geom.isInitialized()) if (this.geom.init(gl, program)) success = false;
+
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
+
+            try {
+                for (var _iterator2 = this.textures[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var texture = _step2.value;
+
+                    if (!texture.isInitialized()) if (!texture.init(gl, program)) success = false;
+                }
+            } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
+                    }
+                } finally {
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
+                    }
+                }
+            }
+
+            return success;
+        }
+    }, {
+        key: "draw",
+        value: function draw(gl, globalUniforms) {
+            var program = this.program;
+
+            this.program.draw(gl);
+            this.geom.draw(gl, program);
+
+            var _iteratorNormalCompletion3 = true;
+            var _didIteratorError3 = false;
+            var _iteratorError3 = undefined;
+
+            try {
+                for (var _iterator3 = this.uniforms[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                    var uniform = _step3.value;
+
+                    uniform.draw(gl, program);
+                }
+            } catch (err) {
+                _didIteratorError3 = true;
+                _iteratorError3 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                        _iterator3.return();
+                    }
+                } finally {
+                    if (_didIteratorError3) {
+                        throw _iteratorError3;
+                    }
+                }
+            }
+
+            var _iteratorNormalCompletion4 = true;
+            var _didIteratorError4 = false;
+            var _iteratorError4 = undefined;
+
+            try {
+                for (var _iterator4 = globalUniforms[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                    var _uniform = _step4.value;
+
+                    _uniform.draw(gl, program);
+                }
+            } catch (err) {
+                _didIteratorError4 = true;
+                _iteratorError4 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                        _iterator4.return();
+                    }
+                } finally {
+                    if (_didIteratorError4) {
+                        throw _iteratorError4;
+                    }
+                }
+            }
+
+            var _iteratorNormalCompletion5 = true;
+            var _didIteratorError5 = false;
+            var _iteratorError5 = undefined;
+
+            try {
+                for (var _iterator5 = this.textures[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                    var texture = _step5.value;
+
+                    texture.draw(gl, program);
+                }
+            } catch (err) {
+                _didIteratorError5 = true;
+                _iteratorError5 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                        _iterator5.return();
+                    }
+                } finally {
+                    if (_didIteratorError5) {
+                        throw _iteratorError5;
+                    }
+                }
+            }
+
+            this.geom.display(gl, program);
+        }
+    }]);
+
+    return Mesh;
+}();
+
+exports.default = Mesh;
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/* 
+ * The MIT License
+ *
+ * Copyright 2017 Damien Doussaud (namide.com).
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+var Scene = function () {
+    function Scene(canvas, cam) {
+        _classCallCheck(this, Scene);
+
+        this.canvas = canvas;
+        this.init(canvas);
+        this.meshs = [];
+        this.cam = cam;
+        this.uniforms = [cam];
+
+        this.depthTest = true;
+    }
+
+    _createClass(Scene, [{
+        key: '_addCamToMeshs',
+        value: function _addCamToMeshs() {
+            var cam = this.cam;
+            this.uniforms.push(cam);
+        }
+
+        /*addCam(cam)
+        {
+            this.cam = cam
+        }*/
+
+    }, {
+        key: 'addMesh',
+        value: function addMesh(mesh) {
+            this.meshs.push(mesh);
+
+            if (!mesh.isInitialized()) mesh.init(this.gl, this.uniforms);
+        }
+    }, {
+        key: 'rmMesh',
+        value: function rmMesh(mesh) {
+            var id = this.meshs.indexOf(mesh);
+            if (id > -1) this.meshs.splice(id, 1);
+        }
+    }, {
+        key: 'resize',
+        value: function resize(w, h) {
+            var gl = this.gl;
+            gl.viewportWidth = w;
+            gl.viewportHeight = h;
+        }
+    }, {
+        key: 'init',
+        value: function init(canvas) {
+            var gl = void 0;
+
+            try {
+                gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                gl.viewportWidth = canvas.width;
+                gl.viewportHeight = canvas.height;
+            } catch (e) {
+                console.error('Could not initialise WebGL:', e.message);
+            }
+
+            if (!gl) {
+                console.error('Could not initialise WebGL');
+            }
+
+            this.gl = gl;
+        }
+    }, {
+        key: 'draw',
+        value: function draw() {
+            var gl = this.gl;
+
+            gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+            if (this.cam.updated) this.cam.update(gl.viewportWidth, gl.viewportHeight);
+
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = this.meshs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var mesh = _step.value;
+
+                    if (mesh.isInitialized()) mesh.draw(gl, this.uniforms);else mesh.init(gl, this.uniforms);
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+        }
+    }, {
+        key: 'depthTest',
+        set: function set(depthTest) {
+            var gl = this.gl;
+
+            if (!!depthTest) gl.enable(gl.DEPTH_TEST);else gl.disable(gl.DEPTH_TEST);
+
+            this._depthTest = !!depthTest;
+        },
+        get: function get() {
+            return this._depthTest;
+        }
+    }, {
+        key: 'bgColor',
+        set: function set(_ref) {
+            var _ref2 = _slicedToArray(_ref, 4),
+                r = _ref2[0],
+                g = _ref2[1],
+                b = _ref2[2],
+                _ref2$ = _ref2[3],
+                a = _ref2$ === undefined ? 1 : _ref2$;
+
+            this.gl.clearColor(r, g, b, a);
+            this._bgColor = [r, g, b, a];
+        },
+        get: function get() {
+            return this._bgColor;
+        }
+    }]);
+
+    return Scene;
+}();
+
+exports.default = Scene;
+
+/***/ }),
 /* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _Attribute = __webpack_require__(1);
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
-var _Attribute2 = _interopRequireDefault(_Attribute);
+var _Matrix4x = __webpack_require__(3);
+
+var _Matrix4x2 = _interopRequireDefault(_Matrix4x);
+
+var _Uniform2 = __webpack_require__(0);
+
+var _Uniform3 = _interopRequireDefault(_Uniform2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * The MIT License
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Copyright 2017 Damien Doussaud (namide.com).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Permission is hereby granted, free of charge, to any person obtaining a copy
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * of this software and associated documentation files (the "Software"), to deal
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * in the Software without restriction, including without limitation the rights
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * copies of the Software, and to permit persons to whom the Software is
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * furnished to do so, subject to the following conditions:
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * The above copyright notice and this permission notice shall be included in
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * all copies or substantial portions of the Software.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * THE SOFTWARE.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+
+var UMat3D = function (_Uniform) {
+    _inherits(UMat3D, _Uniform);
+
+    function UMat3D(label) {
+        _classCallCheck(this, UMat3D);
+
+        return _possibleConstructorReturn(this, (UMat3D.__proto__ || Object.getPrototypeOf(UMat3D)).call(this, label, 35676 /* gl.FLOAT_MAT4 */, new _Matrix4x2.default().identity()));
+    }
+
+    return UMat3D;
+}(_Uniform3.default);
+
+exports.default = UMat3D;
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 var _Uniform = __webpack_require__(0);
 
 var _Uniform2 = _interopRequireDefault(_Uniform);
 
-var _Program = __webpack_require__(7);
+var _UMat3D = __webpack_require__(10);
+
+var _UMat3D2 = _interopRequireDefault(_UMat3D);
+
+var _Attribute = __webpack_require__(1);
+
+var _Attribute2 = _interopRequireDefault(_Attribute);
+
+var _Program = __webpack_require__(5);
 
 var _Program2 = _interopRequireDefault(_Program);
 
-var _Geom = __webpack_require__(5);
+var _Geom = __webpack_require__(4);
 
 var _Geom2 = _interopRequireDefault(_Geom);
 
-var _Mesh3D = __webpack_require__(6);
-
-var _Mesh3D2 = _interopRequireDefault(_Mesh3D);
-
-var _Cam3D = __webpack_require__(4);
-
-var _Cam3D2 = _interopRequireDefault(_Cam3D);
-
-var _Scene = __webpack_require__(8);
-
-var _Scene2 = _interopRequireDefault(_Scene);
-
-var _Texture = __webpack_require__(9);
+var _Texture = __webpack_require__(6);
 
 var _Texture2 = _interopRequireDefault(_Texture);
 
+var _Mesh = __webpack_require__(8);
+
+var _Mesh2 = _interopRequireDefault(_Mesh);
+
+var _Cam3D = __webpack_require__(7);
+
+var _Cam3D2 = _interopRequireDefault(_Cam3D);
+
+var _Scene = __webpack_require__(9);
+
+var _Scene2 = _interopRequireDefault(_Scene);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var canvas = document.body.querySelector('canvas');
+
+// Camera
 /* 
  * The MIT License
  *
@@ -2667,14 +3009,14 @@ exports.vec2 = require("./gl-matrix/vec2.js");
 exports.vec3 = require("./gl-matrix/vec3.js");
 exports.vec4 = require("./gl-matrix/vec4.js");*/
 
-var canvas = document.body.querySelector('canvas');
-
-// Camera
 var cam3D = new _Cam3D2.default('uPMatrix');
-cam3D.matrix.translate([-1.5, 0.0, -7.0]);
+// cam3D.matrix.translate([-1.5, 0.0, -7.0])
+
 
 // Scene
 var scene = new _Scene2.default(canvas, cam3D);
+scene.bgColor = [0.0, 0.0, 0.1, 1.0];
+scene.depthTest = true;
 
 // Programs
 var colorProgram = new _Program2.default();
@@ -2701,6 +3043,7 @@ var pyramidVertices = [
 
 // Left face
 0.0, 1.0, 0.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0];
+
 var pyramidColors = [
 // Front face
 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0,
@@ -2713,11 +3056,15 @@ var pyramidColors = [
 
 // Left face
 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0];
+
 var pyramidGeom = new _Geom2.default();
 pyramidGeom.addVertices('aVertexPosition', pyramidVertices, 3);
 pyramidGeom.addVertices('aVertexColor', pyramidColors, 4);
 
-var pyramidMesh = new _Mesh3D2.default(pyramidGeom, colorProgram);
+var pyramidMesh = new _Mesh2.default(pyramidGeom, colorProgram);
+var pyramidUniformMatrix = new _UMat3D2.default('uMVMatrix');
+pyramidMesh.addUniform(pyramidUniformMatrix);
+pyramidMesh.matrix = pyramidUniformMatrix.data;
 pyramidMesh.matrix.translate([-1.5, -1.5, -8.0]);
 scene.addMesh(pyramidMesh);
 
@@ -2775,7 +3122,10 @@ cubeGeom.addVertices('aVertexPosition', cubeVertices, 3);
 cubeGeom.addVertices('aVertexColor', unpackedCubeColors, 4);
 cubeGeom.addIndices(cubeIndices);
 
-var cubeMesh = new _Mesh3D2.default(cubeGeom, fogProgram);
+var cubeMesh = new _Mesh2.default(cubeGeom, fogProgram);
+var cubeUniformMatrix = new _UMat3D2.default('uMVMatrix');
+cubeMesh.addUniform(cubeUniformMatrix);
+cubeMesh.matrix = cubeUniformMatrix.data;
 cubeMesh.matrix.translate([1.5, -1.5, -8.0]);
 scene.addMesh(cubeMesh);
 
@@ -2811,14 +3161,17 @@ var cubeUV = [
 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0];
 
 var cubeTexture = new _Texture2.default('uSampler');
-cubeTexture.load('cube-diffuse.jpg');
+cubeTexture.addURL('cube-diffuse.jpg');
 
 var cubeTexturedGeom = new _Geom2.default();
 cubeTexturedGeom.addVertices('aVertexPosition', cubeVertices, 3);
 cubeTexturedGeom.addVertices('aTextureCoord', cubeUV, 2);
 cubeTexturedGeom.addIndices(cubeIndices);
 
-var cubeTexturedMesh = new _Mesh3D2.default(cubeTexturedGeom, texturedProgram);
+var cubeTexturedMesh = new _Mesh2.default(cubeTexturedGeom, texturedProgram);
+var cubeTexturedUniformMatrix = new _UMat3D2.default('uMVMatrix');
+cubeTexturedMesh.addUniform(cubeTexturedUniformMatrix);
+cubeTexturedMesh.matrix = cubeTexturedUniformMatrix.data;
 cubeTexturedMesh.addTexture(cubeTexture);
 cubeTexturedMesh.matrix.translate([1.5, 1.5, -8.0]);
 scene.addMesh(cubeTexturedMesh);
