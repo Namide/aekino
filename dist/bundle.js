@@ -392,6 +392,26 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var EPSILON = 0.000001;
 
+// Improve performances and weight
+function setMat(a, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14, m15) {
+    a[0] = m0;
+    a[1] = m1;
+    a[2] = m2;
+    a[3] = m3;
+    a[4] = m4;
+    a[5] = m5;
+    a[6] = m6;
+    a[7] = m7;
+    a[8] = m8;
+    a[9] = m9;
+    a[10] = m10;
+    a[11] = m11;
+    a[12] = m12;
+    a[13] = m13;
+    a[14] = m14;
+    a[15] = m15;
+}
+
 var Matrix4x4 = function (_Float32Array) {
     _inherits(Matrix4x4, _Float32Array);
 
@@ -425,121 +445,106 @@ var Matrix4x4 = function (_Float32Array) {
     }, {
         key: "identity",
         value: function identity() {
-            this[0] = 1;
-            this[1] = 0;
-            this[2] = 0;
-            this[3] = 0;
-            this[4] = 0;
-            this[5] = 1;
-            this[6] = 0;
-            this[7] = 0;
-            this[8] = 0;
-            this[9] = 0;
-            this[10] = 1;
-            this[11] = 0;
-            this[12] = 0;
-            this[13] = 0;
-            this[14] = 0;
-            this[15] = 1;
+            setMat(this, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 
             return this;
         }
     }, {
         key: "add",
-        value: function add(mat4) {
-            this[0] += mat4[0];
-            this[1] += mat4[1];
-            this[2] += mat4[2];
-            this[3] += mat4[3];
-            this[4] += mat4[4];
-            this[5] += mat4[5];
-            this[6] += mat4[6];
-            this[7] += mat4[7];
-            this[8] += mat4[8];
-            this[9] += mat4[9];
-            this[10] += mat4[10];
-            this[11] += mat4[11];
-            this[12] += mat4[12];
-            this[13] += mat4[13];
-            this[14] += mat4[14];
-            this[15] += mat4[15];
+        value: function add(mat4x4) {
+            this[0] += mat4x4[0];
+            this[1] += mat4x4[1];
+            this[2] += mat4x4[2];
+            this[3] += mat4x4[3];
+            this[4] += mat4x4[4];
+            this[5] += mat4x4[5];
+            this[6] += mat4x4[6];
+            this[7] += mat4x4[7];
+            this[8] += mat4x4[8];
+            this[9] += mat4x4[9];
+            this[10] += mat4x4[10];
+            this[11] += mat4x4[11];
+            this[12] += mat4x4[12];
+            this[13] += mat4x4[13];
+            this[14] += mat4x4[14];
+            this[15] += mat4x4[15];
 
             return this;
         }
     }, {
         key: "subtract",
-        value: function subtract(mat4) {
-            this[0] -= mat4[0];
-            this[1] -= mat4[1];
-            this[2] -= mat4[2];
-            this[3] -= mat4[3];
-            this[4] -= mat4[4];
-            this[5] -= mat4[5];
-            this[6] -= mat4[6];
-            this[7] -= mat4[7];
-            this[8] -= mat4[8];
-            this[9] -= mat4[9];
-            this[10] -= mat4[10];
-            this[11] -= mat4[11];
-            this[12] -= mat4[12];
-            this[13] -= mat4[13];
-            this[14] -= mat4[14];
-            this[15] -= mat4[15];
+        value: function subtract(mat4x4) {
+            this[0] -= mat4x4[0];
+            this[1] -= mat4x4[1];
+            this[2] -= mat4x4[2];
+            this[3] -= mat4x4[3];
+            this[4] -= mat4x4[4];
+            this[5] -= mat4x4[5];
+            this[6] -= mat4x4[6];
+            this[7] -= mat4x4[7];
+            this[8] -= mat4x4[8];
+            this[9] -= mat4x4[9];
+            this[10] -= mat4x4[10];
+            this[11] -= mat4x4[11];
+            this[12] -= mat4x4[12];
+            this[13] -= mat4x4[13];
+            this[14] -= mat4x4[14];
+            this[15] -= mat4x4[15];
 
             return this;
         }
     }, {
         key: "multiplyScalar",
-        value: function multiplyScalar(mat4) {
-            this[0] *= mat4;
-            this[1] *= mat4;
-            this[2] *= mat4;
-            this[3] *= mat4;
-            this[4] *= mat4;
-            this[5] *= mat4;
-            this[6] *= mat4;
-            this[7] *= mat4;
-            this[8] *= mat4;
-            this[9] *= mat4;
-            this[10] *= mat4;
-            this[11] *= mat4;
-            this[12] *= mat4;
-            this[13] *= mat4;
-            this[14] *= mat4;
-            this[15] *= mat4;
+        value: function multiplyScalar(scalar) {
+            this[0] *= scalar;
+            this[1] *= scalar;
+            this[2] *= scalar;
+            this[3] *= scalar;
+            this[4] *= scalar;
+            this[5] *= scalar;
+            this[6] *= scalar;
+            this[7] *= scalar;
+            this[8] *= scalar;
+            this[9] *= scalar;
+            this[10] *= scalar;
+            this[11] *= scalar;
+            this[12] *= scalar;
+            this[13] *= scalar;
+            this[14] *= scalar;
+            this[15] *= scalar;
 
             return this;
         }
     }, {
         key: "multiplyScalarAndAdd",
-        value: function multiplyScalarAndAdd(mat4, scale) {
-            this[0] += mat4[0] * scale;
-            this[1] += mat4[1] * scale;
-            this[2] += mat4[2] * scale;
-            this[3] += mat4[3] * scale;
-            this[4] += mat4[4] * scale;
-            this[5] += mat4[5] * scale;
-            this[6] += mat4[6] * scale;
-            this[7] += mat4[7] * scale;
-            this[8] += mat4[8] * scale;
-            this[9] += mat4[9] * scale;
-            this[10] += mat4[10] * scale;
-            this[11] += mat4[11] * scale;
-            this[12] += mat4[12] * scale;
-            this[13] += mat4[13] * scale;
-            this[14] += mat4[14] * scale;
-            this[15] += mat4[15] * scale;
+        value: function multiplyScalarAndAdd(mat4x4, scalar) {
+            this[0] += mat4x4[0] * scalar;
+            this[1] += mat4x4[1] * scalar;
+            this[2] += mat4x4[2] * scalar;
+            this[3] += mat4x4[3] * scalar;
+            this[4] += mat4x4[4] * scalar;
+            this[5] += mat4x4[5] * scalar;
+            this[6] += mat4x4[6] * scalar;
+            this[7] += mat4x4[7] * scalar;
+            this[8] += mat4x4[8] * scalar;
+            this[9] += mat4x4[9] * scalar;
+            this[10] += mat4x4[10] * scalar;
+            this[11] += mat4x4[11] * scalar;
+            this[12] += mat4x4[12] * scalar;
+            this[13] += mat4x4[13] * scalar;
+            this[14] += mat4x4[14] * scalar;
+            this[15] += mat4x4[15] * scalar;
 
             return this;
         }
     }, {
         key: "exactEquals",
-        value: function exactEquals(mat4) {
-            return this[0] === mat4[0] && this[1] === mat4[1] && this[2] === mat4[2] && this[3] === mat4[3] && this[4] === mat4[4] && this[5] === mat4[5] && this[6] === mat4[6] && this[7] === mat4[7] && this[8] === mat4[8] && this[9] === mat4[9] && this[10] === mat4[10] && this[11] === mat4[11] && this[12] === mat4[12] && this[13] === mat4[13] && this[14] === mat4[14] && this[15] === mat4[15];
+        value: function exactEquals(mat4x4) {
+            return this[0] === mat4x4[0] && this[1] === mat4x4[1] && this[2] === mat4x4[2] && this[3] === mat4x4[3] && this[4] === mat4x4[4] && this[5] === mat4x4[5] && this[6] === mat4x4[6] && this[7] === mat4x4[7] && this[8] === mat4x4[8] && this[9] === mat4x4[9] && this[10] === mat4x4[10] && this[11] === mat4x4[11] && this[12] === mat4x4[12] && this[13] === mat4x4[13] && this[14] === mat4x4[14] && this[15] === mat4x4[15];
         }
     }, {
         key: "equals",
-        value: function equals(mat4) {
+        value: function equals(mat4x4) {
             var _ref = _slicedToArray(this, 16),
                 a0 = _ref[0],
                 a1 = _ref[1],
@@ -558,73 +563,58 @@ var Matrix4x4 = function (_Float32Array) {
                 a14 = _ref[14],
                 a15 = _ref[15];
 
-            var _mat = _slicedToArray(mat4, 16),
-                b0 = _mat[0],
-                b1 = _mat[1],
-                b2 = _mat[2],
-                b3 = _mat[3],
-                b4 = _mat[4],
-                b5 = _mat[5],
-                b6 = _mat[6],
-                b7 = _mat[7],
-                b8 = _mat[8],
-                b9 = _mat[9],
-                b10 = _mat[10],
-                b11 = _mat[11],
-                b12 = _mat[12],
-                b13 = _mat[13],
-                b14 = _mat[14],
-                b15 = _mat[15];
+            var _mat4x = _slicedToArray(mat4x4, 16),
+                b0 = _mat4x[0],
+                b1 = _mat4x[1],
+                b2 = _mat4x[2],
+                b3 = _mat4x[3],
+                b4 = _mat4x[4],
+                b5 = _mat4x[5],
+                b6 = _mat4x[6],
+                b7 = _mat4x[7],
+                b8 = _mat4x[8],
+                b9 = _mat4x[9],
+                b10 = _mat4x[10],
+                b11 = _mat4x[11],
+                b12 = _mat4x[12],
+                b13 = _mat4x[13],
+                b14 = _mat4x[14],
+                b15 = _mat4x[15];
 
             return Math.abs(a0 - b0) <= EPSILON * Math.max(1.0, Math.abs(a0), Math.abs(b0)) && Math.abs(a1 - b1) <= EPSILON * Math.max(1.0, Math.abs(a1), Math.abs(b1)) && Math.abs(a2 - b2) <= EPSILON * Math.max(1.0, Math.abs(a2), Math.abs(b2)) && Math.abs(a3 - b3) <= EPSILON * Math.max(1.0, Math.abs(a3), Math.abs(b3)) && Math.abs(a4 - b4) <= EPSILON * Math.max(1.0, Math.abs(a4), Math.abs(b4)) && Math.abs(a5 - b5) <= EPSILON * Math.max(1.0, Math.abs(a5), Math.abs(b5)) && Math.abs(a6 - b6) <= EPSILON * Math.max(1.0, Math.abs(a6), Math.abs(b6)) && Math.abs(a7 - b7) <= EPSILON * Math.max(1.0, Math.abs(a7), Math.abs(b7)) && Math.abs(a8 - b8) <= EPSILON * Math.max(1.0, Math.abs(a8), Math.abs(b8)) && Math.abs(a9 - b9) <= EPSILON * Math.max(1.0, Math.abs(a9), Math.abs(b9)) && Math.abs(a10 - b10) <= EPSILON * Math.max(1.0, Math.abs(a10), Math.abs(b10)) && Math.abs(a11 - b11) <= EPSILON * Math.max(1.0, Math.abs(a11), Math.abs(b11)) && Math.abs(a12 - b12) <= EPSILON * Math.max(1.0, Math.abs(a12), Math.abs(b12)) && Math.abs(a13 - b13) <= EPSILON * Math.max(1.0, Math.abs(a13), Math.abs(b13)) && Math.abs(a14 - b14) <= EPSILON * Math.max(1.0, Math.abs(a14), Math.abs(b14)) && Math.abs(a15 - b15) <= EPSILON * Math.max(1.0, Math.abs(a15), Math.abs(b15));
         }
     }, {
         key: "transpose",
-        value: function transpose(mat4) {
-            if (mat4 === this) {
-                var m1 = mat4[1];
-                var m2 = mat4[2];
-                var m3 = mat4[3];
-                var m12 = mat4[6];
-                var m13 = mat4[7];
-                var m23 = mat4[11];
+        value: function transpose(mat4x4) {
+            if (mat4x4 === this) {
+                var m1 = mat4x4[1];
+                var m2 = mat4x4[2];
+                var m3 = mat4x4[3];
+                var m12 = mat4x4[6];
+                var m13 = mat4x4[7];
+                var m23 = mat4x4[11];
 
-                this[1] = mat4[4];
-                this[2] = mat4[8];
-                this[3] = mat4[12];
+                this[1] = mat4x4[4];
+                this[2] = mat4x4[8];
+                this[3] = mat4x4[12];
                 this[4] = m1;
-                this[6] = mat4[9];
-                this[7] = mat4[13];
+                this[6] = mat4x4[9];
+                this[7] = mat4x4[13];
                 this[8] = m2;
                 this[9] = m12;
-                this[11] = mat4[14];
+                this[11] = mat4x4[14];
                 this[12] = m3;
                 this[13] = m13;
                 this[14] = m23;
             } else {
-                this[0] = mat4[0];
-                this[1] = mat4[4];
-                this[2] = mat4[8];
-                this[3] = mat4[12];
-                this[4] = mat4[1];
-                this[5] = mat4[5];
-                this[6] = mat4[9];
-                this[7] = mat4[13];
-                this[8] = mat4[2];
-                this[9] = mat4[6];
-                this[10] = mat4[10];
-                this[11] = mat4[14];
-                this[12] = mat4[3];
-                this[13] = mat4[7];
-                this[14] = mat4[11];
-                this[15] = mat4[15];
+                setMat(this, mat4x4[0], mat4x4[4], mat4x4[8], mat4x4[12], mat4x4[1], mat4x4[5], mat4x4[9], mat4x4[13], mat4x4[2], mat4x4[6], mat4x4[10], mat4x4[14], mat4x4[3], mat4x4[7], mat4x4[11], mat4x4[15]);
             }
 
             return this;
         }
     }, {
         key: "invert",
-        value: function invert(mat4) {
+        value: function invert() {
             var _ref2 = _slicedToArray(this, 16),
                 a00 = _ref2[0],
                 a01 = _ref2[1],
@@ -659,34 +649,17 @@ var Matrix4x4 = function (_Float32Array) {
             // Calculate the determinant
             var det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
 
-            if (!det) {
-                return this;
-            }
+            if (!det) return this;
 
             det = 1.0 / det;
 
-            this[0] = (a11 * b11 - a12 * b10 + a13 * b09) * det;
-            this[1] = (a02 * b10 - a01 * b11 - a03 * b09) * det;
-            this[2] = (a31 * b05 - a32 * b04 + a33 * b03) * det;
-            this[3] = (a22 * b04 - a21 * b05 - a23 * b03) * det;
-            this[4] = (a12 * b08 - a10 * b11 - a13 * b07) * det;
-            this[5] = (a00 * b11 - a02 * b08 + a03 * b07) * det;
-            this[6] = (a32 * b02 - a30 * b05 - a33 * b01) * det;
-            this[7] = (a20 * b05 - a22 * b02 + a23 * b01) * det;
-            this[8] = (a10 * b10 - a11 * b08 + a13 * b06) * det;
-            this[9] = (a01 * b08 - a00 * b10 - a03 * b06) * det;
-            this[10] = (a30 * b04 - a31 * b02 + a33 * b00) * det;
-            this[11] = (a21 * b02 - a20 * b04 - a23 * b00) * det;
-            this[12] = (a11 * b07 - a10 * b09 - a12 * b06) * det;
-            this[13] = (a00 * b09 - a01 * b07 + a02 * b06) * det;
-            this[14] = (a31 * b01 - a30 * b03 - a32 * b00) * det;
-            this[15] = (a20 * b03 - a21 * b01 + a22 * b00) * det;
+            setMat(this, (a11 * b11 - a12 * b10 + a13 * b09) * det, (a02 * b10 - a01 * b11 - a03 * b09) * det, (a31 * b05 - a32 * b04 + a33 * b03) * det, (a22 * b04 - a21 * b05 - a23 * b03) * det, (a12 * b08 - a10 * b11 - a13 * b07) * det, (a00 * b11 - a02 * b08 + a03 * b07) * det, (a32 * b02 - a30 * b05 - a33 * b01) * det, (a20 * b05 - a22 * b02 + a23 * b01) * det, (a10 * b10 - a11 * b08 + a13 * b06) * det, (a01 * b08 - a00 * b10 - a03 * b06) * det, (a30 * b04 - a31 * b02 + a33 * b00) * det, (a21 * b02 - a20 * b04 - a23 * b00) * det, (a11 * b07 - a10 * b09 - a12 * b06) * det, (a00 * b09 - a01 * b07 + a02 * b06) * det, (a31 * b01 - a30 * b03 - a32 * b00) * det, (a20 * b03 - a21 * b01 + a22 * b00) * det);
 
             return this;
         }
     }, {
         key: "adjoint",
-        value: function adjoint(mat4) {
+        value: function adjoint() {
             var _ref3 = _slicedToArray(this, 16),
                 a00 = _ref3[0],
                 a01 = _ref3[1],
@@ -705,22 +678,7 @@ var Matrix4x4 = function (_Float32Array) {
                 a32 = _ref3[14],
                 a33 = _ref3[15];
 
-            this[0] = a11 * (a22 * a33 - a23 * a32) - a21 * (a12 * a33 - a13 * a32) + a31 * (a12 * a23 - a13 * a22);
-            this[1] = -(a01 * (a22 * a33 - a23 * a32) - a21 * (a02 * a33 - a03 * a32) + a31 * (a02 * a23 - a03 * a22));
-            this[2] = a01 * (a12 * a33 - a13 * a32) - a11 * (a02 * a33 - a03 * a32) + a31 * (a02 * a13 - a03 * a12);
-            this[3] = -(a01 * (a12 * a23 - a13 * a22) - a11 * (a02 * a23 - a03 * a22) + a21 * (a02 * a13 - a03 * a12));
-            this[4] = -(a10 * (a22 * a33 - a23 * a32) - a20 * (a12 * a33 - a13 * a32) + a30 * (a12 * a23 - a13 * a22));
-            this[5] = a00 * (a22 * a33 - a23 * a32) - a20 * (a02 * a33 - a03 * a32) + a30 * (a02 * a23 - a03 * a22);
-            this[6] = -(a00 * (a12 * a33 - a13 * a32) - a10 * (a02 * a33 - a03 * a32) + a30 * (a02 * a13 - a03 * a12));
-            this[7] = a00 * (a12 * a23 - a13 * a22) - a10 * (a02 * a23 - a03 * a22) + a20 * (a02 * a13 - a03 * a12);
-            this[8] = a10 * (a21 * a33 - a23 * a31) - a20 * (a11 * a33 - a13 * a31) + a30 * (a11 * a23 - a13 * a21);
-            this[9] = -(a00 * (a21 * a33 - a23 * a31) - a20 * (a01 * a33 - a03 * a31) + a30 * (a01 * a23 - a03 * a21));
-            this[10] = a00 * (a11 * a33 - a13 * a31) - a10 * (a01 * a33 - a03 * a31) + a30 * (a01 * a13 - a03 * a11);
-            this[11] = -(a00 * (a11 * a23 - a13 * a21) - a10 * (a01 * a23 - a03 * a21) + a20 * (a01 * a13 - a03 * a11));
-            this[12] = -(a10 * (a21 * a32 - a22 * a31) - a20 * (a11 * a32 - a12 * a31) + a30 * (a11 * a22 - a12 * a21));
-            this[13] = a00 * (a21 * a32 - a22 * a31) - a20 * (a01 * a32 - a02 * a31) + a30 * (a01 * a22 - a02 * a21);
-            this[14] = -(a00 * (a11 * a32 - a12 * a31) - a10 * (a01 * a32 - a02 * a31) + a30 * (a01 * a12 - a02 * a11));
-            this[15] = a00 * (a11 * a22 - a12 * a21) - a10 * (a01 * a22 - a02 * a21) + a20 * (a01 * a12 - a02 * a11);
+            setMat(this, a11 * (a22 * a33 - a23 * a32) - a21 * (a12 * a33 - a13 * a32) + a31 * (a12 * a23 - a13 * a22), -(a01 * (a22 * a33 - a23 * a32) - a21 * (a02 * a33 - a03 * a32) + a31 * (a02 * a23 - a03 * a22)), a01 * (a12 * a33 - a13 * a32) - a11 * (a02 * a33 - a03 * a32) + a31 * (a02 * a13 - a03 * a12), -(a01 * (a12 * a23 - a13 * a22) - a11 * (a02 * a23 - a03 * a22) + a21 * (a02 * a13 - a03 * a12)), -(a10 * (a22 * a33 - a23 * a32) - a20 * (a12 * a33 - a13 * a32) + a30 * (a12 * a23 - a13 * a22)), a00 * (a22 * a33 - a23 * a32) - a20 * (a02 * a33 - a03 * a32) + a30 * (a02 * a23 - a03 * a22), -(a00 * (a12 * a33 - a13 * a32) - a10 * (a02 * a33 - a03 * a32) + a30 * (a02 * a13 - a03 * a12)), a00 * (a12 * a23 - a13 * a22) - a10 * (a02 * a23 - a03 * a22) + a20 * (a02 * a13 - a03 * a12), a10 * (a21 * a33 - a23 * a31) - a20 * (a11 * a33 - a13 * a31) + a30 * (a11 * a23 - a13 * a21), -(a00 * (a21 * a33 - a23 * a31) - a20 * (a01 * a33 - a03 * a31) + a30 * (a01 * a23 - a03 * a21)), a00 * (a11 * a33 - a13 * a31) - a10 * (a01 * a33 - a03 * a31) + a30 * (a01 * a13 - a03 * a11), -(a00 * (a11 * a23 - a13 * a21) - a10 * (a01 * a23 - a03 * a21) + a20 * (a01 * a13 - a03 * a11)), -(a10 * (a21 * a32 - a22 * a31) - a20 * (a11 * a32 - a12 * a31) + a30 * (a11 * a22 - a12 * a21)), a00 * (a21 * a32 - a22 * a31) - a20 * (a01 * a32 - a02 * a31) + a30 * (a01 * a22 - a02 * a21), -(a00 * (a11 * a32 - a12 * a31) - a10 * (a01 * a32 - a02 * a31) + a30 * (a01 * a12 - a02 * a11)), a00 * (a11 * a22 - a12 * a21) - a10 * (a01 * a22 - a02 * a21) + a20 * (a01 * a12 - a02 * a11));
 
             return this;
         }
@@ -745,24 +703,24 @@ var Matrix4x4 = function (_Float32Array) {
                 a32 = _ref4[14],
                 a33 = _ref4[15];
 
-            var b00 = a00 * a11 - a01 * a10;
-            var b01 = a00 * a12 - a02 * a10;
-            var b02 = a00 * a13 - a03 * a10;
-            var b03 = a01 * a12 - a02 * a11;
-            var b04 = a01 * a13 - a03 * a11;
-            var b05 = a02 * a13 - a03 * a12;
-            var b06 = a20 * a31 - a21 * a30;
-            var b07 = a20 * a32 - a22 * a30;
-            var b08 = a20 * a33 - a23 * a30;
-            var b09 = a21 * a32 - a22 * a31;
-            var b10 = a21 * a33 - a23 * a31;
-            var b11 = a22 * a33 - a23 * a32;
+            var b00 = a00 * a11 - a01 * a10,
+                b01 = a00 * a12 - a02 * a10,
+                b02 = a00 * a13 - a03 * a10,
+                b03 = a01 * a12 - a02 * a11,
+                b04 = a01 * a13 - a03 * a11,
+                b05 = a02 * a13 - a03 * a12,
+                b06 = a20 * a31 - a21 * a30,
+                b07 = a20 * a32 - a22 * a30,
+                b08 = a20 * a33 - a23 * a30,
+                b09 = a21 * a32 - a22 * a31,
+                b10 = a21 * a33 - a23 * a31,
+                b11 = a22 * a33 - a23 * a32;
 
             return b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
         }
     }, {
         key: "multiply",
-        value: function multiply(mat4) {
+        value: function multiply(mat4x4) {
             var _ref5 = _slicedToArray(this, 16),
                 a00 = _ref5[0],
                 a01 = _ref5[1],
@@ -784,40 +742,40 @@ var Matrix4x4 = function (_Float32Array) {
             // Cache only the current line of the second matrix
 
 
-            var _mat2 = _slicedToArray(mat4, 4),
-                b0 = _mat2[0],
-                b1 = _mat2[1],
-                b2 = _mat2[2],
-                b3 = _mat2[3];
+            var _mat4x2 = _slicedToArray(mat4x4, 4),
+                b0 = _mat4x2[0],
+                b1 = _mat4x2[1],
+                b2 = _mat4x2[2],
+                b3 = _mat4x2[3];
 
             this[0] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
             this[1] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
             this[2] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
             this[3] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
 
-            b0 = mat4[4];
-            b1 = mat4[5];
-            b2 = mat4[6];
-            b3 = mat4[7];
+            b0 = mat4x4[4];
+            b1 = mat4x4[5];
+            b2 = mat4x4[6];
+            b3 = mat4x4[7];
 
             this[4] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
             this[5] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
             this[6] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
             this[7] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
 
-            b0 = mat4[8];
-            b1 = mat4[9];
-            b2 = mat4[10];
-            b3 = mat4[11];
+            b0 = mat4x4[8];
+            b1 = mat4x4[9];
+            b2 = mat4x4[10];
+            b3 = mat4x4[11];
             this[8] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
             this[9] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
             this[10] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
             this[11] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
 
-            b0 = mat4[12];
-            b1 = mat4[13];
-            b2 = mat4[14];
-            b3 = mat4[15];
+            b0 = mat4x4[12];
+            b1 = mat4x4[13];
+            b2 = mat4x4[14];
+            b3 = mat4x4[15];
             this[12] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
             this[13] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
             this[14] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
@@ -827,11 +785,11 @@ var Matrix4x4 = function (_Float32Array) {
         }
     }, {
         key: "translate",
-        value: function translate(vec3) {
-            var _vec = _slicedToArray(vec3, 3),
-                x = _vec[0],
-                y = _vec[1],
-                z = _vec[2];
+        value: function translate(_ref6) {
+            var _ref7 = _slicedToArray(_ref6, 3),
+                x = _ref7[0],
+                y = _ref7[1],
+                z = _ref7[2];
 
             this[12] = this[0] * x + this[4] * y + this[8] * z + this[12];
             this[13] = this[1] * x + this[5] * y + this[9] * z + this[13];
@@ -842,11 +800,11 @@ var Matrix4x4 = function (_Float32Array) {
         }
     }, {
         key: "scale",
-        value: function scale(vec3) {
-            var _vec2 = _slicedToArray(vec3, 3),
-                x = _vec2[0],
-                y = _vec2[1],
-                z = _vec2[2];
+        value: function scale(_ref8) {
+            var _ref9 = _slicedToArray(_ref8, 3),
+                x = _ref9[0],
+                y = _ref9[1],
+                z = _ref9[2];
 
             this[0] *= x;
             this[1] *= x;
@@ -865,11 +823,11 @@ var Matrix4x4 = function (_Float32Array) {
         }
     }, {
         key: "rotate",
-        value: function rotate(rad, axis) {
-            var _axis = _slicedToArray(axis, 3),
-                x = _axis[0],
-                y = _axis[1],
-                z = _axis[2];
+        value: function rotate(rad, _ref10) {
+            var _ref11 = _slicedToArray(_ref10, 3),
+                x = _ref11[0],
+                y = _ref11[1],
+                z = _ref11[2];
 
             var len = Math.sqrt(x * x + y * y + z * z);
 
@@ -883,19 +841,19 @@ var Matrix4x4 = function (_Float32Array) {
                 var c = Math.cos(rad);
                 var t = 1 - c;
 
-                var _ref6 = _slicedToArray(this, 12),
-                    a00 = _ref6[0],
-                    a01 = _ref6[1],
-                    _a = _ref6[2],
-                    a03 = _ref6[3],
-                    a10 = _ref6[4],
-                    a11 = _ref6[5],
-                    a12 = _ref6[6],
-                    a13 = _ref6[7],
-                    a20 = _ref6[8],
-                    a21 = _ref6[9],
-                    a22 = _ref6[10],
-                    a23 = _ref6[11];
+                var _ref12 = _slicedToArray(this, 12),
+                    a00 = _ref12[0],
+                    a01 = _ref12[1],
+                    _a = _ref12[2],
+                    a03 = _ref12[3],
+                    a10 = _ref12[4],
+                    a11 = _ref12[5],
+                    a12 = _ref12[6],
+                    a13 = _ref12[7],
+                    a20 = _ref12[8],
+                    a21 = _ref12[9],
+                    a22 = _ref12[10],
+                    a23 = _ref12[11];
 
                 // Construct the elements of the rotation matrix
 
@@ -959,7 +917,6 @@ var Matrix4x4 = function (_Float32Array) {
         value: function rotateY(rad) {
             var s = Math.sin(rad);
             var c = Math.cos(rad);
-
             var a00 = a[0];
             var a01 = a[1];
             var a02 = a[2];
@@ -987,15 +944,15 @@ var Matrix4x4 = function (_Float32Array) {
             var s = Math.sin(rad);
             var c = Math.cos(rad);
 
-            var _ref7 = _slicedToArray(this, 8),
-                a00 = _ref7[0],
-                a01 = _ref7[1],
-                a0 = _ref7[2],
-                a03 = _ref7[3],
-                a10 = _ref7[4],
-                a11 = _ref7[5],
-                a12 = _ref7[6],
-                a13 = _ref7[7];
+            var _ref13 = _slicedToArray(this, 8),
+                a00 = _ref13[0],
+                a01 = _ref13[1],
+                a0 = _ref13[2],
+                a03 = _ref13[3],
+                a10 = _ref13[4],
+                a11 = _ref13[5],
+                a12 = _ref13[6],
+                a13 = _ref13[7];
 
             // Perform axis-specific matrix multiplication
 
@@ -1014,54 +971,24 @@ var Matrix4x4 = function (_Float32Array) {
     }, {
         key: "fromTranslation",
         value: function fromTranslation(vec3) {
-            this[0] = 1;
-            this[1] = 0;
-            this[2] = 0;
-            this[3] = 0;
-            this[4] = 0;
-            this[5] = 1;
-            this[6] = 0;
-            this[7] = 0;
-            this[8] = 0;
-            this[9] = 0;
-            this[10] = 1;
-            this[11] = 0;
-            this[12] = vec3[0];
-            this[13] = vec3[1];
-            this[14] = vec3[2];
-            this[15] = 1;
+            setMat(this, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, vec3[0], vec3[1], vec3[2], 1);
 
             return this;
         }
     }, {
         key: "fromScaling",
         value: function fromScaling(vec3) {
-            this[0] = vec3[0];
-            this[1] = 0;
-            this[2] = 0;
-            this[3] = 0;
-            this[4] = 0;
-            this[5] = vec3[1];
-            this[6] = 0;
-            this[7] = 0;
-            this[8] = 0;
-            this[9] = 0;
-            this[10] = vec3[2];
-            this[11] = 0;
-            this[12] = 0;
-            this[13] = 0;
-            this[14] = 0;
-            this[15] = 1;
+            setMat(this, vec3[0], 0, 0, 0, 0, vec3[1], 0, 0, 0, 0, vec3[2], 0, 0, 0, 0, 1);
 
             return this;
         }
     }, {
         key: "fromRotation",
-        value: function fromRotation(rad, axis) {
-            var _axis2 = _slicedToArray(axis, 3),
-                x = _axis2[0],
-                y = _axis2[1],
-                z = _axis2[2];
+        value: function fromRotation(rad, _ref14) {
+            var _ref15 = _slicedToArray(_ref14, 3),
+                x = _ref15[0],
+                y = _ref15[1],
+                z = _ref15[2];
 
             var len = Math.sqrt(x * x + y * y + z * z);
 
@@ -1076,22 +1003,7 @@ var Matrix4x4 = function (_Float32Array) {
                 var t = 1 - c;
 
                 // Perform rotation-specific matrix multiplication
-                this[0] = x * x * t + c;
-                this[1] = y * x * t + z * s;
-                this[2] = z * x * t - y * s;
-                this[3] = 0;
-                this[4] = x * y * t - z * s;
-                this[5] = y * y * t + c;
-                this[6] = z * y * t + x * s;
-                this[7] = 0;
-                this[8] = x * z * t + y * s;
-                this[9] = y * z * t - x * s;
-                this[10] = z * z * t + c;
-                this[11] = 0;
-                this[12] = 0;
-                this[13] = 0;
-                this[14] = 0;
-                this[15] = 1;
+                setMat(this, x * x * t + c, y * x * t + z * s, z * x * t - y * s, 0, x * y * t - z * s, y * y * t + c, z * y * t + x * s, 0, x * z * t + y * s, y * z * t - x * s, z * z * t + c, 0, 0, 0, 0, 1);
             }
 
             return this;
@@ -1103,22 +1015,7 @@ var Matrix4x4 = function (_Float32Array) {
             var c = Math.cos(rad);
 
             // Perform axis-specific matrix multiplication
-            this[0] = 1;
-            this[1] = 0;
-            this[2] = 0;
-            this[3] = 0;
-            this[4] = 0;
-            this[5] = c;
-            this[6] = s;
-            this[7] = 0;
-            this[8] = 0;
-            this[9] = -s;
-            this[10] = c;
-            this[11] = 0;
-            this[12] = 0;
-            this[13] = 0;
-            this[14] = 0;
-            this[15] = 1;
+            setMat(this, 1, 0, 0, 0, 0, c, s, 0, 0, -s, c, 0, 0, 0, 0, 1);
 
             return this;
         }
@@ -1129,23 +1026,7 @@ var Matrix4x4 = function (_Float32Array) {
             var c = Math.cos(rad);
 
             // Perform axis-specific matrix multiplication
-            this[0] = c;
-            this[1] = 0;
-            this[2] = -s;
-            this[3] = 0;
-            this[4] = 0;
-            this[5] = 1;
-            this[6] = 0;
-            this[7] = 0;
-            this[8] = s;
-            this[9] = 0;
-            this[10] = c;
-            this[11] = 0;
-            this[12] = 0;
-            this[13] = 0;
-            this[14] = 0;
-            this[15] = 1;
-
+            setMat(this, c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, 0, 0, 0, 1);
             return this;
         }
     }, {
@@ -1155,22 +1036,7 @@ var Matrix4x4 = function (_Float32Array) {
             var c = Math.cos(rad);
 
             // Perform axis-specific matrix multiplication
-            this[0] = c;
-            this[1] = s;
-            this[2] = 0;
-            this[3] = 0;
-            this[4] = -s;
-            this[5] = c;
-            this[6] = 0;
-            this[7] = 0;
-            this[8] = 0;
-            this[9] = 0;
-            this[10] = 1;
-            this[11] = 0;
-            this[12] = 0;
-            this[13] = 0;
-            this[14] = 0;
-            this[15] = 1;
+            setMat(this, c, s, 0, 0, -s, c, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 
             return this;
         }
@@ -1186,7 +1052,6 @@ var Matrix4x4 = function (_Float32Array) {
             var x2 = x + x;
             var y2 = y + y;
             var z2 = z + z;
-
             var xx = x * x2;
             var yx = y * x2;
             var yy = y * y2;
@@ -1197,22 +1062,7 @@ var Matrix4x4 = function (_Float32Array) {
             var wy = w * y2;
             var wz = w * z2;
 
-            this[0] = 1 - yy - zz;
-            this[1] = yx + wz;
-            this[2] = zx - wy;
-            this[3] = 0;
-            this[4] = yx - wz;
-            this[5] = 1 - xx - zz;
-            this[6] = zy + wx;
-            this[7] = 0;
-            this[8] = zx + wy;
-            this[9] = zy - wx;
-            this[10] = 1 - xx - yy;
-            this[11] = 0;
-            this[12] = 0;
-            this[13] = 0;
-            this[14] = 0;
-            this[15] = 1;
+            setMat(this, 1 - yy - zz, yx + wz, zx - wy, 0, yx - wz, 1 - xx - zz, zy + wx, 0, zx + wy, zy - wx, 1 - xx - yy, 0, 0, 0, 0, 1);
 
             return this;
         }
@@ -1229,7 +1079,6 @@ var Matrix4x4 = function (_Float32Array) {
             var x2 = x + x;
             var y2 = y + y;
             var z2 = z + z;
-
             var xx = x * x2;
             var xy = x * y2;
             var xz = x * z2;
@@ -1240,28 +1089,18 @@ var Matrix4x4 = function (_Float32Array) {
             var wy = w * y2;
             var wz = w * z2;
 
-            this[0] = 1 - (yy + zz);
-            this[1] = xy + wz;
-            this[2] = xz - wy;
-            this[3] = 0;
-            this[4] = xy - wz;
-            this[5] = 1 - (xx + zz);
-            this[6] = yz + wx;
-            this[7] = 0;
-            this[8] = xz + wy;
-            this[9] = yz - wx;
-            this[10] = 1 - (xx + yy);
-            this[11] = 0;
-            this[12] = vec3[0];
-            this[13] = vec3[1];
-            this[14] = vec3[2];
-            this[15] = 1;
+            setMat(this, 1 - (yy + zz), xy + wz, xz - wy, 0, xy - wz, 1 - (xx + zz), yz + wx, 0, xz + wy, yz - wx, 1 - (xx + yy), 0, vec3[0], vec3[1], vec3[2], 1);
 
             return this;
         }
     }, {
         key: "fromRotationTranslationScale",
-        value: function fromRotationTranslationScale(quat, vec3, scale) {
+        value: function fromRotationTranslationScale(quat, vec3, _ref16) {
+            var _ref17 = _slicedToArray(_ref16, 3),
+                sx = _ref17[0],
+                sy = _ref17[1],
+                sz = _ref17[2];
+
             // Quaternion math
             var _quat3 = _slicedToArray(quat, 4),
                 x = _quat3[0],
@@ -1272,7 +1111,33 @@ var Matrix4x4 = function (_Float32Array) {
             var x2 = x + x;
             var y2 = y + y;
             var z2 = z + z;
+            var xx = x * x2;
+            var xy = x * y2;
+            var xz = x * z2;
+            var yy = y * y2;
+            var yz = y * z2;
+            var zz = z * z2;
+            var wx = w * x2;
+            var wy = w * y2;
+            var wz = w * z2;
 
+            setMat(this, (1 - (yy + zz)) * sx, (xy + wz) * sx, (xz - wy) * sx, 0, (xy - wz) * sy, (1 - (xx + zz)) * sy, (yz + wx) * sy, 0, (xz + wy) * sz, (yz - wx) * sz, (1 - (xx + yy)) * sz, 0, vec3[0], vec3[1], vec3[2], 1);
+
+            return this;
+        }
+    }, {
+        key: "fromRotationTranslationScaleOrigin",
+        value: function fromRotationTranslationScaleOrigin(rot, trans, scale, origin) {
+            // Quaternion math
+            var _rot = _slicedToArray(rot, 4),
+                x = _rot[0],
+                y = _rot[1],
+                z = _rot[2],
+                w = _rot[3];
+
+            var x2 = x + x;
+            var y2 = y + y;
+            var z2 = z + z;
             var xx = x * x2;
             var xy = x * y2;
             var xz = x * z2;
@@ -1288,75 +1153,12 @@ var Matrix4x4 = function (_Float32Array) {
                 sy = _scale[1],
                 sz = _scale[2];
 
-            this[0] = (1 - (yy + zz)) * sx;
-            this[1] = (xy + wz) * sx;
-            this[2] = (xz - wy) * sx;
-            this[3] = 0;
-            this[4] = (xy - wz) * sy;
-            this[5] = (1 - (xx + zz)) * sy;
-            this[6] = (yz + wx) * sy;
-            this[7] = 0;
-            this[8] = (xz + wy) * sz;
-            this[9] = (yz - wx) * sz;
-            this[10] = (1 - (xx + yy)) * sz;
-            this[11] = 0;
-            this[12] = vec3[0];
-            this[13] = vec3[1];
-            this[14] = vec3[2];
-            this[15] = 1;
-
-            return this;
-        }
-    }, {
-        key: "fromRotationTranslationScaleOrigin",
-        value: function fromRotationTranslationScaleOrigin(rotation, translation, scale, origin) {
-            // Quaternion math
-            var _rotation = _slicedToArray(rotation, 4),
-                x = _rotation[0],
-                y = _rotation[1],
-                z = _rotation[2],
-                w = _rotation[3];
-
-            var x2 = x + x;
-            var y2 = y + y;
-            var z2 = z + z;
-
-            var xx = x * x2;
-            var xy = x * y2;
-            var xz = x * z2;
-            var yy = y * y2;
-            var yz = y * z2;
-            var zz = z * z2;
-            var wx = w * x2;
-            var wy = w * y2;
-            var wz = w * z2;
-
-            var _scale2 = _slicedToArray(scale, 3),
-                sx = _scale2[0],
-                sy = _scale2[1],
-                sz = _scale2[2];
-
             var _origin = _slicedToArray(origin, 3),
                 ox = _origin[0],
                 oy = _origin[1],
                 oz = _origin[2];
 
-            this[0] = (1 - (yy + zz)) * sx;
-            this[1] = (xy + wz) * sx;
-            this[2] = (xz - wy) * sx;
-            this[3] = 0;
-            this[4] = (xy - wz) * sy;
-            this[5] = (1 - (xx + zz)) * sy;
-            this[6] = (yz + wx) * sy;
-            this[7] = 0;
-            this[8] = (xz + wy) * sz;
-            this[9] = (yz - wx) * sz;
-            this[10] = (1 - (xx + yy)) * sz;
-            this[11] = 0;
-            this[12] = translation[0] + ox - (this[0] * ox + this[4] * oy + this[8] * oz);
-            this[13] = translation[1] + oy - (this[1] * ox + this[5] * oy + this[9] * oz);
-            this[14] = translation[2] + oz - (this[2] * ox + this[6] * oy + this[10] * oz);
-            this[15] = 1;
+            setMat(this, (1 - (yy + zz)) * sx, (xy + wz) * sx, (xz - wy) * sx, 0, (xy - wz) * sy, (1 - (xx + zz)) * sy, (yz + wx) * sy, 0, (xz + wy) * sz, (yz - wx) * sz, (1 - (xx + yy)) * sz, 0, trans[0] + ox - (this[0] * ox + this[4] * oy + this[8] * oz), trans[1] + oy - (this[1] * ox + this[5] * oy + this[9] * oz), trans[2] + oz - (this[2] * ox + this[6] * oy + this[10] * oz), 1);
 
             return this;
         }
@@ -1414,22 +1216,7 @@ var Matrix4x4 = function (_Float32Array) {
             var tb = 1 / (top - bottom);
             var nf = 1 / (near - far);
 
-            this[0] = near * 2 * rl;
-            this[1] = 0;
-            this[2] = 0;
-            this[3] = 0;
-            this[4] = 0;
-            this[5] = near * 2 * tb;
-            this[6] = 0;
-            this[7] = 0;
-            this[8] = (right + left) * rl;
-            this[9] = (top + bottom) * tb;
-            this[10] = (far + near) * nf;
-            this[11] = -1;
-            this[12] = 0;
-            this[13] = 0;
-            this[14] = far * near * 2 * nf;
-            this[15] = 0;
+            setMat(this, near * 2 * rl, 0, 0, 0, 0, near * 2 * tb, 0, 0, (right + left) * rl, (top + bottom) * tb, (far + near) * nf, -1, 0, 0, far * near * 2 * nf, 0);
 
             return this;
         }
@@ -1439,22 +1226,7 @@ var Matrix4x4 = function (_Float32Array) {
             var f = 1.0 / Math.tan(fovy / 2);
             var nf = 1 / (near - far);
 
-            this[0] = f / aspect;
-            this[1] = 0;
-            this[2] = 0;
-            this[3] = 0;
-            this[4] = 0;
-            this[5] = f;
-            this[6] = 0;
-            this[7] = 0;
-            this[8] = 0;
-            this[9] = 0;
-            this[10] = (far + near) * nf;
-            this[11] = -1;
-            this[12] = 0;
-            this[13] = 0;
-            this[14] = 2 * far * near * nf;
-            this[15] = 0;
+            setMat(this, f / aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, (far + near) * nf, -1, 0, 0, 2 * far * near * nf, 0);
 
             return this;
         }
@@ -1468,22 +1240,7 @@ var Matrix4x4 = function (_Float32Array) {
             var xScale = 2 / (leftTan + rightTan);
             var yScale = 2 / (upTan + downTan);
 
-            this[0] = xScale;
-            this[1] = 0;
-            this[2] = 0;
-            this[3] = 0;
-            this[4] = 0;
-            this[5] = yScale;
-            this[6] = 0;
-            this[7] = 0;
-            this[8] = -(leftTan - rightTan) * xScale * 0.5;
-            this[9] = (upTan - downTan) * yScale * 0.5;
-            this[10] = far / (near - far);
-            this[11] = -1.0;
-            this[12] = 0;
-            this[13] = 0;
-            this[14] = far * near / (near - far);
-            this[15] = 0;
+            setMat(this, xScale, 0, 0, 0, 0, yScale, 0, 0, -(leftTan - rightTan) * xScale * 0.5, (upTan - downTan) * yScale * 0.5, far / (near - far), -1.0, 0, 0, far * near / (near - far), 0);
 
             return this;
         }
@@ -1494,22 +1251,7 @@ var Matrix4x4 = function (_Float32Array) {
             var bt = 1 / (bottom - top);
             var nf = 1 / (near - far);
 
-            this[0] = -2 * lr;
-            this[1] = 0;
-            this[2] = 0;
-            this[3] = 0;
-            this[4] = 0;
-            this[5] = -2 * bt;
-            this[6] = 0;
-            this[7] = 0;
-            this[8] = 0;
-            this[9] = 0;
-            this[10] = 2 * nf;
-            this[11] = 0;
-            this[12] = (left + right) * lr;
-            this[13] = (top + bottom) * bt;
-            this[14] = (far + near) * nf;
-            this[15] = 1;
+            setMat(this, -2 * lr, 0, 0, 0, 0, -2 * bt, 0, 0, 0, 0, 2 * nf, 0, (left + right) * lr, (top + bottom) * bt, (far + near) * nf, 1);
 
             return this;
         }
@@ -1576,22 +1318,7 @@ var Matrix4x4 = function (_Float32Array) {
                 y2 *= len;
             }
 
-            this[0] = x0;
-            this[1] = y0;
-            this[2] = z0;
-            this[3] = 0;
-            this[4] = x1;
-            this[5] = y1;
-            this[6] = z1;
-            this[7] = 0;
-            this[8] = x2;
-            this[9] = y2;
-            this[10] = z2;
-            this[11] = 0;
-            this[12] = -(x0 * eyex + x1 * eyey + x2 * eyez);
-            this[13] = -(y0 * eyex + y1 * eyey + y2 * eyez);
-            this[14] = -(z0 * eyex + z1 * eyey + z2 * eyez);
-            this[15] = 1;
+            setMat(this, x0, y0, z0, 0, x1, y1, z1, 0, x2, y2, z2, 0, -(x0 * eyex + x1 * eyey + x2 * eyez), -(y0 * eyex + y1 * eyey + y2 * eyez), -(z0 * eyex + z1 * eyey + z2 * eyez), 1);
 
             return this;
         }
