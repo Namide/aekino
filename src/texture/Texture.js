@@ -93,12 +93,47 @@ export default class Texture
         return (val & (val - 1)) === 0
     }
     
-    static IS_MULT_OF(val, mult)
+    /*static IS_MULT_OF(val, mult)
     {
         return Number.isInteger(val / mult)
+    }*/
+    
+    /*_setupFilterAndMipmap(gl, img)
+    {
+        if (Texture.IS_POWER_OF_2(img.width) && Texture.IS_POWER_OF_2(img.height))
+        {
+            gl.generateMipmap(gl.TEXTURE_2D)
+            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
+        }
+        else
+        {
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+        }
+    }*/
+    
+    static SET_DATA(gl)
+    {
+        Texture.MAX_SIZE = gl.getParameter(gl.MAX_TEXTURE_SIZE)
+        Texture.FORMAT = { }
+
+        /*
+        https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_compressed_texture_s3tc
+        */
+        const formats = gl.getParameter(gl.COMPRESSED_TEXTURE_FORMATS)
+        for (let i = 0; i < formats.length; i++)
+        {
+            Texture.FORMAT[formats[i]] = true
+            console.log(formats[i])
+        }
+
+        Texture._DATA_INITIALIZED = true
     }
     
-    _setupFilterAndMipmap(gl, img)
+    static SETUP(gl, img)
     {
         if (Texture.IS_POWER_OF_2(img.width) && Texture.IS_POWER_OF_2(img.height))
         {
@@ -114,27 +149,8 @@ export default class Texture
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
         }
     }
-    
-    static SET_DATA(gl)
-    {
-        Texture.MAX_SIZE = gl.getParameter(gl.MAX_TEXTURE_SIZE)
-        Texture.FORMAT = { }
-
-        /*
-        https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_compressed_texture_s3tc
-        */
-        console.log(gl.COMPRESSED_TEXTURE_FORMATS)
-        const formats = gl.getParameter(gl.COMPRESSED_TEXTURE_FORMATS)
-        for (let i = 0; i < formats.length; i++)
-        {
-            Texture.FORMAT[formats[i]] = true
-            console.log(formats[i])
-        }
-
-        Texture._DATA_INITIALIZED = true
-    }
         
-    init(gl, program)
+    init(gl)
     {
         const texture = gl.createTexture()
         
@@ -151,27 +167,25 @@ export default class Texture
         */
         
         
-        // Temporary ptexture (1 pixel)
+        // Temporary texture (1 pixel)
         gl.bindTexture(gl.TEXTURE_2D, texture)
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE,
           new Uint8Array(this.color))
 
         
-        const location = program.getTextureLocation(this.label)
+        /*const location = program.getTextureLocation(this.label)
         const index = program.getTextureIndex(this.label)
-        gl.uniform1i(location, index)
+        gl.uniform1i(location, index)*/
         
         this.pointer = texture
-        
-        
         
         return true
     }
     
-    draw(gl, program)
+    draw(gl, location, index)
     {
-        const index = program.getTextureIndex(this.label)
-        
+        // const index = program.getTextureIndex(this.label)
+        gl.uniform1i(location, index) // Chaque frame ou chaque init ?
         gl.activeTexture(gl.TEXTURE0 + index)
         gl.bindTexture(gl.TEXTURE_2D, this.pointer)
         // gl.uniform1i(program.getTextureLocation(this.label), 0)

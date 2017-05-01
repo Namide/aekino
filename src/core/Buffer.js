@@ -92,7 +92,7 @@ export default class Buffer
         this.itemSize = size
     }
     
-    init(gl, program)
+    init(gl)
     {
         // Create buffer
         const buffer = gl.createBuffer()

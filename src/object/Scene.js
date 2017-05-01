@@ -131,10 +131,20 @@ export default class Scene
         if (this.cam.updated)
             this.cam.update(gl.viewportWidth, gl.viewportHeight)
         
+        let lastProgram = null
+    
         for (const mesh of this.meshs)
+        {
             if (mesh.isInitialized())
-                mesh.draw(gl, this.uniforms)
+            {
+                mesh.draw(gl, mesh.program === lastProgram)
+                lastProgram = mesh.program
+            }  
             else
+            {
                 mesh.init(gl, this.uniforms)
+                lastProgram = null
+            }
+        }
     }
 }

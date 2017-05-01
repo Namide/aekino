@@ -123,20 +123,20 @@ var Uniform = function () {
 
     _createClass(Uniform, [{
         key: 'draw',
-        value: function draw(gl, program) {
+        value: function draw(gl, location) {
             switch (this.type) {
                 case 35676:
                     // gl.FLOAT_MAT4
                     {
-                        var location = program.getUniformLocation(this.label);
+                        // const location = program.getUniformLocation(this.label)
                         gl.uniformMatrix4fv(location, false, this.data);
                         break;
                     }
                 case 35665:
                     // gl.FLOAT_VEC3
                     {
-                        var _location = program.getUniformLocation(this.label);
-                        gl.uniform3f.apply(gl, [_location].concat(_toConsumableArray(this.data)));
+                        // const location = program.getUniformLocation(this.label)
+                        gl.uniform3f.apply(gl, [location].concat(_toConsumableArray(this.data)));
                         break;
                     }
                 default:
@@ -213,9 +213,9 @@ var Attribute = function (_Buffer) {
 
     _createClass(Attribute, [{
         key: 'draw',
-        value: function draw(gl, program) {
+        value: function draw(gl, location) {
             _get(Attribute.prototype.__proto__ || Object.getPrototypeOf(Attribute.prototype), 'draw', this).call(this, gl);
-            var location = program.getAttribLocation(this.label);
+            // const location = program.getAttribLocation(this.label)
             gl.vertexAttribPointer(location, this.itemSize, this.itemType, false, 0, 0);
         }
     }]);
@@ -347,7 +347,7 @@ var Buffer = function () {
         }
     }, {
         key: "init",
-        value: function init(gl, program) {
+        value: function init(gl) {
             // Create buffer
             var buffer = gl.createBuffer();
             gl.bindBuffer(this.arrayType, buffer);
@@ -1665,37 +1665,16 @@ var Geom = function () {
         this.numItems = 0;
     }
 
+    /*isInitialized()
+    {
+        for (const buffer of this.attributes)
+            if (!buffer.isInitialized())
+                return false
+        
+        return true
+    }*/
+
     _createClass(Geom, [{
-        key: 'isInitialized',
-        value: function isInitialized() {
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
-
-            try {
-                for (var _iterator = this.attributes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var buffer = _step.value;
-
-                    if (!buffer.isInitialized()) return false;
-                }
-            } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
-                    }
-                } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
-                    }
-                }
-            }
-
-            return true;
-        }
-    }, {
         key: 'addVertices',
         value: function addVertices(label, vertices, dimension) {
             var attribute = new _Attribute2.default(label);
@@ -1720,116 +1699,33 @@ var Geom = function () {
 
             this.numItems = indices.length;
         }
-    }, {
-        key: 'init',
-        value: function init(gl, program) {
-            var success = true;
 
-            var _iteratorNormalCompletion2 = true;
-            var _didIteratorError2 = false;
-            var _iteratorError2 = undefined;
+        /*init(gl, program)
+        {
+            let success = true
+            
+            for (const attribute of this.attributes)
+                if (!attribute.isInitialized())
+                    if (!attribute.init(gl, program))
+                        success = false
+                        
+            for (const buffer of this.buffers)
+                if (!buffer.isInitialized())
+                    if (!buffer.init(gl, program))
+                        success = false      
+                        
+            return success
+        }*/
 
-            try {
-                for (var _iterator2 = this.attributes[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                    var attribute = _step2.value;
+        /*draw(gl, program)
+        {
+            for(const attribute of this.attributes)
+                attribute.draw(gl, program)
+                        
+            for (const buffer of this.buffers)
+                buffer.draw(gl, program)
+        }*/
 
-                    if (!attribute.isInitialized()) if (!attribute.init(gl, program)) success = false;
-                }
-            } catch (err) {
-                _didIteratorError2 = true;
-                _iteratorError2 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                        _iterator2.return();
-                    }
-                } finally {
-                    if (_didIteratorError2) {
-                        throw _iteratorError2;
-                    }
-                }
-            }
-
-            var _iteratorNormalCompletion3 = true;
-            var _didIteratorError3 = false;
-            var _iteratorError3 = undefined;
-
-            try {
-                for (var _iterator3 = this.buffers[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                    var buffer = _step3.value;
-
-                    if (!buffer.isInitialized()) if (!buffer.init(gl, program)) success = false;
-                }
-            } catch (err) {
-                _didIteratorError3 = true;
-                _iteratorError3 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                        _iterator3.return();
-                    }
-                } finally {
-                    if (_didIteratorError3) {
-                        throw _iteratorError3;
-                    }
-                }
-            }
-
-            return success;
-        }
-    }, {
-        key: 'draw',
-        value: function draw(gl, program) {
-            var _iteratorNormalCompletion4 = true;
-            var _didIteratorError4 = false;
-            var _iteratorError4 = undefined;
-
-            try {
-                for (var _iterator4 = this.attributes[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                    var attribute = _step4.value;
-
-                    attribute.draw(gl, program);
-                }
-            } catch (err) {
-                _didIteratorError4 = true;
-                _iteratorError4 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                        _iterator4.return();
-                    }
-                } finally {
-                    if (_didIteratorError4) {
-                        throw _iteratorError4;
-                    }
-                }
-            }
-
-            var _iteratorNormalCompletion5 = true;
-            var _didIteratorError5 = false;
-            var _iteratorError5 = undefined;
-
-            try {
-                for (var _iterator5 = this.buffers[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                    var buffer = _step5.value;
-
-                    buffer.draw(gl, program);
-                }
-            } catch (err) {
-                _didIteratorError5 = true;
-                _iteratorError5 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion5 && _iterator5.return) {
-                        _iterator5.return();
-                    }
-                } finally {
-                    if (_didIteratorError5) {
-                        throw _iteratorError5;
-                    }
-                }
-            }
-        }
     }, {
         key: 'display',
         value: function display(gl) {
@@ -1912,36 +1808,8 @@ var Program = function () {
             return !!this.pointer;
         }
     }, {
-        key: 'getUniformLocation',
-        value: function getUniformLocation(label) {
-            if (this.uniformLocation.hasOwnProperty(label)) return this.uniformLocation[label];else console.error('The uniform location ' + label + ' don\'nt exist on this program');
-
-            return null;
-        }
-    }, {
-        key: 'getAttribLocation',
-        value: function getAttribLocation(label) {
-            if (this.attribLocation.hasOwnProperty(label)) return this.attribLocation[label];else console.error('The attribute location ' + label + ' don\'nt exist on this program');
-
-            return null;
-        }
-    }, {
-        key: 'getTextureLocation',
-        value: function getTextureLocation(label) {
-            if (this.textureLocation.hasOwnProperty(label)) return this.textureLocation[label];else console.error('The texture location ' + label + ' don\'nt exist on this program');
-
-            return null;
-        }
-    }, {
-        key: 'getTextureIndex',
-        value: function getTextureIndex(label) {
-            if (this.textureIndex.hasOwnProperty(label)) return this.textureIndex[label];else console.error('The texture index ' + label + ' don\'nt exist on this program');
-
-            return null;
-        }
-    }, {
         key: 'init',
-        value: function init(gl, attributes, uniforms, textures) {
+        value: function init(gl) {
             this.vertexShader = this._createShader(gl, 35633 /* gl.VERTEX_SHADER */, this.vertexShaderSrc);
             this.fragmentShader = this._createShader(gl, 35632 /* gl.FRAGMENT_SHADER */, this.fragmentShaderSrc);
 
@@ -1950,99 +1818,54 @@ var Program = function () {
             gl.attachShader(program, this.fragmentShader);
             gl.linkProgram(program);
 
-            if (!gl.getProgramParameter(program, gl.LINK_STATUS)) console.error('Shader initialization error');
+            if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+                console.error('Shader initialization error');
+                return false;
+            }
 
             gl.useProgram(program);
-
-            // Link buffer / program
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
-
-            try {
-                for (var _iterator = attributes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var attribute = _step.value;
-
-                    var attribLocation = gl.getAttribLocation(program, attribute.label);
-                    gl.enableVertexAttribArray(attribLocation);
-                    this.attribLocation[attribute.label] = attribLocation;
-                }
-
-                // Link uniform / program
-            } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
-                    }
-                } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
-                    }
-                }
-            }
-
-            var _iteratorNormalCompletion2 = true;
-            var _didIteratorError2 = false;
-            var _iteratorError2 = undefined;
-
-            try {
-                for (var _iterator2 = uniforms[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                    var uniform = _step2.value;
-
-                    var uniformLocation = gl.getUniformLocation(program, uniform.label);
-                    this.uniformLocation[uniform.label] = uniformLocation;
-                }
-
-                // Link textures / program
-            } catch (err) {
-                _didIteratorError2 = true;
-                _iteratorError2 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                        _iterator2.return();
-                    }
-                } finally {
-                    if (_didIteratorError2) {
-                        throw _iteratorError2;
-                    }
-                }
-            }
-
-            var _iteratorNormalCompletion3 = true;
-            var _didIteratorError3 = false;
-            var _iteratorError3 = undefined;
-
-            try {
-                for (var _iterator3 = textures[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                    var texture = _step3.value;
-
-                    var textureLocation = gl.getUniformLocation(program, texture.label);
-                    this.textureLocation[texture.label] = textureLocation;
-                    this.textureIndex[texture.label] = this.textureNum;
-                    this.textureNum++;
-                }
-            } catch (err) {
-                _didIteratorError3 = true;
-                _iteratorError3 = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                        _iterator3.return();
-                    }
-                } finally {
-                    if (_didIteratorError3) {
-                        throw _iteratorError3;
-                    }
-                }
-            }
 
             this.pointer = program;
 
             return true;
+        }
+    }, {
+        key: 'getAttribLocation',
+        value: function getAttribLocation(gl, attribute) {
+            var label = attribute.label;
+            if (!this.attribLocation.hasOwnProperty(label)) {
+                var attribLocation = gl.getAttribLocation(this.pointer, label);
+                gl.enableVertexAttribArray(attribLocation);
+                this.attribLocation[label] = attribLocation;
+                return attribLocation;
+            }
+
+            return this.attribLocation[label];
+        }
+    }, {
+        key: 'getUniformLocation',
+        value: function getUniformLocation(gl, uniform) {
+            var label = uniform.label;
+            if (!this.uniformLocation.hasOwnProperty(label)) {
+                var uniformLocation = gl.getUniformLocation(this.pointer, label);
+                this.uniformLocation[label] = uniformLocation;
+                return uniformLocation;
+            }
+
+            return this.uniformLocation[label];
+        }
+    }, {
+        key: 'getTextureLocationIndex',
+        value: function getTextureLocationIndex(gl, texture) {
+            var label = texture.label;
+            if (!this.textureLocation.hasOwnProperty(label) || !this.textureIndex.hasOwnProperty(label)) {
+                var textureLocation = gl.getUniformLocation(this.pointer, texture.label);
+                this.textureLocation[label] = textureLocation;
+                this.textureIndex[label] = this.textureNum;
+                return [textureLocation, this.textureNum++];
+            }
+
+            return [this.textureLocation[label], this.textureIndex[label]];
         }
     }, {
         key: 'draw',
@@ -2071,302 +1894,6 @@ exports.default = Program;
 
 /***/ }),
 /* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/* 
- * The MIT License
- *
- * Copyright 2017 Damien Doussaud (namide.com).
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
-var Texture = function () {
-    function Texture(label) {
-        _classCallCheck(this, Texture);
-
-        this.label = label;
-        this.color = [255, 255, 255, 255];
-
-        this.srcs = [];
-        this.pointer = null;
-        this.parameters = {
-            9729: 9987
-        };
-
-        this.setFormat();
-    }
-
-    /*
-        6407    gl.RGB
-        6408    gl.RGBA
-    */
-
-
-    _createClass(Texture, [{
-        key: 'setFormat',
-        value: function setFormat() {
-            var format = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 6408;
-
-            // this.internalformat = internalformat
-            this.format = format;
-        }
-
-        /*
-            target
-                3553    gl.TEXTURE_2D           A two-dimensional texture.
-                34067   gl.TEXTURE_CUBE_MAP     A cube-mapped texture.
-        
-            pname
-                10240   gl.TEXTURE_MAG_FILTER	Texture magnification filter
-                            - 9729 gl.LINEAR (default value),
-                            - 9728 gl.NEAREST.
-            
-                10241   gl.TEXTURE_MIN_FILTER	Texture minification filter
-                            - 9729 gl.LINEAR,
-                            - 9728 gl.NEAREST,
-                            - 9984 gl.NEAREST_MIPMAP_NEAREST,
-                            - 9985 gl.LINEAR_MIPMAP_NEAREST,
-                            - 9986 gl.NEAREST_MIPMAP_LINEAR (default value),
-                            - 9987 gl.LINEAR_MIPMAP_LINEAR.
-                
-                10242   gl.TEXTURE_WRAP_S	    Wrapping function for texture coordinate s
-                            - 10497 gl.REPEAT (default value),
-                            - 33071 gl.CLAMP_TO_EDGE,
-                            - 33648 gl.MIRRORED_REPEAT.
-                            
-                10243   gl.TEXTURE_WRAP_T	      Wrapping function for texture coordinate t
-                            - 10497 gl.REPEAT (default value),
-                            - 33071 gl.CLAMP_TO_EDGE,
-                            - 33648 gl.MIRRORED_REPEAT.
-            
-            param
-        */
-
-    }, {
-        key: 'setParameters',
-        value: function setParameters(target, pName, param) {}
-    }, {
-        key: 'isInitialized',
-        value: function isInitialized() {
-            return !!this.pointer;
-        }
-
-        // https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/
-
-    }, {
-        key: 'addDxt5URL',
-        value: function addDxt5URL(_ref) {
-            var src = _ref.src,
-                width = _ref.width,
-                height = _ref.height,
-                format = _ref.format,
-                priority = _ref.priority;
-
-
-            var byteLength = floor((width + 3) * 0.25) * floor((height + 3) * 0.25) * 16;
-            var level = this._isMultOf(width, 4) && this._isMultOf(height, 4) ? 0 : 1;
-
-            // var formats = gl.getParameter(gl.COMPRESSED_TEXTURE_FORMATS)
-        }
-    }, {
-        key: 'addURL',
-        value: function addURL(URL) {
-            var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-
-            this.srcs.push({
-                size: size,
-                src: URL,
-                internalformat: 6408 /* gl.RGBA */
-                , img: null,
-                priority: 0,
-                custom: false
-            });
-        }
-
-        /*load(URL, callback)
-        {
-            this.src = URL
-            
-            const img = new Image()
-            img.onload = () =>
-            {
-                this.img = img            
-                if (this._changeImg)
-                    this._changeImg(img)
-            }
-            img.src = URL
-        }*/
-
-    }, {
-        key: '_startLoad',
-        value: function _startLoad(callback) {
-            var _this = this;
-
-            var srcs = this.srcs;
-            if (srcs.length > 0) {
-                srcs.sort(function (a, b) {
-                    return a.size === b.size ? a.size - b.size : a.priority - b.priority;
-                });
-                var srcsValid = this.srcs.filter(function (o) {
-                    return o.size >= Texture.MAX_SIZE;
-                });
-
-                if (srcs.length > 1) {
-                    var first = srcs[0];
-                    var last = srcs[srcs.length - 1];
-
-                    this._load(first, function (data) {
-                        callback(data);
-                        _this._load(last, callback);
-                    });
-                } else if (srcs.length > 0) {
-                    this._load(srcs[0], callback);
-                } else {
-                    console.warn('The GPU can\'nt load a texture with size > ', Texture.MAX_SIZE);
-                }
-            } else {
-                console.warn('URL of your texture', this.label, 'not found: texture.addURL(URL, size = 0)');
-            }
-        }
-    }, {
-        key: '_load',
-        value: function _load(data, callback) {
-            var img = new Image();
-            img.onload = function () {
-                callback(data);
-            };
-            data.img = img;
-
-            img.src = data.src;
-        }
-    }, {
-        key: '_isPowerOf2',
-        value: function _isPowerOf2(val) {
-            return (val & val - 1) == 0;
-        }
-    }, {
-        key: '_isMultOf',
-        value: function _isMultOf(val, mult) {
-            return Number.isInteger(val / mult);
-        }
-    }, {
-        key: '_setupFilterAndMipmap',
-        value: function _setupFilterAndMipmap(gl, img) {
-            if (this._isPowerOf2(img.width) && this._isPowerOf2(img.height)) {
-                gl.generateMipmap(gl.TEXTURE_2D);
-                // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-            } else {
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-            }
-        }
-    }, {
-        key: 'setData',
-        value: function setData(gl) {
-            Texture.MAX_SIZE = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-            Texture.FORMAT = {};
-
-            /*
-            https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_compressed_texture_s3tc
-            */
-            console.log(gl.COMPRESSED_TEXTURE_FORMATS);
-            var formats = gl.getParameter(gl.COMPRESSED_TEXTURE_FORMATS);
-            for (var i = 0; i < formats.length; i++) {
-                Texture.FORMAT[formats[i]] = true;
-                console.log(formats[i]);
-            }
-
-            Texture._DATA_INITIALIZED = true;
-        }
-    }, {
-        key: 'init',
-        value: function init(gl, program) {
-            var _this2 = this;
-
-            var texture = gl.createTexture();
-
-            if (!Texture._DATA_INITIALIZED) {
-                this.setData(gl);
-            }
-
-            /*
-            gl.getParameter(gl.MAX_TEXTURE_SIZE)
-            gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS)
-            gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS)
-            */
-
-            var changeImg = function changeImg(newImg) {
-                gl.bindTexture(gl.TEXTURE_2D, texture);
-                gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-
-                gl.texImage2D(gl.TEXTURE_2D, 0, newImg.internalformat, _this2.format, gl.UNSIGNED_BYTE, newImg.img);
-                _this2._setupFilterAndMipmap(gl, newImg.img);
-                // gl.bindTexture(gl.TEXTURE_2D, null)
-            };
-
-            // Temporary ptexture (1 pixel)
-            gl.bindTexture(gl.TEXTURE_2D, texture);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE, new Uint8Array(this.color));
-
-            var location = program.getTextureLocation(this.label);
-            var index = program.getTextureIndex(this.label);
-            gl.uniform1i(location, index);
-
-            this.pointer = texture;
-
-            this._startLoad(changeImg);
-
-            return true;
-        }
-    }, {
-        key: 'draw',
-        value: function draw(gl, program) {
-            var index = program.getTextureIndex(this.label);
-
-            gl.activeTexture(gl.TEXTURE0 + index);
-            gl.bindTexture(gl.TEXTURE_2D, this.pointer);
-            // gl.uniform1i(program.getTextureLocation(this.label), 0)
-        }
-    }]);
-
-    return Texture;
-}();
-
-exports.default = Texture;
-
-/***/ }),
-/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2454,7 +1981,7 @@ var Cam3D = function (_Uniform) {
 exports.default = Cam3D;
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2464,9 +1991,9 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -2503,6 +2030,11 @@ var Mesh = function () {
 
         this.uniforms = [];
         this.textures = [];
+
+        this.localCalls = [];
+        this.globalCalls = [];
+
+        this._isInitialized = false;
     }
 
     _createClass(Mesh, [{
@@ -2518,21 +2050,21 @@ var Mesh = function () {
     }, {
         key: "isInitialized",
         value: function isInitialized() {
-            var success = true;
+            var success = this._isInitialized;
+
+            if (success) return success;
 
             if (!this.program.isInitialized()) success = false;
-
-            if (!this.geom.isInitialized()) success = false;
 
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
             var _iteratorError = undefined;
 
             try {
-                for (var _iterator = this.textures[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var texture = _step.value;
+                for (var _iterator = this.geom.attributes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var attribute = _step.value;
 
-                    if (!texture.isInitialized()) success = false;
+                    if (!attribute.isInitialized()) success = false;
                 }
             } catch (err) {
                 _didIteratorError = true;
@@ -2549,28 +2081,15 @@ var Mesh = function () {
                 }
             }
 
-            return success;
-        }
-    }, {
-        key: "init",
-        value: function init(gl, globalUniforms) {
-            var program = this.program;
-            var allUniforms = [].concat(_toConsumableArray(this.uniforms), _toConsumableArray(globalUniforms));
-            var success = true;
-
-            if (!this.program.isInitialized()) if (this.program.init(gl, this.geom.attributes, allUniforms, this.textures)) success = false;
-
-            if (!this.geom.isInitialized()) if (this.geom.init(gl, program)) success = false;
-
             var _iteratorNormalCompletion2 = true;
             var _didIteratorError2 = false;
             var _iteratorError2 = undefined;
 
             try {
-                for (var _iterator2 = this.textures[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                    var texture = _step2.value;
+                for (var _iterator2 = this.geom.buffers[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var buffer = _step2.value;
 
-                    if (!texture.isInitialized()) if (!texture.init(gl, program)) success = false;
+                    if (!buffer.isInitialized()) success = false;
                 }
             } catch (err) {
                 _didIteratorError2 = true;
@@ -2587,25 +2106,15 @@ var Mesh = function () {
                 }
             }
 
-            return success;
-        }
-    }, {
-        key: "draw",
-        value: function draw(gl, globalUniforms) {
-            var program = this.program;
-
-            this.program.draw(gl);
-            this.geom.draw(gl, program);
-
             var _iteratorNormalCompletion3 = true;
             var _didIteratorError3 = false;
             var _iteratorError3 = undefined;
 
             try {
-                for (var _iterator3 = this.uniforms[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                    var uniform = _step3.value;
+                for (var _iterator3 = this.textures[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                    var texture = _step3.value;
 
-                    uniform.draw(gl, program);
+                    if (!texture.isInitialized()) success = false;
                 }
             } catch (err) {
                 _didIteratorError3 = true;
@@ -2622,15 +2131,26 @@ var Mesh = function () {
                 }
             }
 
+            return success;
+        }
+
+        // GET LOCATIONS (AND INDEX) AND SAVE IT FOR CALLS
+
+    }, {
+        key: "_setCalls",
+        value: function _setCalls(gl, globalUniforms) {
+            var program = this.program;
+
             var _iteratorNormalCompletion4 = true;
             var _didIteratorError4 = false;
             var _iteratorError4 = undefined;
 
             try {
-                for (var _iterator4 = globalUniforms[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                    var _uniform = _step4.value;
+                for (var _iterator4 = this.geom.attributes[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                    var attribute = _step4.value;
 
-                    _uniform.draw(gl, program);
+                    var location = program.getAttribLocation(gl, attribute);
+                    this.localCalls.push(attribute.draw.bind(attribute, gl, location));
                 }
             } catch (err) {
                 _didIteratorError4 = true;
@@ -2652,10 +2172,10 @@ var Mesh = function () {
             var _iteratorError5 = undefined;
 
             try {
-                for (var _iterator5 = this.textures[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-                    var texture = _step5.value;
+                for (var _iterator5 = this.geom.buffers[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                    var buffer = _step5.value;
 
-                    texture.draw(gl, program);
+                    this.localCalls.push(buffer.draw.bind(buffer, gl));
                 }
             } catch (err) {
                 _didIteratorError5 = true;
@@ -2672,7 +2192,251 @@ var Mesh = function () {
                 }
             }
 
-            this.geom.display(gl, program);
+            var _iteratorNormalCompletion6 = true;
+            var _didIteratorError6 = false;
+            var _iteratorError6 = undefined;
+
+            try {
+                for (var _iterator6 = this.uniforms[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                    var uniform = _step6.value;
+
+                    var _location = program.getUniformLocation(gl, uniform);
+                    this.localCalls.push(uniform.draw.bind(uniform, gl, _location));
+                }
+            } catch (err) {
+                _didIteratorError6 = true;
+                _iteratorError6 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                        _iterator6.return();
+                    }
+                } finally {
+                    if (_didIteratorError6) {
+                        throw _iteratorError6;
+                    }
+                }
+            }
+
+            var _iteratorNormalCompletion7 = true;
+            var _didIteratorError7 = false;
+            var _iteratorError7 = undefined;
+
+            try {
+                for (var _iterator7 = this.textures[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                    var texture = _step7.value;
+
+                    var _program$getTextureLo = program.getTextureLocationIndex(gl, texture),
+                        _program$getTextureLo2 = _slicedToArray(_program$getTextureLo, 2),
+                        _location2 = _program$getTextureLo2[0],
+                        index = _program$getTextureLo2[1];
+
+                    this.localCalls.push(texture.draw.bind(texture, gl, _location2, index));
+                }
+            } catch (err) {
+                _didIteratorError7 = true;
+                _iteratorError7 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion7 && _iterator7.return) {
+                        _iterator7.return();
+                    }
+                } finally {
+                    if (_didIteratorError7) {
+                        throw _iteratorError7;
+                    }
+                }
+            }
+
+            var _iteratorNormalCompletion8 = true;
+            var _didIteratorError8 = false;
+            var _iteratorError8 = undefined;
+
+            try {
+                for (var _iterator8 = globalUniforms[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+                    var _uniform = _step8.value;
+
+                    var _location3 = program.getUniformLocation(gl, _uniform);
+                    this.globalCalls.push(_uniform.draw.bind(_uniform, gl, _location3));
+                }
+            } catch (err) {
+                _didIteratorError8 = true;
+                _iteratorError8 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion8 && _iterator8.return) {
+                        _iterator8.return();
+                    }
+                } finally {
+                    if (_didIteratorError8) {
+                        throw _iteratorError8;
+                    }
+                }
+            }
+        }
+    }, {
+        key: "_initData",
+        value: function _initData(gl) {
+            var program = this.program;
+
+            var success = true;
+
+            var _iteratorNormalCompletion9 = true;
+            var _didIteratorError9 = false;
+            var _iteratorError9 = undefined;
+
+            try {
+                for (var _iterator9 = this.geom.attributes[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+                    var attribute = _step9.value;
+
+                    if (!attribute.isInitialized()) if (!attribute.init(gl)) success = false;
+                }
+            } catch (err) {
+                _didIteratorError9 = true;
+                _iteratorError9 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion9 && _iterator9.return) {
+                        _iterator9.return();
+                    }
+                } finally {
+                    if (_didIteratorError9) {
+                        throw _iteratorError9;
+                    }
+                }
+            }
+
+            var _iteratorNormalCompletion10 = true;
+            var _didIteratorError10 = false;
+            var _iteratorError10 = undefined;
+
+            try {
+                for (var _iterator10 = this.geom.buffers[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+                    var buffer = _step10.value;
+
+                    if (!buffer.isInitialized()) if (!buffer.init(gl)) success = false;
+                }
+            } catch (err) {
+                _didIteratorError10 = true;
+                _iteratorError10 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion10 && _iterator10.return) {
+                        _iterator10.return();
+                    }
+                } finally {
+                    if (_didIteratorError10) {
+                        throw _iteratorError10;
+                    }
+                }
+            }
+
+            var _iteratorNormalCompletion11 = true;
+            var _didIteratorError11 = false;
+            var _iteratorError11 = undefined;
+
+            try {
+                for (var _iterator11 = this.textures[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+                    var texture = _step11.value;
+
+                    if (!texture.isInitialized()) if (!texture.init(gl)) success = false;
+                }
+            } catch (err) {
+                _didIteratorError11 = true;
+                _iteratorError11 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion11 && _iterator11.return) {
+                        _iterator11.return();
+                    }
+                } finally {
+                    if (_didIteratorError11) {
+                        throw _iteratorError11;
+                    }
+                }
+            }
+
+            return success;
+        }
+    }, {
+        key: "init",
+        value: function init(gl, globalUniforms) {
+            var program = this.program;
+            var success = true;
+
+            // Use program
+            if (!this.program.isInitialized()) if (!this.program.init(gl)) success = false;else this.program.draw(gl);
+
+            // Init all mesh data (textures, buffers, attributes, uniforms)
+            if (!this._initData(gl)) success = false;
+
+            // Store all calls (mesh data + global data)
+            if (success && this.localCalls.length < 1) this._setCalls(gl, globalUniforms);
+
+            this._isInitialized = success;
+            return success;
+        }
+    }, {
+        key: "draw",
+        value: function draw(gl) {
+            var sameProgram = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+            // Use program
+            if (!sameProgram) this.program.draw(gl);
+
+            // Call local
+            var _iteratorNormalCompletion12 = true;
+            var _didIteratorError12 = false;
+            var _iteratorError12 = undefined;
+
+            try {
+                for (var _iterator12 = this.localCalls[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+                    var callback = _step12.value;
+
+                    callback();
+                } // Call global
+            } catch (err) {
+                _didIteratorError12 = true;
+                _iteratorError12 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion12 && _iterator12.return) {
+                        _iterator12.return();
+                    }
+                } finally {
+                    if (_didIteratorError12) {
+                        throw _iteratorError12;
+                    }
+                }
+            }
+
+            if (!sameProgram) {
+                var _iteratorNormalCompletion13 = true;
+                var _didIteratorError13 = false;
+                var _iteratorError13 = undefined;
+
+                try {
+                    for (var _iterator13 = this.globalCalls[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
+                        var _callback = _step13.value;
+
+                        _callback();
+                    }
+                } catch (err) {
+                    _didIteratorError13 = true;
+                    _iteratorError13 = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion13 && _iterator13.return) {
+                            _iterator13.return();
+                        }
+                    } finally {
+                        if (_didIteratorError13) {
+                            throw _iteratorError13;
+                        }
+                    }
+                }
+            } // Draw mesh
+            this.geom.display(gl);
         }
     }]);
 
@@ -2682,7 +2446,7 @@ var Mesh = function () {
 exports.default = Mesh;
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2796,6 +2560,8 @@ var Scene = function () {
 
             if (this.cam.updated) this.cam.update(gl.viewportWidth, gl.viewportHeight);
 
+            var lastProgram = null;
+
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
             var _iteratorError = undefined;
@@ -2804,7 +2570,13 @@ var Scene = function () {
                 for (var _iterator = this.meshs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                     var mesh = _step.value;
 
-                    if (mesh.isInitialized()) mesh.draw(gl, this.uniforms);else mesh.init(gl, this.uniforms);
+                    if (mesh.isInitialized()) {
+                        mesh.draw(gl, mesh.program === lastProgram);
+                        lastProgram = mesh.program;
+                    } else {
+                        mesh.init(gl, this.uniforms);
+                        lastProgram = null;
+                    }
                 }
             } catch (err) {
                 _didIteratorError = true;
@@ -2855,6 +2627,201 @@ var Scene = function () {
 }();
 
 exports.default = Scene;
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _Texture2 = __webpack_require__(12);
+
+var _Texture3 = _interopRequireDefault(_Texture2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * The MIT License
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Copyright 2017 Damien Doussaud (namide.com).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Permission is hereby granted, free of charge, to any person obtaining a copy
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * of this software and associated documentation files (the "Software"), to deal
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * in the Software without restriction, including without limitation the rights
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * copies of the Software, and to permit persons to whom the Software is
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * furnished to do so, subject to the following conditions:
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * The above copyright notice and this permission notice shall be included in
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * all copies or substantial portions of the Software.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * THE SOFTWARE.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+
+function isMultOf(val, mult) {
+    return Number.isInteger(val / mult);
+}
+
+var SmartTexture = function (_Texture) {
+    _inherits(SmartTexture, _Texture);
+
+    function SmartTexture(label) {
+        _classCallCheck(this, SmartTexture);
+
+        var _this = _possibleConstructorReturn(this, (SmartTexture.__proto__ || Object.getPrototypeOf(SmartTexture)).call(this, label));
+
+        _this.srcs = [];
+        return _this;
+    }
+
+    // https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/
+
+
+    _createClass(SmartTexture, [{
+        key: 'addDxt5URL',
+        value: function addDxt5URL(_ref) {
+            var src = _ref.src,
+                width = _ref.width,
+                height = _ref.height,
+                format = _ref.format,
+                priority = _ref.priority;
+
+            var byteLength = floor((width + 3) * 0.25) * floor((height + 3) * 0.25) * 16;
+            var level = isMultOf(width, 4) && isMultOf(height, 4) ? 0 : 1;
+
+            // var formats = gl.getParameter(gl.COMPRESSED_TEXTURE_FORMATS)
+        }
+    }, {
+        key: 'addURL',
+        value: function addURL(URL) {
+            var _this2 = this;
+
+            var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+            var imgData = {
+                size: size,
+                src: URL,
+                img: null,
+                priority: 0,
+                init: null
+            };
+
+            imgData.init = function (gl) {
+                gl.bindTexture(gl.TEXTURE_2D, _this2.pointer);
+                gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
+                gl.texImage2D(gl.TEXTURE_2D, 0, 6408 /* gl.RGBA */, _this2.format, gl.UNSIGNED_BYTE, imgData.img);
+                _Texture3.default.SETUP(gl, imgData.img);
+                // gl.bindTexture(gl.TEXTURE_2D, null)
+            };
+
+            this.srcs.push(imgData);
+        }
+
+        /*load(URL, callback)
+        {
+            this.src = URL
+            
+            const img = new Image()
+            img.onload = () =>
+            {
+                this.img = img            
+                if (this._changeImg)
+                    this._changeImg(img)
+            }
+            img.src = URL
+        }*/
+
+    }, {
+        key: 'init',
+        value: function init(gl, program) {
+            var _this3 = this;
+
+            var success = _get(SmartTexture.prototype.__proto__ || Object.getPrototypeOf(SmartTexture.prototype), 'init', this).call(this, gl, program);
+
+            var texture = this.pointer;
+
+            var changeImg = function changeImg(newImg) {
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+                gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
+                gl.texImage2D(gl.TEXTURE_2D, 0, newImg.internalformat, _this3.format, gl.UNSIGNED_BYTE, newImg.img);
+                _Texture3.default.SETUP(gl, newImg.img);
+                // gl.bindTexture(gl.TEXTURE_2D, null)
+            };
+
+            SmartTexture.START_LOAD(gl, this.srcs);
+            return success;
+        }
+    }], [{
+        key: 'START_LOAD',
+        value: function START_LOAD(gl, srcs) {
+            if (srcs.length > 0) {
+                srcs.sort(function (a, b) {
+                    return a.size === b.size ? a.size - b.size : a.priority - b.priority;
+                });
+                var srcsValid = srcs.filter(function (o) {
+                    return o.size >= _Texture3.default.MAX_SIZE;
+                });
+
+                if (srcs.length > 1) {
+                    var first = srcs[0];
+                    var last = srcs[srcs.length - 1];
+
+                    SmartTexture.LOAD(first, function () {
+                        first.init(gl);
+                        SmartTexture.LOAD(last, function () {
+                            last.init(gl);
+                        });
+                    });
+                } else if (srcs.length > 0) {
+                    var imgData = srcs[0];
+                    SmartTexture.LOAD(imgData, function () {
+                        imgData.init(gl);
+                    });
+                } else {
+                    console.warn('The GPU can\'nt load a texture with size > ', _Texture3.default.MAX_SIZE);
+                }
+            } else {
+                console.warn('URL of your texture', this.label, 'not found: texture.addURL(URL, size = 0)');
+            }
+        }
+    }, {
+        key: 'LOAD',
+        value: function LOAD(data, callback) {
+            var img = new Image();
+            img.onload = function () {
+                callback(data);
+            };
+            data.img = img;
+
+            img.src = data.src;
+        }
+    }]);
+
+    return SmartTexture;
+}(_Texture3.default);
+
+exports.default = SmartTexture;
 
 /***/ }),
 /* 10 */
@@ -2946,19 +2913,19 @@ var _Geom = __webpack_require__(4);
 
 var _Geom2 = _interopRequireDefault(_Geom);
 
-var _Texture = __webpack_require__(6);
+var _SmartTexture = __webpack_require__(9);
 
-var _Texture2 = _interopRequireDefault(_Texture);
+var _SmartTexture2 = _interopRequireDefault(_SmartTexture);
 
-var _Mesh = __webpack_require__(8);
+var _Mesh = __webpack_require__(7);
 
 var _Mesh2 = _interopRequireDefault(_Mesh);
 
-var _Cam3D = __webpack_require__(7);
+var _Cam3D = __webpack_require__(6);
 
 var _Cam3D2 = _interopRequireDefault(_Cam3D);
 
-var _Scene = __webpack_require__(9);
+var _Scene = __webpack_require__(8);
 
 var _Scene2 = _interopRequireDefault(_Scene);
 
@@ -3070,6 +3037,21 @@ scene.addMesh(pyramidMesh);
 
 // ----------------------------
 //
+//      SAME PYRAMID
+//
+// ----------------------------
+
+var pyramidMesh2 = new _Mesh2.default(pyramidGeom, colorProgram);
+var pyramidUniformMatrix2 = new _UMat3D2.default('uMVMatrix');
+pyramidMesh2.addUniform(pyramidUniformMatrix2);
+pyramidMesh2.matrix = pyramidUniformMatrix2.data;
+pyramidMesh2.matrix.translate([-1.5, 1.5, -8.0]);
+pyramidMesh2.matrix.scale([1, -1, 1]);
+
+scene.addMesh(pyramidMesh2);
+
+// ----------------------------
+//
 //      CUBE RAINBOW
 //
 // ----------------------------
@@ -3160,7 +3142,7 @@ var cubeUV = [
 // Left face
 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0];
 
-var cubeTexture = new _Texture2.default('uSampler');
+var cubeTexture = new _SmartTexture2.default('uSampler');
 cubeTexture.addURL('cube-diffuse.jpg');
 
 var cubeTexturedGeom = new _Geom2.default();
@@ -3179,12 +3161,223 @@ scene.addMesh(cubeTexturedMesh);
 refresh();
 function refresh() {
     pyramidMesh.matrix.rotate(0.005, [0, 1, 0]);
+    pyramidMesh2.matrix.rotate(-0.005, [0, 1, 0]);
     cubeMesh.matrix.rotate(0.01, [0, 1, 0]);
     cubeTexturedMesh.matrix.rotate(-0.01, [0, 1, 0]);
 
     scene.draw();
     requestAnimationFrame(refresh);
 }
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/* 
+ * The MIT License
+ *
+ * Copyright 2017 Damien Doussaud (namide.com).
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+var Texture = function () {
+    function Texture(label) {
+        _classCallCheck(this, Texture);
+
+        this.label = label;
+        this.color = [255, 255, 255, 255];
+
+        this.pointer = null;
+        this.parameters = {
+            9729: 9987
+        };
+
+        this.setFormat();
+    }
+
+    /*
+        6407    gl.RGB
+        6408    gl.RGBA
+    */
+
+
+    _createClass(Texture, [{
+        key: "setFormat",
+        value: function setFormat() {
+            var format = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 6408;
+
+            // this.internalformat = internalformat
+            this.format = format;
+        }
+
+        /*
+            target
+                3553    gl.TEXTURE_2D           A two-dimensional texture.
+                34067   gl.TEXTURE_CUBE_MAP     A cube-mapped texture.
+        
+            pname
+                10240   gl.TEXTURE_MAG_FILTER	Texture magnification filter
+                            - 9729 gl.LINEAR (default value),
+                            - 9728 gl.NEAREST.
+            
+                10241   gl.TEXTURE_MIN_FILTER	Texture minification filter
+                            - 9729 gl.LINEAR,
+                            - 9728 gl.NEAREST,
+                            - 9984 gl.NEAREST_MIPMAP_NEAREST,
+                            - 9985 gl.LINEAR_MIPMAP_NEAREST,
+                            - 9986 gl.NEAREST_MIPMAP_LINEAR (default value),
+                            - 9987 gl.LINEAR_MIPMAP_LINEAR.
+                
+                10242   gl.TEXTURE_WRAP_S	    Wrapping function for texture coordinate s
+                            - 10497 gl.REPEAT (default value),
+                            - 33071 gl.CLAMP_TO_EDGE,
+                            - 33648 gl.MIRRORED_REPEAT.
+                            
+                10243   gl.TEXTURE_WRAP_T	      Wrapping function for texture coordinate t
+                            - 10497 gl.REPEAT (default value),
+                            - 33071 gl.CLAMP_TO_EDGE,
+                            - 33648 gl.MIRRORED_REPEAT.
+            
+            param
+        */
+
+    }, {
+        key: "setParameters",
+        value: function setParameters(target, pName, param) {}
+    }, {
+        key: "isInitialized",
+        value: function isInitialized() {
+            return !!this.pointer;
+        }
+    }, {
+        key: "init",
+        value: function init(gl) {
+            var texture = gl.createTexture();
+
+            if (!Texture._DATA_INITIALIZED) {
+                Texture.SET_DATA(gl);
+            }
+
+            /*
+            gl.getParameter(gl.MAX_TEXTURE_SIZE)
+            gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS)
+            gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS)
+            */
+
+            // Temporary texture (1 pixel)
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE, new Uint8Array(this.color));
+
+            /*const location = program.getTextureLocation(this.label)
+            const index = program.getTextureIndex(this.label)
+            gl.uniform1i(location, index)*/
+
+            this.pointer = texture;
+
+            return true;
+        }
+    }, {
+        key: "draw",
+        value: function draw(gl, location, index) {
+            // const index = program.getTextureIndex(this.label)
+            gl.uniform1i(location, index); // Chaque frame ou chaque init ?
+            gl.activeTexture(gl.TEXTURE0 + index);
+            gl.bindTexture(gl.TEXTURE_2D, this.pointer);
+            // gl.uniform1i(program.getTextureLocation(this.label), 0)
+        }
+    }], [{
+        key: "IS_POWER_OF_2",
+        value: function IS_POWER_OF_2(val) {
+            return (val & val - 1) === 0;
+        }
+
+        /*static IS_MULT_OF(val, mult)
+        {
+            return Number.isInteger(val / mult)
+        }*/
+
+        /*_setupFilterAndMipmap(gl, img)
+        {
+            if (Texture.IS_POWER_OF_2(img.width) && Texture.IS_POWER_OF_2(img.height))
+            {
+                gl.generateMipmap(gl.TEXTURE_2D)
+                // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
+            }
+            else
+            {
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+                // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+            }
+        }*/
+
+    }, {
+        key: "SET_DATA",
+        value: function SET_DATA(gl) {
+            Texture.MAX_SIZE = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+            Texture.FORMAT = {};
+
+            /*
+            https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_compressed_texture_s3tc
+            */
+            var formats = gl.getParameter(gl.COMPRESSED_TEXTURE_FORMATS);
+            for (var i = 0; i < formats.length; i++) {
+                Texture.FORMAT[formats[i]] = true;
+                console.log(formats[i]);
+            }
+
+            Texture._DATA_INITIALIZED = true;
+        }
+    }, {
+        key: "SETUP",
+        value: function SETUP(gl, img) {
+            if (Texture.IS_POWER_OF_2(img.width) && Texture.IS_POWER_OF_2(img.height)) {
+                gl.generateMipmap(gl.TEXTURE_2D);
+                // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+            } else {
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            }
+        }
+    }]);
+
+    return Texture;
+}();
+
+exports.default = Texture;
 
 /***/ })
 /******/ ]);

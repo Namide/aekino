@@ -109,19 +109,19 @@ class Uniform
         // this.location = null
     }
     
-    draw(gl, program)
+    draw(gl, location)
     {
         switch(this.type)
         {
             case 35676: // gl.FLOAT_MAT4
             {
-                const location = program.getUniformLocation(this.label)
+                // const location = program.getUniformLocation(this.label)
                 gl.uniformMatrix4fv(location, false, this.data)
                 break
             }
             case 35665: // gl.FLOAT_VEC3
             {
-                const location = program.getUniformLocation(this.label)
+                // const location = program.getUniformLocation(this.label)
                 gl.uniform3f(location, ...this.data)
                 break
             } 
@@ -175,10 +175,10 @@ class Attribute extends __WEBPACK_IMPORTED_MODULE_0__Buffer__["a" /* default */]
         this.label = label
     }
     
-    draw(gl, program)
+    draw(gl, location)
     {
         super.draw(gl)
-        const location = program.getAttribLocation(this.label)
+        // const location = program.getAttribLocation(this.label)
         gl.vertexAttribPointer(location, this.itemSize, this.itemType, false, 0, 0)
     }
 }
@@ -284,7 +284,7 @@ class Buffer
         this.itemSize = size
     }
     
-    init(gl, program)
+    init(gl)
     {
         // Create buffer
         const buffer = gl.createBuffer()
@@ -1403,14 +1403,14 @@ class Geom
         this.numItems = 0
     }
     
-    isInitialized()
+    /*isInitialized()
     {
         for (const buffer of this.attributes)
             if (!buffer.isInitialized())
                 return false
         
         return true
-    }
+    }*/
     
     addVertices(label, vertices, dimension)
     {
@@ -1438,7 +1438,7 @@ class Geom
         this.numItems = indices.length
     }
     
-    init(gl, program)
+    /*init(gl, program)
     {
         let success = true
         
@@ -1453,16 +1453,16 @@ class Geom
                     success = false      
                     
         return success
-    }
+    }*/
     
-    draw(gl, program)
+    /*draw(gl, program)
     {
         for(const attribute of this.attributes)
             attribute.draw(gl, program)
                     
         for (const buffer of this.buffers)
             buffer.draw(gl, program)
-    }
+    }*/
     
     display(gl)
     {
@@ -1552,47 +1552,7 @@ class Program
         return !!this.pointer
     }
     
-    getUniformLocation(label)
-    {        
-        if (this.uniformLocation.hasOwnProperty(label))
-            return this.uniformLocation[label]
-        else
-            console.error('The uniform location ' + label + ' don\'nt exist on this program')
-            
-        return null
-    }
-    
-    getAttribLocation(label)
-    {
-        if (this.attribLocation.hasOwnProperty(label))
-            return this.attribLocation[label]
-        else
-            console.error('The attribute location ' + label + ' don\'nt exist on this program')
-            
-        return null
-    }
-    
-    getTextureLocation(label)
-    {
-        if (this.textureLocation.hasOwnProperty(label))
-            return this.textureLocation[label]
-        else
-            console.error('The texture location ' + label + ' don\'nt exist on this program')
-            
-        return null
-    }
-    
-    getTextureIndex(label)
-    {
-        if (this.textureIndex.hasOwnProperty(label))
-            return this.textureIndex[label]
-        else
-            console.error('The texture index ' + label + ' don\'nt exist on this program')
-            
-        return null
-    }
-    
-    init(gl, attributes, uniforms, textures)
+    init(gl)
     {
         this.vertexShader = this._createShader(gl, 35633 /* gl.VERTEX_SHADER */, this.vertexShaderSrc)
         this.fragmentShader = this._createShader(gl, 35632 /* gl.FRAGMENT_SHADER */, this.fragmentShaderSrc)
@@ -1603,41 +1563,57 @@ class Program
         gl.linkProgram(program)
         
         if (!gl.getProgramParameter(program, gl.LINK_STATUS))
+        {
             console.error('Shader initialization error')
-        
-        gl.useProgram(program)
-
-
-        // Link buffer / program
-        for (const attribute of attributes)
-        {
-            const attribLocation = gl.getAttribLocation(program, attribute.label)
-            gl.enableVertexAttribArray(attribLocation)
-            this.attribLocation[attribute.label] = attribLocation
+            return false
         }
         
-        
-        // Link uniform / program
-        for (const uniform of uniforms)
-        {
-            const uniformLocation = gl.getUniformLocation(program, uniform.label)
-            this.uniformLocation[uniform.label] = uniformLocation
-        }
-        
-        
-        // Link textures / program
-        for (const texture of textures)
-        {
-            const textureLocation = gl.getUniformLocation(program, texture.label)
-            this.textureLocation[texture.label] = textureLocation
-            this.textureIndex[texture.label] = this.textureNum
-            this.textureNum++
-        }
-        
+        gl.useProgram(program) 
         
         this.pointer = program
         
         return true
+    }
+    
+    getAttribLocation(gl, attribute)
+    {
+        const label = attribute.label
+        if (!this.attribLocation.hasOwnProperty(label))
+        {
+            const attribLocation = gl.getAttribLocation(this.pointer, label)
+            gl.enableVertexAttribArray(attribLocation)
+            this.attribLocation[label] = attribLocation
+            return attribLocation
+        }
+        
+        return this.attribLocation[label]
+    }
+    
+    getUniformLocation(gl, uniform)
+    {
+        const label = uniform.label
+        if (!this.uniformLocation.hasOwnProperty(label))
+        {
+            const uniformLocation = gl.getUniformLocation(this.pointer, label)
+            this.uniformLocation[label] = uniformLocation
+            return uniformLocation
+        }
+        
+        return this.uniformLocation[label]
+    }
+    
+    getTextureLocationIndex(gl, texture)
+    {
+        const label = texture.label
+        if (!this.textureLocation.hasOwnProperty(label) || !this.textureIndex.hasOwnProperty(label))
+        {
+            const textureLocation = gl.getUniformLocation(this.pointer, texture.label)
+            this.textureLocation[label] = textureLocation
+            this.textureIndex[label] = this.textureNum
+            return [textureLocation, this.textureNum++]
+        }
+        
+        return [this.textureLocation[label], this.textureIndex[label]]
     }
     
     draw(gl)
@@ -1764,6 +1740,11 @@ class Mesh
 
         this.uniforms = []
         this.textures = []
+        
+        this.localCalls = []
+        this.globalCalls = []
+        
+        this._isInitialized = false
     }
     
     addUniform(uniform)
@@ -1779,60 +1760,134 @@ class Mesh
     
     isInitialized()
     {
-        let success = true
+        let success = this._isInitialized
+        
+        if (success)
+            return success
+        
         
         if (!this.program.isInitialized())
             success = false
         
-        if (!this.geom.isInitialized())
-            success = false      
+        for (const attribute of this.geom.attributes)
+            if (!attribute.isInitialized())
+                success = false
+        
+        for (const buffer of this.geom.buffers)
+            if (!buffer.isInitialized())
+                success = false
         
         for (const texture of this.textures)
             if (!texture.isInitialized())
                 success = false
         
+        
+        return success
+    }
+    
+    // GET LOCATIONS (AND INDEX) AND SAVE IT FOR CALLS
+    _setCalls(gl, globalUniforms)
+    {
+        const program = this.program
+        
+        for (const attribute of this.geom.attributes)
+        {
+            const location = program.getAttribLocation(gl, attribute)
+            this.localCalls.push(attribute.draw.bind(attribute, gl, location))
+        }
+        
+        for (const buffer of this.geom.buffers)
+        {
+            this.localCalls.push(buffer.draw.bind(buffer, gl))
+        }
+        
+        for (const uniform of this.uniforms)
+        {
+            const location = program.getUniformLocation(gl, uniform)
+            this.localCalls.push(uniform.draw.bind(uniform, gl, location))
+        }
+        
+        for (const texture of this.textures)
+        {
+            const [location, index] = program.getTextureLocationIndex(gl, texture)
+            this.localCalls.push(texture.draw.bind(texture, gl, location, index))
+        }
+        
+        for (const uniform of globalUniforms)
+        {
+            const location = program.getUniformLocation(gl, uniform)
+            this.globalCalls.push(uniform.draw.bind(uniform, gl, location))
+        }
+    }
+    
+    _initData(gl)
+    {
+        const program = this.program
+        
+        let success = true
+        
+        for (const attribute of this.geom.attributes)
+            if (!attribute.isInitialized())
+                if (!attribute.init(gl))
+                    success = false
+                    
+        for (const buffer of this.geom.buffers)
+            if (!buffer.isInitialized())
+                if (!buffer.init(gl))
+                    success = false
+            
+        for (const texture of this.textures)
+            if (!texture.isInitialized())
+                if (!texture.init(gl))
+                    success = false
+           
         return success
     }
     
     init(gl, globalUniforms)
     {
         const program = this.program
-        const allUniforms = [...this.uniforms, ...globalUniforms]
         let success = true
 
+        // Use program
         if (!this.program.isInitialized())
-            if (this.program.init(gl, this.geom.attributes, allUniforms, this.textures))
+            if (!this.program.init(gl))
                 success = false
-            
-        if (!this.geom.isInitialized())
-            if (this.geom.init(gl, program))
-                success = false
-            
-        for (const texture of this.textures)
-            if (!texture.isInitialized())
-                if (!texture.init(gl, program))
-                    success = false
-                    
+        else
+            this.program.draw(gl)
+        
+        
+        // Init all mesh data (textures, buffers, attributes, uniforms)
+        if (!this._initData(gl))
+            success = false
+        
+        
+        // Store all calls (mesh data + global data)
+        if (success && this.localCalls.length < 1)
+            this._setCalls(gl, globalUniforms)
+        
+        
+        this._isInitialized = success
         return success
     }
     
-    draw(gl, globalUniforms)
+    draw(gl, sameProgram = false)
     {
-        const program = this.program
+        // Use program
+        if (!sameProgram)
+            this.program.draw(gl)
         
-        this.program.draw(gl)
-        this.geom.draw(gl, program)
+        // Call local
+        for(const callback of this.localCalls)
+            callback()
+        
+        // Call global
+        if (!sameProgram)
+            for(const callback of this.globalCalls)
+                callback()
             
-        for(const uniform of this.uniforms)
-            uniform.draw(gl, program)
-        
-        for(const uniform of globalUniforms)
-            uniform.draw(gl, program)
-        
-        for (const texture of this.textures)
-            texture.draw(gl, program)
-            
-        this.geom.display(gl, program)
+        // Draw mesh
+        this.geom.display(gl)
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Mesh;
@@ -1977,11 +2032,21 @@ class Scene
         if (this.cam.updated)
             this.cam.update(gl.viewportWidth, gl.viewportHeight)
         
+        let lastProgram = null
+    
         for (const mesh of this.meshs)
+        {
             if (mesh.isInitialized())
-                mesh.draw(gl, this.uniforms)
+            {
+                mesh.draw(gl, mesh.program === lastProgram)
+                lastProgram = mesh.program
+            }  
             else
+            {
                 mesh.init(gl, this.uniforms)
+                lastProgram = null
+            }
+        }
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Scene;
@@ -2019,6 +2084,11 @@ class Scene
 
 
 
+function isMultOf(val, mult)
+{
+    return Number.isInteger(val / mult)
+}
+
 class SmartTexture extends __WEBPACK_IMPORTED_MODULE_0__Texture__["a" /* default */]
 {
     constructor(label)
@@ -2031,23 +2101,33 @@ class SmartTexture extends __WEBPACK_IMPORTED_MODULE_0__Texture__["a" /* default
     // https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/
     addDxt5URL({src, width, height, format, priority})
     {
-        
         const byteLength = floor((width + 3) * 0.25) * floor((height + 3) * 0.25) * 16
-        const level = this._isMultOf(width, 4) && this._isMultOf(height, 4) ? 0 : 1 
+        const level = isMultOf(width, 4) && isMultOf(height, 4) ? 0 : 1 
         
         // var formats = gl.getParameter(gl.COMPRESSED_TEXTURE_FORMATS)
     }
     
     addURL(URL, size = 0)
     {
-        this.srcs.push({
+        const imgData = {
             size,
             src: URL,
-            internalformat: 6408 /* gl.RGBA */,
             img: null,
             priority: 0,
-            custom: false
-        })
+            init: null
+        }
+        
+        imgData.init = gl =>
+        {
+            gl.bindTexture(gl.TEXTURE_2D, this.pointer)
+            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
+
+            gl.texImage2D(gl.TEXTURE_2D, 0, 6408 /* gl.RGBA */, this.format, gl.UNSIGNED_BYTE, imgData.img)
+            __WEBPACK_IMPORTED_MODULE_0__Texture__["a" /* default */].SETUP(gl, imgData.img)
+            // gl.bindTexture(gl.TEXTURE_2D, null)
+        }
+        
+        this.srcs.push(imgData)
     }
     
     /*load(URL, callback)
@@ -2064,28 +2144,34 @@ class SmartTexture extends __WEBPACK_IMPORTED_MODULE_0__Texture__["a" /* default
         img.src = URL
     }*/
     
-    _startLoad(callback)
+    static START_LOAD(gl, srcs)
     {
-        const srcs = this.srcs
         if (srcs.length > 0)
         {
             srcs.sort((a, b) => (a.size === b.size ? (a.size - b.size) : (a.priority - b.priority)))
-            const srcsValid = this.srcs.filter(o => o.size >= __WEBPACK_IMPORTED_MODULE_0__Texture__["a" /* default */].MAX_SIZE)
+            const srcsValid = srcs.filter(o => o.size >= __WEBPACK_IMPORTED_MODULE_0__Texture__["a" /* default */].MAX_SIZE)
             
             if (srcs.length > 1)
             {
                 const first = srcs[0]
                 const last = srcs[srcs.length - 1]
                 
-                this._load(first, data =>
+                SmartTexture.LOAD(first, () =>
                 {
-                    callback(data)
-                    this._load(last, callback)
+                    first.init(gl)
+                    SmartTexture.LOAD(last, () =>
+                    {
+                        last.init(gl)
+                    })
                 })
             }
             else if (srcs.length > 0)
             {
-                this._load(srcs[0], callback)
+                const imgData = srcs[0]
+                SmartTexture.LOAD(imgData, () =>
+                {
+                    imgData.init(gl)
+                })
             }
             else
             {
@@ -2098,7 +2184,7 @@ class SmartTexture extends __WEBPACK_IMPORTED_MODULE_0__Texture__["a" /* default
         }
     }
     
-    _load(data, callback)
+    static LOAD(data, callback)
     {        
         const img = new Image()
         img.onload = () =>
@@ -2110,36 +2196,9 @@ class SmartTexture extends __WEBPACK_IMPORTED_MODULE_0__Texture__["a" /* default
         img.src = data.src
     }
     
-    _isPowerOf2(val)
-    {
-        return (val & (val - 1)) == 0
-    }
-    
-    _isMultOf(val, mult)
-    {
-        return Number.isInteger(val / mult)
-    }
-    
-    _setupFilterAndMipmap(gl, img)
-    {
-        if (this._isPowerOf2(img.width) && this._isPowerOf2(img.height))
-        {
-            gl.generateMipmap(gl.TEXTURE_2D)
-            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
-        }
-        else
-        {
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-        }
-    }
-    
     init(gl, program)
     {
-        super.init(gl, program)
+        const success = super.init(gl, program)
         
         const texture = this.pointer
         
@@ -2149,11 +2208,12 @@ class SmartTexture extends __WEBPACK_IMPORTED_MODULE_0__Texture__["a" /* default
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
 
             gl.texImage2D(gl.TEXTURE_2D, 0, newImg.internalformat, this.format, gl.UNSIGNED_BYTE, newImg.img)
-            this._setupFilterAndMipmap(gl, newImg.img)
+            __WEBPACK_IMPORTED_MODULE_0__Texture__["a" /* default */].SETUP(gl, newImg.img)
             // gl.bindTexture(gl.TEXTURE_2D, null)
         }
            
-        this._startLoad(changeImg)
+        SmartTexture.START_LOAD(gl, this.srcs)
+        return success
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = SmartTexture;
@@ -2377,6 +2437,24 @@ scene.addMesh(pyramidMesh)
 
 
 
+
+// ----------------------------
+//
+//      SAME PYRAMID
+//
+// ----------------------------
+
+const pyramidMesh2 = new __WEBPACK_IMPORTED_MODULE_6__object_Mesh__["a" /* default */](pyramidGeom, colorProgram)
+const pyramidUniformMatrix2 = new __WEBPACK_IMPORTED_MODULE_1__uniform_UMat3D__["a" /* default */]('uMVMatrix')
+pyramidMesh2.addUniform(pyramidUniformMatrix2)
+pyramidMesh2.matrix = pyramidUniformMatrix2.data
+pyramidMesh2.matrix.translate([-1.5, 1.5, -8.0])
+pyramidMesh2.matrix.scale([1, -1, 1])
+
+scene.addMesh(pyramidMesh2)
+
+
+
 // ----------------------------
 //
 //      CUBE RAINBOW
@@ -2555,6 +2633,7 @@ refresh()
 function refresh()
 {
     pyramidMesh.matrix.rotate(0.005, [0, 1, 0])
+    pyramidMesh2.matrix.rotate(-0.005, [0, 1, 0])
     cubeMesh.matrix.rotate(0.01, [0, 1, 0])
     cubeTexturedMesh.matrix.rotate(-0.01, [0, 1, 0])
     
@@ -2664,12 +2743,47 @@ class Texture
         return (val & (val - 1)) === 0
     }
     
-    static IS_MULT_OF(val, mult)
+    /*static IS_MULT_OF(val, mult)
     {
         return Number.isInteger(val / mult)
+    }*/
+    
+    /*_setupFilterAndMipmap(gl, img)
+    {
+        if (Texture.IS_POWER_OF_2(img.width) && Texture.IS_POWER_OF_2(img.height))
+        {
+            gl.generateMipmap(gl.TEXTURE_2D)
+            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
+        }
+        else
+        {
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+        }
+    }*/
+    
+    static SET_DATA(gl)
+    {
+        Texture.MAX_SIZE = gl.getParameter(gl.MAX_TEXTURE_SIZE)
+        Texture.FORMAT = { }
+
+        /*
+        https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_compressed_texture_s3tc
+        */
+        const formats = gl.getParameter(gl.COMPRESSED_TEXTURE_FORMATS)
+        for (let i = 0; i < formats.length; i++)
+        {
+            Texture.FORMAT[formats[i]] = true
+            console.log(formats[i])
+        }
+
+        Texture._DATA_INITIALIZED = true
     }
     
-    _setupFilterAndMipmap(gl, img)
+    static SETUP(gl, img)
     {
         if (Texture.IS_POWER_OF_2(img.width) && Texture.IS_POWER_OF_2(img.height))
         {
@@ -2685,27 +2799,8 @@ class Texture
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
         }
     }
-    
-    static SET_DATA(gl)
-    {
-        Texture.MAX_SIZE = gl.getParameter(gl.MAX_TEXTURE_SIZE)
-        Texture.FORMAT = { }
-
-        /*
-        https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_compressed_texture_s3tc
-        */
-        console.log(gl.COMPRESSED_TEXTURE_FORMATS)
-        const formats = gl.getParameter(gl.COMPRESSED_TEXTURE_FORMATS)
-        for (let i = 0; i < formats.length; i++)
-        {
-            Texture.FORMAT[formats[i]] = true
-            console.log(formats[i])
-        }
-
-        Texture._DATA_INITIALIZED = true
-    }
         
-    init(gl, program)
+    init(gl)
     {
         const texture = gl.createTexture()
         
@@ -2722,27 +2817,25 @@ class Texture
         */
         
         
-        // Temporary ptexture (1 pixel)
+        // Temporary texture (1 pixel)
         gl.bindTexture(gl.TEXTURE_2D, texture)
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE,
           new Uint8Array(this.color))
 
         
-        const location = program.getTextureLocation(this.label)
+        /*const location = program.getTextureLocation(this.label)
         const index = program.getTextureIndex(this.label)
-        gl.uniform1i(location, index)
+        gl.uniform1i(location, index)*/
         
         this.pointer = texture
-        
-        
         
         return true
     }
     
-    draw(gl, program)
+    draw(gl, location, index)
     {
-        const index = program.getTextureIndex(this.label)
-        
+        // const index = program.getTextureIndex(this.label)
+        gl.uniform1i(location, index) // Chaque frame ou chaque init ?
         gl.activeTexture(gl.TEXTURE0 + index)
         gl.bindTexture(gl.TEXTURE_2D, this.pointer)
         // gl.uniform1i(program.getTextureLocation(this.label), 0)

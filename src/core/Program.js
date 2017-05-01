@@ -70,47 +70,7 @@ export default class Program
         return !!this.pointer
     }
     
-    getUniformLocation(label)
-    {        
-        if (this.uniformLocation.hasOwnProperty(label))
-            return this.uniformLocation[label]
-        else
-            console.error('The uniform location ' + label + ' don\'nt exist on this program')
-            
-        return null
-    }
-    
-    getAttribLocation(label)
-    {
-        if (this.attribLocation.hasOwnProperty(label))
-            return this.attribLocation[label]
-        else
-            console.error('The attribute location ' + label + ' don\'nt exist on this program')
-            
-        return null
-    }
-    
-    getTextureLocation(label)
-    {
-        if (this.textureLocation.hasOwnProperty(label))
-            return this.textureLocation[label]
-        else
-            console.error('The texture location ' + label + ' don\'nt exist on this program')
-            
-        return null
-    }
-    
-    getTextureIndex(label)
-    {
-        if (this.textureIndex.hasOwnProperty(label))
-            return this.textureIndex[label]
-        else
-            console.error('The texture index ' + label + ' don\'nt exist on this program')
-            
-        return null
-    }
-    
-    init(gl, attributes, uniforms, textures)
+    init(gl)
     {
         this.vertexShader = this._createShader(gl, 35633 /* gl.VERTEX_SHADER */, this.vertexShaderSrc)
         this.fragmentShader = this._createShader(gl, 35632 /* gl.FRAGMENT_SHADER */, this.fragmentShaderSrc)
@@ -121,41 +81,57 @@ export default class Program
         gl.linkProgram(program)
         
         if (!gl.getProgramParameter(program, gl.LINK_STATUS))
+        {
             console.error('Shader initialization error')
-        
-        gl.useProgram(program)
-
-
-        // Link buffer / program
-        for (const attribute of attributes)
-        {
-            const attribLocation = gl.getAttribLocation(program, attribute.label)
-            gl.enableVertexAttribArray(attribLocation)
-            this.attribLocation[attribute.label] = attribLocation
+            return false
         }
         
-        
-        // Link uniform / program
-        for (const uniform of uniforms)
-        {
-            const uniformLocation = gl.getUniformLocation(program, uniform.label)
-            this.uniformLocation[uniform.label] = uniformLocation
-        }
-        
-        
-        // Link textures / program
-        for (const texture of textures)
-        {
-            const textureLocation = gl.getUniformLocation(program, texture.label)
-            this.textureLocation[texture.label] = textureLocation
-            this.textureIndex[texture.label] = this.textureNum
-            this.textureNum++
-        }
-        
+        gl.useProgram(program) 
         
         this.pointer = program
         
         return true
+    }
+    
+    getAttribLocation(gl, attribute)
+    {
+        const label = attribute.label
+        if (!this.attribLocation.hasOwnProperty(label))
+        {
+            const attribLocation = gl.getAttribLocation(this.pointer, label)
+            gl.enableVertexAttribArray(attribLocation)
+            this.attribLocation[label] = attribLocation
+            return attribLocation
+        }
+        
+        return this.attribLocation[label]
+    }
+    
+    getUniformLocation(gl, uniform)
+    {
+        const label = uniform.label
+        if (!this.uniformLocation.hasOwnProperty(label))
+        {
+            const uniformLocation = gl.getUniformLocation(this.pointer, label)
+            this.uniformLocation[label] = uniformLocation
+            return uniformLocation
+        }
+        
+        return this.uniformLocation[label]
+    }
+    
+    getTextureLocationIndex(gl, texture)
+    {
+        const label = texture.label
+        if (!this.textureLocation.hasOwnProperty(label) || !this.textureIndex.hasOwnProperty(label))
+        {
+            const textureLocation = gl.getUniformLocation(this.pointer, texture.label)
+            this.textureLocation[label] = textureLocation
+            this.textureIndex[label] = this.textureNum
+            return [textureLocation, this.textureNum++]
+        }
+        
+        return [this.textureLocation[label], this.textureIndex[label]]
     }
     
     draw(gl)

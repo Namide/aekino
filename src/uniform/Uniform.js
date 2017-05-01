@@ -36,19 +36,19 @@ export default class Uniform
         // this.location = null
     }
     
-    draw(gl, program)
+    draw(gl, location)
     {
         switch(this.type)
         {
             case 35676: // gl.FLOAT_MAT4
             {
-                const location = program.getUniformLocation(this.label)
+                // const location = program.getUniformLocation(this.label)
                 gl.uniformMatrix4fv(location, false, this.data)
                 break
             }
             case 35665: // gl.FLOAT_VEC3
             {
-                const location = program.getUniformLocation(this.label)
+                // const location = program.getUniformLocation(this.label)
                 gl.uniform3f(location, ...this.data)
                 break
             } 

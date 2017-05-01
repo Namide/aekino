@@ -24,6 +24,11 @@
 
 import Texture from './Texture'
 
+function isMultOf(val, mult)
+{
+    return Number.isInteger(val / mult)
+}
+
 export default class SmartTexture extends Texture
 {
     constructor(label)
@@ -36,23 +41,33 @@ export default class SmartTexture extends Texture
     // https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/
     addDxt5URL({src, width, height, format, priority})
     {
-        
         const byteLength = floor((width + 3) * 0.25) * floor((height + 3) * 0.25) * 16
-        const level = this._isMultOf(width, 4) && this._isMultOf(height, 4) ? 0 : 1 
+        const level = isMultOf(width, 4) && isMultOf(height, 4) ? 0 : 1 
         
         // var formats = gl.getParameter(gl.COMPRESSED_TEXTURE_FORMATS)
     }
     
     addURL(URL, size = 0)
     {
-        this.srcs.push({
+        const imgData = {
             size,
             src: URL,
-            internalformat: 6408 /* gl.RGBA */,
             img: null,
             priority: 0,
-            custom: false
-        })
+            init: null
+        }
+        
+        imgData.init = gl =>
+        {
+            gl.bindTexture(gl.TEXTURE_2D, this.pointer)
+            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
+
+            gl.texImage2D(gl.TEXTURE_2D, 0, 6408 /* gl.RGBA */, this.format, gl.UNSIGNED_BYTE, imgData.img)
+            Texture.SETUP(gl, imgData.img)
+            // gl.bindTexture(gl.TEXTURE_2D, null)
+        }
+        
+        this.srcs.push(imgData)
     }
     
     /*load(URL, callback)
@@ -69,28 +84,34 @@ export default class SmartTexture extends Texture
         img.src = URL
     }*/
     
-    _startLoad(callback)
+    static START_LOAD(gl, srcs)
     {
-        const srcs = this.srcs
         if (srcs.length > 0)
         {
             srcs.sort((a, b) => (a.size === b.size ? (a.size - b.size) : (a.priority - b.priority)))
-            const srcsValid = this.srcs.filter(o => o.size >= Texture.MAX_SIZE)
+            const srcsValid = srcs.filter(o => o.size >= Texture.MAX_SIZE)
             
             if (srcs.length > 1)
             {
                 const first = srcs[0]
                 const last = srcs[srcs.length - 1]
                 
-                this._load(first, data =>
+                SmartTexture.LOAD(first, () =>
                 {
-                    callback(data)
-                    this._load(last, callback)
+                    first.init(gl)
+                    SmartTexture.LOAD(last, () =>
+                    {
+                        last.init(gl)
+                    })
                 })
             }
             else if (srcs.length > 0)
             {
-                this._load(srcs[0], callback)
+                const imgData = srcs[0]
+                SmartTexture.LOAD(imgData, () =>
+                {
+                    imgData.init(gl)
+                })
             }
             else
             {
@@ -103,7 +124,7 @@ export default class SmartTexture extends Texture
         }
     }
     
-    _load(data, callback)
+    static LOAD(data, callback)
     {        
         const img = new Image()
         img.onload = () =>
@@ -115,36 +136,9 @@ export default class SmartTexture extends Texture
         img.src = data.src
     }
     
-    _isPowerOf2(val)
-    {
-        return (val & (val - 1)) == 0
-    }
-    
-    _isMultOf(val, mult)
-    {
-        return Number.isInteger(val / mult)
-    }
-    
-    _setupFilterAndMipmap(gl, img)
-    {
-        if (this._isPowerOf2(img.width) && this._isPowerOf2(img.height))
-        {
-            gl.generateMipmap(gl.TEXTURE_2D)
-            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
-        }
-        else
-        {
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-        }
-    }
-    
     init(gl, program)
     {
-        super.init(gl, program)
+        const success = super.init(gl, program)
         
         const texture = this.pointer
         
@@ -154,10 +148,11 @@ export default class SmartTexture extends Texture
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
 
             gl.texImage2D(gl.TEXTURE_2D, 0, newImg.internalformat, this.format, gl.UNSIGNED_BYTE, newImg.img)
-            this._setupFilterAndMipmap(gl, newImg.img)
+            Texture.SETUP(gl, newImg.img)
             // gl.bindTexture(gl.TEXTURE_2D, null)
         }
            
-        this._startLoad(changeImg)
+        SmartTexture.START_LOAD(gl, this.srcs)
+        return success
     }
 }

@@ -155,6 +155,24 @@ scene.addMesh(pyramidMesh)
 
 
 
+
+// ----------------------------
+//
+//      SAME PYRAMID
+//
+// ----------------------------
+
+const pyramidMesh2 = new Mesh(pyramidGeom, colorProgram)
+const pyramidUniformMatrix2 = new UMat3D('uMVMatrix')
+pyramidMesh2.addUniform(pyramidUniformMatrix2)
+pyramidMesh2.matrix = pyramidUniformMatrix2.data
+pyramidMesh2.matrix.translate([-1.5, 1.5, -8.0])
+pyramidMesh2.matrix.scale([1, -1, 1])
+
+scene.addMesh(pyramidMesh2)
+
+
+
 // ----------------------------
 //
 //      CUBE RAINBOW
@@ -333,6 +351,7 @@ refresh()
 function refresh()
 {
     pyramidMesh.matrix.rotate(0.005, [0, 1, 0])
+    pyramidMesh2.matrix.rotate(-0.005, [0, 1, 0])
     cubeMesh.matrix.rotate(0.01, [0, 1, 0])
     cubeTexturedMesh.matrix.rotate(-0.01, [0, 1, 0])
     

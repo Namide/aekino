@@ -36,14 +36,14 @@ export default class Geom
         this.numItems = 0
     }
     
-    isInitialized()
+    /*isInitialized()
     {
         for (const buffer of this.attributes)
             if (!buffer.isInitialized())
                 return false
         
         return true
-    }
+    }*/
     
     addVertices(label, vertices, dimension)
     {
@@ -71,7 +71,7 @@ export default class Geom
         this.numItems = indices.length
     }
     
-    init(gl, program)
+    /*init(gl, program)
     {
         let success = true
         
@@ -86,16 +86,16 @@ export default class Geom
                     success = false      
                     
         return success
-    }
+    }*/
     
-    draw(gl, program)
+    /*draw(gl, program)
     {
         for(const attribute of this.attributes)
             attribute.draw(gl, program)
                     
         for (const buffer of this.buffers)
             buffer.draw(gl, program)
-    }
+    }*/
     
     display(gl)
     {

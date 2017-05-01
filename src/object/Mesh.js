@@ -31,6 +31,11 @@ export default class Mesh
 
         this.uniforms = []
         this.textures = []
+        
+        this.localCalls = []
+        this.globalCalls = []
+        
+        this._isInitialized = false
     }
     
     addUniform(uniform)
@@ -46,59 +51,133 @@ export default class Mesh
     
     isInitialized()
     {
-        let success = true
+        let success = this._isInitialized
+        
+        if (success)
+            return success
+        
         
         if (!this.program.isInitialized())
             success = false
         
-        if (!this.geom.isInitialized())
-            success = false      
+        for (const attribute of this.geom.attributes)
+            if (!attribute.isInitialized())
+                success = false
+        
+        for (const buffer of this.geom.buffers)
+            if (!buffer.isInitialized())
+                success = false
         
         for (const texture of this.textures)
             if (!texture.isInitialized())
                 success = false
         
+        
+        return success
+    }
+    
+    // GET LOCATIONS (AND INDEX) AND SAVE IT FOR CALLS
+    _setCalls(gl, globalUniforms)
+    {
+        const program = this.program
+        
+        for (const attribute of this.geom.attributes)
+        {
+            const location = program.getAttribLocation(gl, attribute)
+            this.localCalls.push(attribute.draw.bind(attribute, gl, location))
+        }
+        
+        for (const buffer of this.geom.buffers)
+        {
+            this.localCalls.push(buffer.draw.bind(buffer, gl))
+        }
+        
+        for (const uniform of this.uniforms)
+        {
+            const location = program.getUniformLocation(gl, uniform)
+            this.localCalls.push(uniform.draw.bind(uniform, gl, location))
+        }
+        
+        for (const texture of this.textures)
+        {
+            const [location, index] = program.getTextureLocationIndex(gl, texture)
+            this.localCalls.push(texture.draw.bind(texture, gl, location, index))
+        }
+        
+        for (const uniform of globalUniforms)
+        {
+            const location = program.getUniformLocation(gl, uniform)
+            this.globalCalls.push(uniform.draw.bind(uniform, gl, location))
+        }
+    }
+    
+    _initData(gl)
+    {
+        const program = this.program
+        
+        let success = true
+        
+        for (const attribute of this.geom.attributes)
+            if (!attribute.isInitialized())
+                if (!attribute.init(gl))
+                    success = false
+                    
+        for (const buffer of this.geom.buffers)
+            if (!buffer.isInitialized())
+                if (!buffer.init(gl))
+                    success = false
+            
+        for (const texture of this.textures)
+            if (!texture.isInitialized())
+                if (!texture.init(gl))
+                    success = false
+           
         return success
     }
     
     init(gl, globalUniforms)
     {
         const program = this.program
-        const allUniforms = [...this.uniforms, ...globalUniforms]
         let success = true
 
+        // Use program
         if (!this.program.isInitialized())
-            if (this.program.init(gl, this.geom.attributes, allUniforms, this.textures))
+            if (!this.program.init(gl))
                 success = false
-            
-        if (!this.geom.isInitialized())
-            if (this.geom.init(gl, program))
-                success = false
-            
-        for (const texture of this.textures)
-            if (!texture.isInitialized())
-                if (!texture.init(gl, program))
-                    success = false
-                    
+        else
+            this.program.draw(gl)
+        
+        
+        // Init all mesh data (textures, buffers, attributes, uniforms)
+        if (!this._initData(gl))
+            success = false
+        
+        
+        // Store all calls (mesh data + global data)
+        if (success && this.localCalls.length < 1)
+            this._setCalls(gl, globalUniforms)
+        
+        
+        this._isInitialized = success
         return success
     }
     
-    draw(gl, globalUniforms)
+    draw(gl, sameProgram = false)
     {
-        const program = this.program
+        // Use program
+        if (!sameProgram)
+            this.program.draw(gl)
         
-        this.program.draw(gl)
-        this.geom.draw(gl, program)
+        // Call local
+        for(const callback of this.localCalls)
+            callback()
+        
+        // Call global
+        if (!sameProgram)
+            for(const callback of this.globalCalls)
+                callback()
             
-        for(const uniform of this.uniforms)
-            uniform.draw(gl, program)
-        
-        for(const uniform of globalUniforms)
-            uniform.draw(gl, program)
-        
-        for (const texture of this.textures)
-            texture.draw(gl, program)
-            
-        this.geom.display(gl, program)
+        // Draw mesh
+        this.geom.display(gl)
     }
 }

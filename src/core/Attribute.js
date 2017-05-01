@@ -32,10 +32,10 @@ export default class Attribute extends Buffer
         this.label = label
     }
     
-    draw(gl, program)
+    draw(gl, location)
     {
         super.draw(gl)
-        const location = program.getAttribLocation(this.label)
+        // const location = program.getAttribLocation(this.label)
         gl.vertexAttribPointer(location, this.itemSize, this.itemType, false, 0, 0)
     }
 }
