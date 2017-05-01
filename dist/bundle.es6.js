@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 11);
+/******/ 	return __webpack_require__(__webpack_require__.s = 12);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -1935,7 +1935,9 @@ class Scene
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Texture__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Texture__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_parse_dds__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_parse_dds___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_parse_dds__);
 /* 
  * The MIT License
  *
@@ -1962,6 +1964,7 @@ class Scene
 
 
 
+
 function isMultOf(val, mult)
 {
     return Number.isInteger(val / mult)
@@ -1977,10 +1980,72 @@ class SmartTexture extends __WEBPACK_IMPORTED_MODULE_0__Texture__["a" /* default
     }
     
     // https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/
-    addDxt5URL({src, width, height, format, priority})
+    addDDSURL(URL, size)
     {
-        const byteLength = floor((width + 3) * 0.25) * floor((height + 3) * 0.25) * 16
-        const level = isMultOf(width, 4) && isMultOf(height, 4) ? 0 : 1 
+        const imgData = {
+            size,
+            src: URL,
+            img: null,
+            isImage: false,
+            priority: 1,
+            isValid: () => true,
+            init: null
+        }
+        
+        imgData.init = gl =>
+        {
+            const dds = __WEBPACK_IMPORTED_MODULE_1_parse_dds___default()(imgData.img)
+            
+            // console.log(dds.format)  // 'dxt5' 
+            // console.log(dds.shape)   // [ width, height ] 
+            // console.log(dds.images)  // [ ... mipmap level data ... ]
+            
+            const image = dds.images[0]
+            const arrBufferView = new Uint8Array(imgData.img, image.offset, image.length)
+            
+            const ext = (
+              gl.getExtension('WEBGL_compressed_texture_s3tc') ||
+              gl.getExtension('MOZ_WEBGL_compressed_texture_s3tc') ||
+              gl.getExtension('WEBKIT_WEBGL_compressed_texture_s3tc')
+            )
+            gl.bindTexture(gl.TEXTURE_2D, this.pointer)
+            
+            gl.compressedTexImage2D(
+                gl.TEXTURE_2D,
+                0, // ? dds.images.length - 1,
+                ext.COMPRESSED_RGBA_S3TC_DXT5_EXT,
+                dds.shape[0],
+                dds.shape[1],
+                0,
+                arrBufferView
+            ) 
+
+            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false)
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                
+            
+            /*var ext = (        
+              gl.getExtension('WEBGL_compressed_texture_s3tc') ||
+              gl.getExtension('MOZ_WEBGL_compressed_texture_s3tc') ||
+              gl.getExtension('WEBKIT_WEBGL_compressed_texture_s3tc')
+            )
+            console.log('load dxt5')
+            gl.bindTexture(gl.TEXTURE_2D, this.pointer)
+
+            gl.compressedTexImage2D(gl.TEXTURE_2D, 0, ext.COMPRESSED_RGBA_S3TC_DXT5_EXT, width, height, 0, new Uint8Array(imgData.img)) 
+
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            
+            const byteLength = floor((width + 3) * 0.25) * floor((height + 3) * 0.25) * 16
+            const level = isMultOf(width, 4) && isMultOf(height, 4) ? 0 : 1 */
+            // gl.bindTexture(gl.TEXTURE_2D, null)
+        }
+        
+        this.srcs.push(imgData)
+        
+        
         
         // var formats = gl.getParameter(gl.COMPRESSED_TEXTURE_FORMATS)
     }
@@ -1992,6 +2057,8 @@ class SmartTexture extends __WEBPACK_IMPORTED_MODULE_0__Texture__["a" /* default
             src: URL,
             img: null,
             priority: 0,
+            isImage: true,
+            isValid: () => true,
             init: null
         }
         
@@ -2008,26 +2075,12 @@ class SmartTexture extends __WEBPACK_IMPORTED_MODULE_0__Texture__["a" /* default
         this.srcs.push(imgData)
     }
     
-    /*load(URL, callback)
-    {
-        this.src = URL
-        
-        const img = new Image()
-        img.onload = () =>
-        {
-            this.img = img            
-            if (this._changeImg)
-                this._changeImg(img)
-        }
-        img.src = URL
-    }*/
-    
     static START_LOAD(gl, srcs)
     {
         if (srcs.length > 0)
         {
             srcs.sort((a, b) => (a.size === b.size ? (a.size - b.size) : (a.priority - b.priority)))
-            const srcsValid = srcs.filter(o => o.size >= __WEBPACK_IMPORTED_MODULE_0__Texture__["a" /* default */].MAX_SIZE)
+            const srcsValid = srcs.filter(imgData => (imgData.size >= __WEBPACK_IMPORTED_MODULE_0__Texture__["a" /* default */].MAX_SIZE && imgData.isValid(gl)))
             
             if (srcs.length > 1)
             {
@@ -2063,15 +2116,41 @@ class SmartTexture extends __WEBPACK_IMPORTED_MODULE_0__Texture__["a" /* default
     }
     
     static LOAD(data, callback)
-    {        
-        const img = new Image()
-        img.onload = () =>
+    {
+        if (data.isImage)
         {
-            callback(data)
+            const img = new Image()
+            img.onload = () =>
+            {
+                callback(data)
+            }
+            data.img = img
+
+            // console.log('LOAD', data.src)
+            img.src = data.src
         }
-        data.img = img
-        
-        img.src = data.src
+        else
+        {
+            const request = new XMLHttpRequest()
+            request.responseType = 'arraybuffer'
+            request.open('GET', data.src, true)
+            request.onreadystatechange = event =>
+            {
+                if (request.readyState === XMLHttpRequest.DONE)
+                {
+                    if (request.status === 200)
+                    {
+                        data.img = request.response
+                        callback(data)
+                    }
+                    else
+                    {
+                        console.error('fail to load image ', data.src, 'status:', request.status, 'statuc text:', request.statusText)
+                    }
+                }
+            }
+            request.send()
+        }
     }
     
     init(gl, program)
@@ -2145,6 +2224,192 @@ class UMat3D extends __WEBPACK_IMPORTED_MODULE_1__Uniform__["a" /* default */]
 
 /***/ }),
 /* 11 */
+/***/ (function(module, exports) {
+
+// All values and structures referenced from:
+// http://msdn.microsoft.com/en-us/library/bb943991.aspx/
+//
+// DX10 Cubemap support based on
+// https://github.com/dariomanesku/cmft/issues/7#issuecomment-69516844
+// https://msdn.microsoft.com/en-us/library/windows/desktop/bb943983(v=vs.85).aspx
+// https://github.com/playcanvas/engine/blob/master/src/resources/resources_texture.js
+
+var DDS_MAGIC = 0x20534444
+var DDSD_MIPMAPCOUNT = 0x20000
+var DDPF_FOURCC = 0x4
+
+var FOURCC_DXT1 = fourCCToInt32('DXT1')
+var FOURCC_DXT3 = fourCCToInt32('DXT3')
+var FOURCC_DXT5 = fourCCToInt32('DXT5')
+var FOURCC_DX10 = fourCCToInt32('DX10')
+var FOURCC_FP32F = 116 // DXGI_FORMAT_R32G32B32A32_FLOAT
+
+var DDSCAPS2_CUBEMAP = 0x200
+var D3D10_RESOURCE_DIMENSION_TEXTURE2D = 3
+var DXGI_FORMAT_R32G32B32A32_FLOAT = 2
+
+// The header length in 32 bit ints
+var headerLengthInt = 31
+
+// Offsets into the header array
+var off_magic = 0
+var off_size = 1
+var off_flags = 2
+var off_height = 3
+var off_width = 4
+var off_mipmapCount = 7
+var off_pfFlags = 20
+var off_pfFourCC = 21
+var off_caps2 = 28
+
+module.exports = parseHeaders
+
+function parseHeaders (arrayBuffer) {
+  var header = new Int32Array(arrayBuffer, 0, headerLengthInt)
+
+  if (header[off_magic] !== DDS_MAGIC) {
+    throw new Error('Invalid magic number in DDS header')
+  }
+
+  if (!header[off_pfFlags] & DDPF_FOURCC) {
+    throw new Error('Unsupported format, must contain a FourCC code')
+  }
+
+  var blockBytes
+  var format
+  var fourCC = header[off_pfFourCC]
+  switch (fourCC) {
+    case FOURCC_DXT1:
+      blockBytes = 8
+      format = 'dxt1'
+      break
+    case FOURCC_DXT3:
+      blockBytes = 16
+      format = 'dxt3'
+      break
+    case FOURCC_DXT5:
+      blockBytes = 16
+      format = 'dxt5'
+      break
+    case FOURCC_FP32F:
+      format = 'rgba32f'
+      break
+    case FOURCC_DX10:
+      var dx10Header = new Uint32Array(arrayBuffer.slice(128, 128 + 20))
+      format = dx10Header[0]
+      var resourceDimension = dx10Header[1]
+      var miscFlag = dx10Header[2]
+      var arraySize = dx10Header[3]
+      var miscFlags2 = dx10Header[4]
+
+      if (resourceDimension === D3D10_RESOURCE_DIMENSION_TEXTURE2D && format === DXGI_FORMAT_R32G32B32A32_FLOAT) {
+        format = 'rgba32f'
+      } else {
+        throw new Error('Unsupported DX10 texture format ' + format)
+      }
+      break
+    default:
+      throw new Error('Unsupported FourCC code: ' + int32ToFourCC(fourCC))
+  }
+
+  var flags = header[off_flags]
+  var mipmapCount = 1
+
+  if (flags & DDSD_MIPMAPCOUNT) {
+    mipmapCount = Math.max(1, header[off_mipmapCount])
+  }
+
+  var cubemap = false
+  var caps2 = header[off_caps2]
+  if (caps2 & DDSCAPS2_CUBEMAP) {
+    cubemap = true
+  }
+
+  var width = header[off_width]
+  var height = header[off_height]
+  var dataOffset = header[off_size] + 4
+  var texWidth = width
+  var texHeight = height
+  var images = []
+  var dataLength
+
+  if (fourCC === FOURCC_DX10) {
+    dataOffset += 20
+  }
+
+  if (cubemap) {
+    for (var f = 0; f < 6; f++) {
+      if (format !== 'rgba32f') {
+        throw new Error('Only RGBA32f cubemaps are supported')
+      }
+      var bpp = 4 * 32 / 8
+
+      width = texWidth
+      height = texHeight
+
+      // cubemap should have all mipmap levels defined
+      // Math.log2(width) + 1
+      var requiredMipLevels = Math.log(width) / Math.log(2) + 1
+
+      for (var i = 0; i < requiredMipLevels; i++) {
+        dataLength = width * height * bpp
+        images.push({
+          offset: dataOffset,
+          length: dataLength,
+          shape: [ width, height ]
+        })
+        // Reuse data from the previous level if we are beyond mipmapCount
+        // This is hack for CMFT not publishing full mipmap chain https://github.com/dariomanesku/cmft/issues/10
+        if (i < mipmapCount) {
+          dataOffset += dataLength
+        }
+        width = Math.floor(width / 2)
+        height = Math.floor(height / 2)
+      }
+    }
+  } else {
+    for (var i = 0; i < mipmapCount; i++) {
+      dataLength = Math.max(4, width) / 4 * Math.max(4, height) / 4 * blockBytes
+
+      images.push({
+        offset: dataOffset,
+        length: dataLength,
+        shape: [ width, height ]
+      })
+      dataOffset += dataLength
+      width = Math.floor(width / 2)
+      height = Math.floor(height / 2)
+    }
+  }
+
+  return {
+    shape: [ texWidth, texHeight ],
+    images: images,
+    format: format,
+    flags: flags,
+    cubemap: cubemap
+  }
+}
+
+function fourCCToInt32 (value) {
+  return value.charCodeAt(0) +
+    (value.charCodeAt(1) << 8) +
+    (value.charCodeAt(2) << 16) +
+    (value.charCodeAt(3) << 24)
+}
+
+function int32ToFourCC (value) {
+  return String.fromCharCode(
+    value & 0xff,
+    (value >> 8) & 0xff,
+    (value >> 16) & 0xff,
+    (value >> 24) & 0xff
+  )
+}
+
+
+/***/ }),
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2522,7 +2787,7 @@ function refresh()
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

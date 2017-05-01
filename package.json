@@ -5,12 +5,10 @@
   "main": "src/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-
     "build-std": "webpack --config webpack/build.config.js --progress --colors",
     "build-es6": "webpack --config webpack/build-es6.config.js --progress --colors",
     "build-min": "webpack --config webpack/build-min.config.js --progress --colors",
     "build": "npm run build-std && npm run build-min && npm run build-es6",
-
     "dev": "webpack-dev-server --content-base dist/ --config webpack/dev.config.js --progress --colors --watch --open"
   },
   "keywords": [
@@ -32,7 +30,8 @@
   },
   "homepage": "https://github.com/namide/aekino#readme",
   "dependencies": {
-    "gl-matrix": "^2.3.2"
+    "gl-matrix": "^2.3.2",
+    "parse-dds": "^1.2.1"
   },
   "devDependencies": {
     "babel-core": "^6.24.1",

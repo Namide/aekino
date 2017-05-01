@@ -23,6 +23,7 @@
  */
 
 import Texture from './Texture'
+import parse from 'parse-dds'
 
 function isMultOf(val, mult)
 {
@@ -39,10 +40,72 @@ export default class SmartTexture extends Texture
     }
     
     // https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/
-    addDxt5URL({src, width, height, format, priority})
+    addDDSURL(URL, size)
     {
-        const byteLength = floor((width + 3) * 0.25) * floor((height + 3) * 0.25) * 16
-        const level = isMultOf(width, 4) && isMultOf(height, 4) ? 0 : 1 
+        const imgData = {
+            size,
+            src: URL,
+            img: null,
+            isImage: false,
+            priority: 1,
+            isValid: () => true,
+            init: null
+        }
+        
+        imgData.init = gl =>
+        {
+            const dds = parse(imgData.img)
+            
+            // console.log(dds.format)  // 'dxt5' 
+            // console.log(dds.shape)   // [ width, height ] 
+            // console.log(dds.images)  // [ ... mipmap level data ... ]
+            
+            const image = dds.images[0]
+            const arrBufferView = new Uint8Array(imgData.img, image.offset, image.length)
+            
+            const ext = (
+              gl.getExtension('WEBGL_compressed_texture_s3tc') ||
+              gl.getExtension('MOZ_WEBGL_compressed_texture_s3tc') ||
+              gl.getExtension('WEBKIT_WEBGL_compressed_texture_s3tc')
+            )
+            gl.bindTexture(gl.TEXTURE_2D, this.pointer)
+            
+            gl.compressedTexImage2D(
+                gl.TEXTURE_2D,
+                0, // ? dds.images.length - 1,
+                ext.COMPRESSED_RGBA_S3TC_DXT5_EXT,
+                dds.shape[0],
+                dds.shape[1],
+                0,
+                arrBufferView
+            ) 
+
+            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false)
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                
+            
+            /*var ext = (        
+              gl.getExtension('WEBGL_compressed_texture_s3tc') ||
+              gl.getExtension('MOZ_WEBGL_compressed_texture_s3tc') ||
+              gl.getExtension('WEBKIT_WEBGL_compressed_texture_s3tc')
+            )
+            console.log('load dxt5')
+            gl.bindTexture(gl.TEXTURE_2D, this.pointer)
+
+            gl.compressedTexImage2D(gl.TEXTURE_2D, 0, ext.COMPRESSED_RGBA_S3TC_DXT5_EXT, width, height, 0, new Uint8Array(imgData.img)) 
+
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            
+            const byteLength = floor((width + 3) * 0.25) * floor((height + 3) * 0.25) * 16
+            const level = isMultOf(width, 4) && isMultOf(height, 4) ? 0 : 1 */
+            // gl.bindTexture(gl.TEXTURE_2D, null)
+        }
+        
+        this.srcs.push(imgData)
+        
+        
         
         // var formats = gl.getParameter(gl.COMPRESSED_TEXTURE_FORMATS)
     }
@@ -54,6 +117,8 @@ export default class SmartTexture extends Texture
             src: URL,
             img: null,
             priority: 0,
+            isImage: true,
+            isValid: () => true,
             init: null
         }
         
@@ -70,26 +135,12 @@ export default class SmartTexture extends Texture
         this.srcs.push(imgData)
     }
     
-    /*load(URL, callback)
-    {
-        this.src = URL
-        
-        const img = new Image()
-        img.onload = () =>
-        {
-            this.img = img            
-            if (this._changeImg)
-                this._changeImg(img)
-        }
-        img.src = URL
-    }*/
-    
     static START_LOAD(gl, srcs)
     {
         if (srcs.length > 0)
         {
             srcs.sort((a, b) => (a.size === b.size ? (a.size - b.size) : (a.priority - b.priority)))
-            const srcsValid = srcs.filter(o => o.size >= Texture.MAX_SIZE)
+            const srcsValid = srcs.filter(imgData => (imgData.size >= Texture.MAX_SIZE && imgData.isValid(gl)))
             
             if (srcs.length > 1)
             {
@@ -125,15 +176,41 @@ export default class SmartTexture extends Texture
     }
     
     static LOAD(data, callback)
-    {        
-        const img = new Image()
-        img.onload = () =>
+    {
+        if (data.isImage)
         {
-            callback(data)
+            const img = new Image()
+            img.onload = () =>
+            {
+                callback(data)
+            }
+            data.img = img
+
+            // console.log('LOAD', data.src)
+            img.src = data.src
         }
-        data.img = img
-        
-        img.src = data.src
+        else
+        {
+            const request = new XMLHttpRequest()
+            request.responseType = 'arraybuffer'
+            request.open('GET', data.src, true)
+            request.onreadystatechange = event =>
+            {
+                if (request.readyState === XMLHttpRequest.DONE)
+                {
+                    if (request.status === 200)
+                    {
+                        data.img = request.response
+                        callback(data)
+                    }
+                    else
+                    {
+                        console.error('fail to load image ', data.src, 'status:', request.status, 'statuc text:', request.statusText)
+                    }
+                }
+            }
+            request.send()
+        }
     }
     
     init(gl, program)
