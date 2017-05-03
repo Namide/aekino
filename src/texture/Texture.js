@@ -184,10 +184,16 @@ export default class Texture
     
     draw(gl, location, index)
     {
+        if (this === Texture.last)
+            return false
+        
         // const index = program.getTextureIndex(this.label)
         gl.uniform1i(location, index) // Chaque frame ou chaque init ?
         gl.activeTexture(gl.TEXTURE0 + index)
         gl.bindTexture(gl.TEXTURE_2D, this.pointer)
         // gl.uniform1i(program.getTextureLocation(this.label), 0)
+        
+        Texture.last = this
+        return true
     }
 }

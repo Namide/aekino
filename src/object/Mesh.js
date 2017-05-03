@@ -162,21 +162,17 @@ export default class Mesh
         return success
     }
     
-    draw(gl, sameProgram = false)
+    draw(gl)
     {
-        // Use program
-        if (!sameProgram)
-            this.program.draw(gl)
-        
-        // Call local
-        for(const callback of this.localCalls)
-            callback()
-        
-        // Call global
-        if (!sameProgram)
+        // Use program, if ok call globals
+        if (this.program.draw(gl))
             for(const callback of this.globalCalls)
                 callback()
-            
+
+        // Call local
+        for(const callback of this.localCalls)
+            callback()            
+   
         // Draw mesh
         this.geom.display(gl)
     }
