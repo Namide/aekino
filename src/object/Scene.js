@@ -22,6 +22,9 @@
  * THE SOFTWARE.
  */
 
+import CallOptimizer from '../core/CallOptimizer'
+
+
 export default class Scene
 {
     constructor(canvas, cam)
@@ -33,6 +36,10 @@ export default class Scene
         this.uniforms = [cam]
         
         this.depthTest = true
+        this.sortCompare = (mesh1, mesh2) =>
+        {
+            return mesh1.program.id - mesh2.program.id
+        }
     }
     
     _addCamToMeshs()
@@ -59,6 +66,11 @@ export default class Scene
         const id = this.meshs.indexOf(mesh)
         if (id > -1)
             this.meshs.splice(id, 1)
+    }
+    
+    sort()
+    {
+        this.meshs.sort(this.sortCompare)
     }
     
     resize(w, h)
@@ -124,6 +136,7 @@ export default class Scene
     draw()
     {
         const gl = this.gl
+        const callOptimizer = CallOptimizer.getInstance(gl)
 
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
@@ -135,7 +148,7 @@ export default class Scene
         {
             if (mesh.isInitialized())
             {
-                mesh.draw(gl)
+                mesh.draw(gl, callOptimizer)
             }  
             else
             {

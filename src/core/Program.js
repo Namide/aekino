@@ -136,13 +136,13 @@ export default class Program
     
     draw(gl)
     {
-        if (this === Program.last)
+        /*if (this === Program.last)
             return false
-        
+        */
         gl.useProgram(this.pointer)
         
-        Program.last = this
-        return true
+        /*Program.last = this
+        return true*/
     }
     
     _createShader(gl, type, src)

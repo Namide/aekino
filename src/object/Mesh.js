@@ -162,13 +162,19 @@ export default class Mesh
         return success
     }
     
-    draw(gl)
+    draw(gl, callOptimizer)
     {
         // Use program, if ok call globals
-        if (this.program.draw(gl))
+        const program = this.program
+        const optimizeProgram = callOptimizer.optimizeProgram(program)
+        if (!optimizeProgram)
+        {
+            this.program.draw(gl)
+            
             for(const callback of this.globalCalls)
                 callback()
-
+        }
+        
         // Call local
         for(const callback of this.localCalls)
             callback()            

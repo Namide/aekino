@@ -158,23 +158,6 @@ scene.addMesh(pyramidMesh)
 
 // ----------------------------
 //
-//      SAME PYRAMID
-//
-// ----------------------------
-
-const pyramidMesh2 = new Mesh(pyramidGeom, colorProgram)
-const pyramidUniformMatrix2 = new UMat3D('uMVMatrix')
-pyramidMesh2.addUniform(pyramidUniformMatrix2)
-pyramidMesh2.matrix = pyramidUniformMatrix2.data
-pyramidMesh2.matrix.translate([-1.5, 1.5, -8.0])
-pyramidMesh2.matrix.scale([1, -1, 1])
-
-scene.addMesh(pyramidMesh2)
-
-
-
-// ----------------------------
-//
 //      CUBE RAINBOW
 //
 // ----------------------------
@@ -255,6 +238,26 @@ cubeMesh.addUniform(cubeUniformMatrix)
 cubeMesh.matrix = cubeUniformMatrix.data
 cubeMesh.matrix.translate([1.5, -1.5, -8.0])
 scene.addMesh(cubeMesh)
+
+
+
+
+// ----------------------------
+//
+//      PYRAMID RAINBOW INVERT
+//
+// ----------------------------
+
+const pyramidMesh2 = new Mesh(pyramidGeom, colorProgram)
+const pyramidUniformMatrix2 = new UMat3D('uMVMatrix')
+pyramidMesh2.addUniform(pyramidUniformMatrix2)
+pyramidMesh2.matrix = pyramidUniformMatrix2.data
+pyramidMesh2.matrix.translate([-1.5, 1.5, -8.0])
+pyramidMesh2.matrix.scale([1, -1, 1])
+
+scene.addMesh(pyramidMesh2)
+
+
 
 
 // ----------------------------
@@ -345,6 +348,8 @@ cubeTexturedMesh.matrix.translate([1.5, 1.5, -8.0])
 scene.addMesh(cubeTexturedMesh)
 
 
+// Optimize order by program (reduce calls)
+scene.sort()
 
 
 refresh()
@@ -358,4 +363,3 @@ function refresh()
     scene.draw()
     requestAnimationFrame(refresh)
 }
-
