@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 12);
+/******/ 	return __webpack_require__(__webpack_require__.s = 13);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -307,6 +307,83 @@ class Buffer
 
 /***/ }),
 /* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* 
+ * The MIT License
+ *
+ * Copyright 2017 Damien Doussaud (namide.com).
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+class CallOptimizer
+{
+    constructor()
+    {
+        this.lastTexture = null
+        this.lastProgram = null
+    }
+    
+    optimizeTexture(texture)
+    {
+        const lastTexture = this.lastTexture
+        this.lastTexture = texture
+        
+        return texture === lastTexture
+    }
+    
+    optimizeProgram(program)
+    {
+        const lastProgram = this.lastProgram
+        this.lastProgram = program
+        
+        return program === lastProgram
+    }
+    
+    static getInstance(gl)
+    {
+        const i = CallOptimizer.glList.indexOf(gl)
+        if (i < 0)
+        {
+            const co = new CallOptimizer()
+            
+            CallOptimizer.glList.push(gl)
+            CallOptimizer.list.push(co)
+            
+            return co
+        }
+        
+        return CallOptimizer.list[i]
+    }
+}
+
+CallOptimizer.glList = []
+CallOptimizer.list = []
+
+
+/* harmony default export */ __webpack_exports__["a"] = (CallOptimizer);
+
+
+/***/ }),
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1237,7 +1314,7 @@ class Matrix4x4 extends Float32Array
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1354,7 +1431,7 @@ class Geom
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1496,7 +1573,13 @@ class Program
     
     draw(gl)
     {
+        /*if (this === Program.last)
+            return false
+        */
         gl.useProgram(this.pointer)
+        
+        /*Program.last = this
+        return true*/
     }
     
     _createShader(gl, type, src)
@@ -1517,11 +1600,11 @@ class Program
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__math_Matrix4x4__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__math_Matrix4x4__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__uniform_Uniform__ = __webpack_require__(0);
 /* 
  * The MIT License
@@ -1581,7 +1664,7 @@ class Cam3D extends __WEBPACK_IMPORTED_MODULE_1__uniform_Uniform__["a" /* defaul
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1621,6 +1704,8 @@ class Mesh
         
         this.localCalls = []
         this.globalCalls = []
+        
+        this.order = 0
         
         this._isInitialized = false
     }
@@ -1749,21 +1834,23 @@ class Mesh
         return success
     }
     
-    draw(gl, sameProgram = false)
+    draw(gl, callOptimizer)
     {
-        // Use program
-        if (!sameProgram)
+        // Use program, if ok call globals
+        const program = this.program
+        const optimizeProgram = callOptimizer.optimizeProgram(program)
+        if (!optimizeProgram)
+        {
             this.program.draw(gl)
+            
+            for(const callback of this.globalCalls)
+                callback()
+        }
         
         // Call local
         for(const callback of this.localCalls)
-            callback()
-        
-        // Call global
-        if (!sameProgram)
-            for(const callback of this.globalCalls)
-                callback()
-            
+            callback()            
+   
         // Draw mesh
         this.geom.display(gl)
     }
@@ -1773,10 +1860,11 @@ class Mesh
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_CallOptimizer__ = __webpack_require__(3);
 /* 
  * The MIT License
  *
@@ -1801,6 +1889,9 @@ class Mesh
  * THE SOFTWARE.
  */
 
+
+
+
 class Scene
 {
     constructor(canvas, cam)
@@ -1810,8 +1901,13 @@ class Scene
         this.meshs = []
         this.cam = cam
         this.uniforms = [cam]
+        this.depthTest = true        
+        this.sortCompare = (mesh1, mesh2) =>
+        {
+            return mesh1.program.id - mesh2.program.id
+        }
         
-        this.depthTest = true
+        this.resize(canvas.width, canvas.height)
     }
     
     _addCamToMeshs()
@@ -1840,11 +1936,18 @@ class Scene
             this.meshs.splice(id, 1)
     }
     
+    sort()
+    {
+        this.meshs.sort(this.sortCompare)
+    }
+    
     resize(w, h)
     {
-        const gl = this.gl
+        /*const gl = this.gl
         gl.viewportWidth = w
-        gl.viewportHeight = h
+        gl.viewportHeight = h*/
+        this.width = w
+        this.height = h
     }
     
     init(canvas)
@@ -1854,8 +1957,9 @@ class Scene
         try
         {
             gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
-            gl.viewportWidth = canvas.width
-            gl.viewportHeight = canvas.height
+            // gl.viewportWidth = canvas.width
+            // gl.viewportHeight = canvas.height
+            // console.log(gl.viewportWidth)
         }
         catch(e)
         {
@@ -1903,26 +2007,23 @@ class Scene
     draw()
     {
         const gl = this.gl
+        const callOptimizer = __WEBPACK_IMPORTED_MODULE_0__core_CallOptimizer__["a" /* default */].getInstance(gl)
 
-        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
+        gl.viewport(0, 0, this.width, this.height)
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
         
         if (this.cam.updated)
-            this.cam.update(gl.viewportWidth, gl.viewportHeight)
+            this.cam.update(this.width, this.height)
         
-        let lastProgram = null
-    
         for (const mesh of this.meshs)
         {
             if (mesh.isInitialized())
             {
-                mesh.draw(gl, mesh.program === lastProgram)
-                lastProgram = mesh.program
+                mesh.draw(gl, callOptimizer)
             }  
             else
             {
                 mesh.init(gl, this.uniforms)
-                lastProgram = null
             }
         }
     }
@@ -1931,12 +2032,12 @@ class Scene
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Texture__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_parse_dds__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Texture__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_parse_dds__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_parse_dds___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_parse_dds__);
 /* 
  * The MIT License
@@ -2018,36 +2119,17 @@ class SmartTexture extends __WEBPACK_IMPORTED_MODULE_0__Texture__["a" /* default
                 dds.shape[1],
                 0,
                 arrBufferView
-            ) 
+            )
 
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false)
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-                
             
-            /*var ext = (        
-              gl.getExtension('WEBGL_compressed_texture_s3tc') ||
-              gl.getExtension('MOZ_WEBGL_compressed_texture_s3tc') ||
-              gl.getExtension('WEBKIT_WEBGL_compressed_texture_s3tc')
-            )
-            console.log('load dxt5')
-            gl.bindTexture(gl.TEXTURE_2D, this.pointer)
-
-            gl.compressedTexImage2D(gl.TEXTURE_2D, 0, ext.COMPRESSED_RGBA_S3TC_DXT5_EXT, width, height, 0, new Uint8Array(imgData.img)) 
-
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-            
-            const byteLength = floor((width + 3) * 0.25) * floor((height + 3) * 0.25) * 16
-            const level = isMultOf(width, 4) && isMultOf(height, 4) ? 0 : 1 */
-            // gl.bindTexture(gl.TEXTURE_2D, null)
+            this.mipmap = false
+            this.setParam(gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+            this.setParam(gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+            this.initParams(gl)
         }
         
         this.srcs.push(imgData)
-        
-        
-        
-        // var formats = gl.getParameter(gl.COMPRESSED_TEXTURE_FORMATS)
     }
     
     addURL(URL, size = 0)
@@ -2068,8 +2150,17 @@ class SmartTexture extends __WEBPACK_IMPORTED_MODULE_0__Texture__["a" /* default
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
 
             gl.texImage2D(gl.TEXTURE_2D, 0, 6408 /* gl.RGBA */, this.format, gl.UNSIGNED_BYTE, imgData.img)
-            __WEBPACK_IMPORTED_MODULE_0__Texture__["a" /* default */].SETUP(gl, imgData.img)
+            // Texture.SETUP(gl, imgData.img)
+            // Texture.SETUP(gl, imgData.img)
             // gl.bindTexture(gl.TEXTURE_2D, null)
+            
+            this.img = imgData.img
+            
+            
+            // this.mipmap = false
+            // this.setParam(gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+            // this.setParam(gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+            this.initParams(gl)
         }
         
         this.srcs.push(imgData)
@@ -2155,20 +2246,21 @@ class SmartTexture extends __WEBPACK_IMPORTED_MODULE_0__Texture__["a" /* default
     
     init(gl, program)
     {
-        const success = super.init(gl, program)
-        
+        const success = super.init(gl, program)     
         const texture = this.pointer
         
-        const changeImg = newImg =>
+        /* const changeImg = imgData =>
         {
             gl.bindTexture(gl.TEXTURE_2D, texture)
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
 
-            gl.texImage2D(gl.TEXTURE_2D, 0, newImg.internalformat, this.format, gl.UNSIGNED_BYTE, newImg.img)
-            __WEBPACK_IMPORTED_MODULE_0__Texture__["a" /* default */].SETUP(gl, newImg.img)
+            gl.texImage2D(gl.TEXTURE_2D, 0, imgData.internalformat, this.format, gl.UNSIGNED_BYTE, imgData.img)
+            
+            this.img = imgData.img
+            Texture.SETUP(gl, imgData.img)
             // gl.bindTexture(gl.TEXTURE_2D, null)
-        }
-           
+        }*/
+        
         SmartTexture.START_LOAD(gl, this.srcs)
         return success
     }
@@ -2177,11 +2269,11 @@ class SmartTexture extends __WEBPACK_IMPORTED_MODULE_0__Texture__["a" /* default
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__math_Matrix4x4__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__math_Matrix4x4__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Uniform__ = __webpack_require__(0);
 /* 
  * The MIT License
@@ -2223,7 +2315,7 @@ class UMat3D extends __WEBPACK_IMPORTED_MODULE_1__Uniform__["a" /* default */]
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 // All values and structures referenced from:
@@ -2409,20 +2501,20 @@ function int32ToFourCC (value) {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__uniform_Uniform__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__uniform_UMat3D__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__uniform_UMat3D__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_Attribute__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_Program__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_Geom__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__texture_SmartTexture__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__object_Mesh__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__object_Cam3D__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__object_Scene__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_Program__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_Geom__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__texture_SmartTexture__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__object_Mesh__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__object_Cam3D__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__object_Scene__ = __webpack_require__(9);
 /* 
  * The MIT License
  *
@@ -2583,23 +2675,6 @@ scene.addMesh(pyramidMesh)
 
 // ----------------------------
 //
-//      SAME PYRAMID
-//
-// ----------------------------
-
-const pyramidMesh2 = new __WEBPACK_IMPORTED_MODULE_6__object_Mesh__["a" /* default */](pyramidGeom, colorProgram)
-const pyramidUniformMatrix2 = new __WEBPACK_IMPORTED_MODULE_1__uniform_UMat3D__["a" /* default */]('uMVMatrix')
-pyramidMesh2.addUniform(pyramidUniformMatrix2)
-pyramidMesh2.matrix = pyramidUniformMatrix2.data
-pyramidMesh2.matrix.translate([-1.5, 1.5, -8.0])
-pyramidMesh2.matrix.scale([1, -1, 1])
-
-scene.addMesh(pyramidMesh2)
-
-
-
-// ----------------------------
-//
 //      CUBE RAINBOW
 //
 // ----------------------------
@@ -2680,6 +2755,26 @@ cubeMesh.addUniform(cubeUniformMatrix)
 cubeMesh.matrix = cubeUniformMatrix.data
 cubeMesh.matrix.translate([1.5, -1.5, -8.0])
 scene.addMesh(cubeMesh)
+
+
+
+
+// ----------------------------
+//
+//      PYRAMID RAINBOW INVERT
+//
+// ----------------------------
+
+const pyramidMesh2 = new __WEBPACK_IMPORTED_MODULE_6__object_Mesh__["a" /* default */](pyramidGeom, colorProgram)
+const pyramidUniformMatrix2 = new __WEBPACK_IMPORTED_MODULE_1__uniform_UMat3D__["a" /* default */]('uMVMatrix')
+pyramidMesh2.addUniform(pyramidUniformMatrix2)
+pyramidMesh2.matrix = pyramidUniformMatrix2.data
+pyramidMesh2.matrix.translate([-1.5, 1.5, -8.0])
+pyramidMesh2.matrix.scale([1, -1, 1])
+
+scene.addMesh(pyramidMesh2)
+
+
 
 
 // ----------------------------
@@ -2770,6 +2865,23 @@ cubeTexturedMesh.matrix.translate([1.5, 1.5, -8.0])
 scene.addMesh(cubeTexturedMesh)
 
 
+// Optimize order by program (reduce calls)
+scene.sort()
+
+
+
+
+// Change resolution
+const size = [500, 500]
+const resolution = 1
+
+scene.resize(size[0] * resolution, size[1] * resolution)
+canvas.width = size[0] * resolution
+canvas.height = size[1] * resolution
+canvas.style.width = size[0] + 'px'
+canvas.style.height = size[1] + 'px'
+
+
 
 
 refresh()
@@ -2785,12 +2897,12 @@ function refresh()
 }
 
 
-
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_CallOptimizer__ = __webpack_require__(3);
 /* 
  * The MIT License
  *
@@ -2815,20 +2927,26 @@ function refresh()
  * THE SOFTWARE.
  */
 
+
+
+
 class Texture
 {
-    constructor(label)
+    constructor(label, img = new Uint8Array([255, 255, 255, 255]))
     {
         this.label = label
-        this.color = [255, 255, 255, 255]
+        this.mipmap = true
         
         
         this.pointer = null
-        this.parameters = {
-            9729: 9987
-        }
+        this.parameters = [
+            // [9729 /* gl.LINEAR */, 9987 /* gl.LINEAR_MIPMAP_LINEAR */]
+        ]
+        
+        this.img = img
         
         this.setFormat()
+        this.setTarget()
     }
     
     /*
@@ -2839,6 +2957,15 @@ class Texture
     {
         // this.internalformat = internalformat
         this.format = format
+    }
+    
+    /*
+        3553    gl.TEXTURE_2D           A two-dimensional texture.
+        34067   gl.TEXTURE_CUBE_MAP     A cube-mapped texture.
+    */
+    setTarget(target = 3553)
+    {
+        this.target = target
     }
     
     /*
@@ -2871,9 +2998,13 @@ class Texture
         
         param
     */
-    setParameters(target, pName, param)
+    setParam(label, value)
     {
-        
+        const i = this.parameters.find(p => p[0] === label)
+        if (i > -1)
+            this.parameters[i][1] = value
+        else
+            this.parameters.push([label, value])
     }
     
     isInitialized()
@@ -2918,31 +3049,54 @@ class Texture
         */
         const formats = gl.getParameter(gl.COMPRESSED_TEXTURE_FORMATS)
         for (let i = 0; i < formats.length; i++)
-        {
             Texture.FORMAT[formats[i]] = true
-            console.log(formats[i])
-        }
 
         Texture._DATA_INITIALIZED = true
     }
     
-    static SETUP(gl, img)
+    setDefaultParams(gl)
     {
-        if (Texture.IS_POWER_OF_2(img.width) && Texture.IS_POWER_OF_2(img.height))
+        if (this.mipmap)
         {
-            gl.generateMipmap(gl.TEXTURE_2D)
-            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
+            // this.setParam(gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+            this.setParam(gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
         }
         else
         {
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+            this.setParam(gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+            this.setParam(gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+            // this.setParam(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+            this.setParam(gl.TEXTURE_MIN_FILTER, gl.LINEAR)
         }
     }
+    
+    initParams(gl)
+    {
+        if (this.mipmap)
+        {
+            const img = this.img
+            if (img === null)
+            {
+                console.warn('You need an image to set the parameters:', this.label)
+            }
+            else if (Texture.IS_POWER_OF_2(img.width) && Texture.IS_POWER_OF_2(img.height))
+            {
+                gl.generateMipmap(gl.TEXTURE_2D)
+            }
+            else
+            {
+                this.mipmap = false
+                console.warn('You need a power of 2 for the size of the mipmaped texture:', this.label)
+            }
+        }
         
+        if (this.parameters.length < 1)
+            this.setDefaultParams(gl)
+        
+        for (const [pname, param] of this.parameters)
+            gl.texParameteri(this.target, pname, param)
+    }
+    
     init(gl)
     {
         const texture = gl.createTexture()
@@ -2951,7 +3105,6 @@ class Texture
         {
             Texture.SET_DATA(gl)
         }
-            
         
         /*
         gl.getParameter(gl.MAX_TEXTURE_SIZE)
@@ -2962,8 +3115,9 @@ class Texture
         
         // Temporary texture (1 pixel)
         gl.bindTexture(gl.TEXTURE_2D, texture)
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE,
-          new Uint8Array(this.color))
+        
+        
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE, this.img)
 
         
         /*const location = program.getTextureLocation(this.label)
@@ -2977,11 +3131,24 @@ class Texture
     
     draw(gl, location, index)
     {
+        const callOptimizer = __WEBPACK_IMPORTED_MODULE_0__core_CallOptimizer__["a" /* default */].getInstance(gl)
+        const optimizeTexture = callOptimizer.optimizeTexture(this)
+        if (!optimizeTexture)
+        {
+            gl.uniform1i(location, index) // Chaque frame ou chaque init ?
+            gl.activeTexture(gl.TEXTURE0 + index)
+            gl.bindTexture(gl.TEXTURE_2D, this.pointer)
+        }
+        
+        /*if (this === Texture.last)
+            return false*/
+        
         // const index = program.getTextureIndex(this.label)
-        gl.uniform1i(location, index) // Chaque frame ou chaque init ?
-        gl.activeTexture(gl.TEXTURE0 + index)
-        gl.bindTexture(gl.TEXTURE_2D, this.pointer)
+            
         // gl.uniform1i(program.getTextureLocation(this.label), 0)
+        
+        /*Texture.last = this
+        return true*/
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Texture;

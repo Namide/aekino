@@ -27,18 +27,21 @@ import CallOptimizer from '../core/CallOptimizer'
 
 export default class Texture
 {
-    constructor(label)
+    constructor(label, img = new Uint8Array([255, 255, 255, 255]))
     {
         this.label = label
-        this.color = [255, 255, 255, 255]
+        this.mipmap = true
         
         
         this.pointer = null
-        this.parameters = {
-            9729: 9987
-        }
+        this.parameters = [
+            // [9729 /* gl.LINEAR */, 9987 /* gl.LINEAR_MIPMAP_LINEAR */]
+        ]
+        
+        this.img = img
         
         this.setFormat()
+        this.setTarget()
     }
     
     /*
@@ -49,6 +52,15 @@ export default class Texture
     {
         // this.internalformat = internalformat
         this.format = format
+    }
+    
+    /*
+        3553    gl.TEXTURE_2D           A two-dimensional texture.
+        34067   gl.TEXTURE_CUBE_MAP     A cube-mapped texture.
+    */
+    setTarget(target = 3553)
+    {
+        this.target = target
     }
     
     /*
@@ -81,9 +93,13 @@ export default class Texture
         
         param
     */
-    setParameters(target, pName, param)
+    setParam(label, value)
     {
-        
+        const i = this.parameters.find(p => p[0] === label)
+        if (i > -1)
+            this.parameters[i][1] = value
+        else
+            this.parameters.push([label, value])
     }
     
     isInitialized()
@@ -128,31 +144,54 @@ export default class Texture
         */
         const formats = gl.getParameter(gl.COMPRESSED_TEXTURE_FORMATS)
         for (let i = 0; i < formats.length; i++)
-        {
             Texture.FORMAT[formats[i]] = true
-            console.log(formats[i])
-        }
 
         Texture._DATA_INITIALIZED = true
     }
     
-    static SETUP(gl, img)
+    setDefaultParams(gl)
     {
-        if (Texture.IS_POWER_OF_2(img.width) && Texture.IS_POWER_OF_2(img.height))
+        if (this.mipmap)
         {
-            gl.generateMipmap(gl.TEXTURE_2D)
-            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
+            // this.setParam(gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+            this.setParam(gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
         }
         else
         {
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+            this.setParam(gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+            this.setParam(gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+            // this.setParam(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+            this.setParam(gl.TEXTURE_MIN_FILTER, gl.LINEAR)
         }
     }
+    
+    initParams(gl)
+    {
+        if (this.mipmap)
+        {
+            const img = this.img
+            if (img === null)
+            {
+                console.warn('You need an image to set the parameters:', this.label)
+            }
+            else if (Texture.IS_POWER_OF_2(img.width) && Texture.IS_POWER_OF_2(img.height))
+            {
+                gl.generateMipmap(gl.TEXTURE_2D)
+            }
+            else
+            {
+                this.mipmap = false
+                console.warn('You need a power of 2 for the size of the mipmaped texture:', this.label)
+            }
+        }
         
+        if (this.parameters.length < 1)
+            this.setDefaultParams(gl)
+        
+        for (const [pname, param] of this.parameters)
+            gl.texParameteri(this.target, pname, param)
+    }
+    
     init(gl)
     {
         const texture = gl.createTexture()
@@ -161,7 +200,6 @@ export default class Texture
         {
             Texture.SET_DATA(gl)
         }
-            
         
         /*
         gl.getParameter(gl.MAX_TEXTURE_SIZE)
@@ -172,8 +210,9 @@ export default class Texture
         
         // Temporary texture (1 pixel)
         gl.bindTexture(gl.TEXTURE_2D, texture)
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE,
-          new Uint8Array(this.color))
+        
+        
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE, this.img)
 
         
         /*const location = program.getTextureLocation(this.label)

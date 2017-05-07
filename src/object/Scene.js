@@ -34,12 +34,13 @@ export default class Scene
         this.meshs = []
         this.cam = cam
         this.uniforms = [cam]
-        
-        this.depthTest = true
+        this.depthTest = true        
         this.sortCompare = (mesh1, mesh2) =>
         {
             return mesh1.program.id - mesh2.program.id
         }
+        
+        this.resize(canvas.width, canvas.height)
     }
     
     _addCamToMeshs()
@@ -75,9 +76,11 @@ export default class Scene
     
     resize(w, h)
     {
-        const gl = this.gl
+        /*const gl = this.gl
         gl.viewportWidth = w
-        gl.viewportHeight = h
+        gl.viewportHeight = h*/
+        this.width = w
+        this.height = h
     }
     
     init(canvas)
@@ -87,8 +90,9 @@ export default class Scene
         try
         {
             gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
-            gl.viewportWidth = canvas.width
-            gl.viewportHeight = canvas.height
+            // gl.viewportWidth = canvas.width
+            // gl.viewportHeight = canvas.height
+            // console.log(gl.viewportWidth)
         }
         catch(e)
         {
@@ -138,11 +142,11 @@ export default class Scene
         const gl = this.gl
         const callOptimizer = CallOptimizer.getInstance(gl)
 
-        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
+        gl.viewport(0, 0, this.width, this.height)
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
         
         if (this.cam.updated)
-            this.cam.update(gl.viewportWidth, gl.viewportHeight)
+            this.cam.update(this.width, this.height)
         
         for (const mesh of this.meshs)
         {

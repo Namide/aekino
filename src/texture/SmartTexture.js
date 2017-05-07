@@ -78,36 +78,17 @@ export default class SmartTexture extends Texture
                 dds.shape[1],
                 0,
                 arrBufferView
-            ) 
+            )
 
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false)
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-                
             
-            /*var ext = (        
-              gl.getExtension('WEBGL_compressed_texture_s3tc') ||
-              gl.getExtension('MOZ_WEBGL_compressed_texture_s3tc') ||
-              gl.getExtension('WEBKIT_WEBGL_compressed_texture_s3tc')
-            )
-            console.log('load dxt5')
-            gl.bindTexture(gl.TEXTURE_2D, this.pointer)
-
-            gl.compressedTexImage2D(gl.TEXTURE_2D, 0, ext.COMPRESSED_RGBA_S3TC_DXT5_EXT, width, height, 0, new Uint8Array(imgData.img)) 
-
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-            
-            const byteLength = floor((width + 3) * 0.25) * floor((height + 3) * 0.25) * 16
-            const level = isMultOf(width, 4) && isMultOf(height, 4) ? 0 : 1 */
-            // gl.bindTexture(gl.TEXTURE_2D, null)
+            this.mipmap = false
+            this.setParam(gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+            this.setParam(gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+            this.initParams(gl)
         }
         
         this.srcs.push(imgData)
-        
-        
-        
-        // var formats = gl.getParameter(gl.COMPRESSED_TEXTURE_FORMATS)
     }
     
     addURL(URL, size = 0)
@@ -128,8 +109,17 @@ export default class SmartTexture extends Texture
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
 
             gl.texImage2D(gl.TEXTURE_2D, 0, 6408 /* gl.RGBA */, this.format, gl.UNSIGNED_BYTE, imgData.img)
-            Texture.SETUP(gl, imgData.img)
+            // Texture.SETUP(gl, imgData.img)
+            // Texture.SETUP(gl, imgData.img)
             // gl.bindTexture(gl.TEXTURE_2D, null)
+            
+            this.img = imgData.img
+            
+            
+            // this.mipmap = false
+            // this.setParam(gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+            // this.setParam(gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+            this.initParams(gl)
         }
         
         this.srcs.push(imgData)
@@ -215,20 +205,21 @@ export default class SmartTexture extends Texture
     
     init(gl, program)
     {
-        const success = super.init(gl, program)
-        
+        const success = super.init(gl, program)     
         const texture = this.pointer
         
-        const changeImg = newImg =>
+        /* const changeImg = imgData =>
         {
             gl.bindTexture(gl.TEXTURE_2D, texture)
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)
 
-            gl.texImage2D(gl.TEXTURE_2D, 0, newImg.internalformat, this.format, gl.UNSIGNED_BYTE, newImg.img)
-            Texture.SETUP(gl, newImg.img)
+            gl.texImage2D(gl.TEXTURE_2D, 0, imgData.internalformat, this.format, gl.UNSIGNED_BYTE, imgData.img)
+            
+            this.img = imgData.img
+            Texture.SETUP(gl, imgData.img)
             // gl.bindTexture(gl.TEXTURE_2D, null)
-        }
-           
+        }*/
+        
         SmartTexture.START_LOAD(gl, this.srcs)
         return success
     }

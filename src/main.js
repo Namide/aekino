@@ -352,6 +352,21 @@ scene.addMesh(cubeTexturedMesh)
 scene.sort()
 
 
+
+
+// Change resolution
+const size = [500, 500]
+const resolution = 1
+
+scene.resize(size[0] * resolution, size[1] * resolution)
+canvas.width = size[0] * resolution
+canvas.height = size[1] * resolution
+canvas.style.width = size[0] + 'px'
+canvas.style.height = size[1] + 'px'
+
+
+
+
 refresh()
 function refresh()
 {
