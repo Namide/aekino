@@ -35,8 +35,14 @@ export default class SmartTexture extends Texture
     constructor(label)
     {
         super(label)
-        
         this.srcs = []
+        
+        this.setTempColor([255, 255, 255, 255])
+    }
+    
+    setTempColor(color)
+    {
+        this.setImg(new Uint8Array(color), 1, 1)
     }
     
     // https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/
@@ -161,7 +167,7 @@ export default class SmartTexture extends Texture
         }
         else
         {
-            console.warn('URL of your texture', this.label, 'not found: texture.addURL(URL, size = 0)')
+            console.warn('URL of your smart texture not found')
         }
     }
     

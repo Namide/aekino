@@ -22,33 +22,38 @@
  * THE SOFTWARE.
  */
 
-import Matrix4x4 from '../math/Matrix4x4'
-import Uniform from '../data/core/Uniform'
+import Mesh from '../object/Mesh'
+import Geom from '../data/geom/Geom'
+import TextureContainer from '../data/texture/TextureContainer'
 
-export default class Cam3D extends Uniform
+// https://www.wanadev.fr/34-trucs-et-astuces-webgl/
+export default class Pass extends Mesh
 {
-    constructor(label)
+    constructor(program, vertexLabel = 'aVertexPosition', textureLabel = 'uSample')
     {
-        super(label, 35676, new Matrix4x4())
-       
-        this.fovy = 45
-        this.near = 0.1
-        this.far = 1000
-        this._matrix = new Matrix4x4()
+        const geom = new Geom()
+        const quadVertices = [
+             1.0, 1.0,
+            -1.0, 1.0,
+            -1.0, -1.0,
+            -1.0, -1.0,
+             1.0, -1.0,
+             1.0, 1.0
+        ]
+        geom.addVertices(vertexLabel, quadVertices, 2)
         
-        this.updated = true
+
+        super(geom, program)
+
+
+        const texture = new TextureContainer(textureLabel)
+        this.addTexture(texture)
+
+        this.inTexture = texture
     }
 
-    get matrix()
+    setInTexture(texture)
     {
-        this.updated = true
-        return this._matrix
-    }
-    
-    update(w, h)
-    {
-        this.data.perspective(this.fovy * Math.PI / 180, w / h, 0.1, 100.0)
-        this.data.multiply(this._matrix)
-        this.updated = false
+        this.inTexture.setTexture(texture)
     }
 }

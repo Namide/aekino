@@ -22,8 +22,8 @@
  * THE SOFTWARE.
  */
 
-import Buffer from './Buffer'
-import Attribute from './Attribute'
+import Buffer from '../core/Buffer'
+import Attribute from '../core/Attribute'
 
 export default class Geom
 {

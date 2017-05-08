@@ -22,26 +22,51 @@
  * THE SOFTWARE.
  */
 
-import CallOptimizer from '../core/CallOptimizer'
+import CallOptimizer from '../../render/CallOptimizer'
 
 
 export default class Texture
 {
-    constructor(label, img = new Uint8Array([255, 255, 255, 255]))
+    constructor(label)
     {
         this.label = label
         this.mipmap = true
         
+        this.img = null
+        this.width = null
+        this.height = null
         
         this.pointer = null
         this.parameters = [
             // [9729 /* gl.LINEAR */, 9987 /* gl.LINEAR_MIPMAP_LINEAR */]
         ]
         
-        this.img = img
-        
         this.setFormat()
         this.setTarget()
+    }
+    
+    resize(width, height)
+    {
+        this.width = width
+        this.height = height
+        
+        if (this.pointer)
+        {
+            gl.bindTexture(this.target, texture)
+            gl.texImage2D(this.target, 0, gl.RGB, this.width, this.height, 0, gl.RGB, gl.UNSIGNED_BYTE, this.img)
+        }
+    }
+    
+    setTempColor(color)
+    {
+        this.setImg(new Uint8Array(color), 1, 1)
+    }
+    
+    setImg(img = new Uint8Array([255, 255, 255, 255]), width = 1, height = 1)
+    {
+        this.img = img
+        this.width = width
+        this.height = height
     }
     
     /*
@@ -172,16 +197,16 @@ export default class Texture
             const img = this.img
             if (img === null)
             {
-                console.warn('You need an image to set the parameters:', this.label)
+                console.warn('You need an image to set the parameters of texture')
             }
             else if (Texture.IS_POWER_OF_2(img.width) && Texture.IS_POWER_OF_2(img.height))
             {
-                gl.generateMipmap(gl.TEXTURE_2D)
+                gl.generateMipmap(this.target)
             }
             else
             {
                 this.mipmap = false
-                console.warn('You need a power of 2 for the size of the mipmaped texture:', this.label)
+                console.warn('You need a power of 2 for the size of the mipmaped texture')
             }
         }
         
@@ -208,11 +233,8 @@ export default class Texture
         */
         
         
-        // Temporary texture (1 pixel)
-        gl.bindTexture(gl.TEXTURE_2D, texture)
-        
-        
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE, this.img)
+        gl.bindTexture(this.target, texture)
+        gl.texImage2D(this.target, 0, gl.RGB, this.width, this.height, 0, gl.RGB, gl.UNSIGNED_BYTE, this.img)
 
         
         /*const location = program.getTextureLocation(this.label)
@@ -230,9 +252,9 @@ export default class Texture
         const optimizeTexture = callOptimizer.optimizeTexture(this)
         if (!optimizeTexture)
         {
-            gl.uniform1i(location, index) // Chaque frame ou chaque init ?
+            gl.uniform1i(location, index)
             gl.activeTexture(gl.TEXTURE0 + index)
-            gl.bindTexture(gl.TEXTURE_2D, this.pointer)
+            gl.bindTexture(this.target, this.pointer)
         }
         
         /*if (this === Texture.last)
@@ -244,5 +266,10 @@ export default class Texture
         
         /*Texture.last = this
         return true*/
+    }
+    
+    free(gl)
+    {
+        gl.bindTexture(gl.TEXTURE_2D, null)
     }
 }

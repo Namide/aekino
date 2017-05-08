@@ -23,10 +23,10 @@
  */
 
 import Matrix4x4 from '../math/Matrix4x4'
-import Uniform from './Uniform'
+import Uniform from './core/Uniform'
 
 
-export default class UMat3D extends Uniform
+export default class UMatrix3D extends Uniform
 {
     constructor(label)
     {

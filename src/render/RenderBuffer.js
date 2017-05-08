@@ -22,33 +22,40 @@
  * THE SOFTWARE.
  */
 
-import Matrix4x4 from '../math/Matrix4x4'
-import Uniform from '../data/core/Uniform'
-
-export default class Cam3D extends Uniform
+export default class RenderBuffer
 {
-    constructor(label)
+    constructor(frameBuffer)
     {
-        super(label, 35676, new Matrix4x4())
-       
-        this.fovy = 45
-        this.near = 0.1
-        this.far = 1000
-        this._matrix = new Matrix4x4()
-        
-        this.updated = true
-    }
-
-    get matrix()
-    {
-        this.updated = true
-        return this._matrix
+        this.pointer = null
+        this.frameBuffer = frameBuffer
     }
     
-    update(w, h)
+    get width()
     {
-        this.data.perspective(this.fovy * Math.PI / 180, w / h, 0.1, 100.0)
-        this.data.multiply(this._matrix)
-        this.updated = false
+        return this.frameBuffer.width
     }
+    
+    get height()
+    {
+        return this.frameBuffer.width
+    }
+    
+    isInitialized()
+    {
+        return !!this.pointer
+    }
+    
+    init(gl)
+    {
+        const renderBuffer = gl.createRenderbuffer()
+        gl.bindRenderbuffer(gl.RENDERBUFFER, renderBuffer)
+        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, frameBuffer.width, frameBuffer.height)
+
+        this.pointer = renderBuffer
+    }
+    
+    /* draw(gl, location, index)
+    {
+        
+    }*/
 }

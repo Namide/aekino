@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-import Geom from '../core/Geom'
+import Geom from '../Geom'
 
 export default class UVSphere extends Geom
 {

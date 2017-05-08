@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-import CallOptimizer from '../core/CallOptimizer'
+import CallOptimizer from './CallOptimizer'
 
 
 export default class Scene
@@ -34,7 +34,7 @@ export default class Scene
         this.meshs = []
         this.cam = cam
         this.uniforms = [cam]
-        this.depthTest = true        
+        this.depthTest = true
         this.sortCompare = (mesh1, mesh2) =>
         {
             return mesh1.program.id - mesh2.program.id
@@ -139,11 +139,11 @@ export default class Scene
     
     draw()
     {
-        const gl = this.gl
-        const callOptimizer = CallOptimizer.getInstance(gl)
+        const gl = this.gl        
 
         gl.viewport(0, 0, this.width, this.height)
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+        
         
         if (this.cam.updated)
             this.cam.update(this.width, this.height)
@@ -151,13 +151,9 @@ export default class Scene
         for (const mesh of this.meshs)
         {
             if (mesh.isInitialized())
-            {
-                mesh.draw(gl, callOptimizer)
-            }  
+                mesh.draw(gl)
             else
-            {
                 mesh.init(gl, this.uniforms)
-            }
-        }
+        }        
     }
 }

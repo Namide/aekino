@@ -40,17 +40,19 @@ exports.vec2 = require("./gl-matrix/vec2.js");
 exports.vec3 = require("./gl-matrix/vec3.js");
 exports.vec4 = require("./gl-matrix/vec4.js");*/
 
-import Uniform from './uniform/Uniform'
-import UMat3D from './uniform/UMat3D'
+import Uniform from './data/core/Uniform'
+import UMatrix3D from './data/UMatrix3D'
 
-import Attribute from './core/Attribute'
-import Program from './core/Program'
-import Geom from './core/Geom'
-import SmartTexture from './texture/SmartTexture'
+import Attribute from './data/core/Attribute'
+import Program from './render/Program'
+import Geom from './data/geom/Geom'
+import SmartTexture from './data/texture/SmartTexture'
 
 import Mesh from './object/Mesh'
 import Cam3D from './object/Cam3D'
-import Scene from './object/Scene'
+import Scene from './render/Scene'
+import Pass from './render/Pass'
+import PassManager from './render/PassManager'
 
 
 const canvas = document.body.querySelector('canvas')
@@ -147,7 +149,7 @@ pyramidGeom.addVertices('aVertexPosition', pyramidVertices, 3)
 pyramidGeom.addVertices('aVertexColor', pyramidColors, 4)
     
 const pyramidMesh = new Mesh(pyramidGeom, colorProgram)
-const pyramidUniformMatrix = new UMat3D('uMVMatrix')
+const pyramidUniformMatrix = new UMatrix3D('uMVMatrix')
 pyramidMesh.addUniform(pyramidUniformMatrix)
 pyramidMesh.matrix = pyramidUniformMatrix.data
 pyramidMesh.matrix.translate([-1.5, -1.5, -8.0])
@@ -233,7 +235,7 @@ cubeGeom.addVertices('aVertexColor', unpackedCubeColors, 4)
 cubeGeom.addIndices(cubeIndices)
 
 const cubeMesh = new Mesh(cubeGeom, fogProgram)
-const cubeUniformMatrix = new UMat3D('uMVMatrix')
+const cubeUniformMatrix = new UMatrix3D('uMVMatrix')
 cubeMesh.addUniform(cubeUniformMatrix)
 cubeMesh.matrix = cubeUniformMatrix.data
 cubeMesh.matrix.translate([1.5, -1.5, -8.0])
@@ -249,7 +251,7 @@ scene.addMesh(cubeMesh)
 // ----------------------------
 
 const pyramidMesh2 = new Mesh(pyramidGeom, colorProgram)
-const pyramidUniformMatrix2 = new UMat3D('uMVMatrix')
+const pyramidUniformMatrix2 = new UMatrix3D('uMVMatrix')
 pyramidMesh2.addUniform(pyramidUniformMatrix2)
 pyramidMesh2.matrix = pyramidUniformMatrix2.data
 pyramidMesh2.matrix.translate([-1.5, 1.5, -8.0])
@@ -285,10 +287,14 @@ const fragmentTextureShader = `
 
     varying vec2 vTextureCoord;
 
-    uniform sampler2D uSampler;
+    uniform sampler2D uDiffuse1;
+    uniform sampler2D uDiffuse2;
 
     void main(void) {
-        gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+        vec4 color1 = texture2D(uDiffuse1, vec2(vTextureCoord.s, vTextureCoord.t));
+        vec4 color2 = texture2D(uDiffuse2, vec2(vTextureCoord.s, vTextureCoord.t));
+        float power = ((sin(vTextureCoord.s * 3.1415)) * (sin(vTextureCoord.t * 3.1415)));
+        gl_FragColor = mix(color1, color2, power);
     }`
 
 const texturedProgram = new Program(vertexTextureShader, fragmentTextureShader)
@@ -331,8 +337,13 @@ var cubeUV = [
     0.0, 1.0,
 ]
 
-const cubeTexture = new SmartTexture('uSampler')
+const cubeTexture = new SmartTexture('uDiffuse1')
 cubeTexture.addURL('cube-diffuse.jpg')
+
+const cubeTexture2 = new SmartTexture('uDiffuse2')
+cubeTexture2.setParam(10240, 9728)  // Pixelise
+cubeTexture2.setParam(10241, 9728)  // Pixelise
+cubeTexture2.addURL('cube-diffuse-2.png')
 
 const cubeTexturedGeom = new Geom()
 cubeTexturedGeom.addVertices('aVertexPosition', cubeVertices, 3)
@@ -340,16 +351,20 @@ cubeTexturedGeom.addVertices('aTextureCoord', cubeUV, 2)
 cubeTexturedGeom.addIndices(cubeIndices)
 
 const cubeTexturedMesh = new Mesh(cubeTexturedGeom, texturedProgram)
-const cubeTexturedUniformMatrix = new UMat3D('uMVMatrix')
+const cubeTexturedUniformMatrix = new UMatrix3D('uMVMatrix')
 cubeTexturedMesh.addUniform(cubeTexturedUniformMatrix)
 cubeTexturedMesh.matrix = cubeTexturedUniformMatrix.data
 cubeTexturedMesh.addTexture(cubeTexture)
+cubeTexturedMesh.addTexture(cubeTexture2)
 cubeTexturedMesh.matrix.translate([1.5, 1.5, -8.0])
 scene.addMesh(cubeTexturedMesh)
 
 
 // Optimize order by program (reduce calls)
 scene.sort()
+
+
+
 
 
 
@@ -367,14 +382,61 @@ canvas.style.height = size[1] + 'px'
 
 
 
+
+const PASS_ENABLE = false
+
+if (PASS_ENABLE)
+{
+    const passVertexShader = `
+        attribute vec3 aVertexPosition;
+
+        varying vec2 vTextureCoord;
+
+        void main(void) {
+            vTextureCoord = vec2(aVertexPosition.x * 0.5 + 0.5, aVertexPosition.y * 0.5 + 0.5);
+            gl_Position = vec4(aVertexPosition, 1.0);
+        }`
+
+    const passFragmentShader = `
+        precision mediump float;
+
+        varying vec2 vTextureCoord;
+
+        uniform sampler2D uSampler;
+
+        void main(void) {
+            vec4 color = texture2D(uSampler, vec2(vTextureCoord.x, vTextureCoord.y));
+            color.y = 0.5;
+            gl_FragColor = color;
+        }`
+
+    const passProgram = new Program(passVertexShader, passFragmentShader)
+    const pass = new Pass(passProgram)
+
+    const passManager = new PassManager(scene)
+    passManager.resize(size[0] * resolution, size[1] * resolution)
+    passManager.addPass(pass)
+    // passManager.init()
+}
+
+
+
+
+
 refresh()
 function refresh()
 {
+    // console.time('draw')
     pyramidMesh.matrix.rotate(0.005, [0, 1, 0])
     pyramidMesh2.matrix.rotate(-0.005, [0, 1, 0])
     cubeMesh.matrix.rotate(0.01, [0, 1, 0])
     cubeTexturedMesh.matrix.rotate(-0.01, [0, 1, 0])
-    
-    scene.draw()
+     
+    if (PASS_ENABLE)
+        passManager.draw()
+    else
+        scene.draw()
+
+    // console.timeEnd('draw')
     requestAnimationFrame(refresh)
 }

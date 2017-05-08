@@ -22,45 +22,30 @@
  * THE SOFTWARE.
  */
 
-import Texture from '../texture/Texture'
-
-
-class PassManager
+export default class TextureContainer
 {
-    constructor(width, height)
+    constructor(label)
     {
-        this.width = width
-        this.height = height
-        
-        const t1 = new Texture('pass1')
-        const t2 = new Texture('pass2')
-        
-        this.textures = [t1, t2]
-        this.pointer = null
+        this.label = label
     }
-    
+
     isInitialized()
     {
-        return this.textures[0].isInitialized() && this.textures[1].isInitialized()
+        return true
     }
-    
+
     init(gl)
     {
-        const fb = gl.createFramebuffer()
-        gl.bindFramebuffer(gl.FRAMEBUFFER, fb)
-        fb.width = this.width
-        fb.height = this.height
-        this.pointer = fb
-        
-        const [t1, t2] = this.textures
-        if (t1.init() && t2.init())
-            return true
-        
-        return false
+        return true
+    }
+
+    setTexture(texture)
+    {
+        this.texture = texture
     }
     
-    add(pass)
+    draw(gl, location, index)
     {
-        
+        this.texture.draw(gl, location, index)
     }
 }

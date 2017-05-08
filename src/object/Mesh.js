@@ -22,6 +22,9 @@
  * THE SOFTWARE.
  */
 
+import CallOptimizer from '../render/CallOptimizer'
+
+
 export default class Mesh
 {
     constructor(geom, program)
@@ -164,8 +167,10 @@ export default class Mesh
         return success
     }
     
-    draw(gl, callOptimizer)
+    draw(gl, customCalls = [])
     {
+        const callOptimizer = CallOptimizer.getInstance(gl)
+
         // Use program, if ok call globals
         const program = this.program
         const optimizeProgram = callOptimizer.optimizeProgram(program)
@@ -179,7 +184,11 @@ export default class Mesh
         
         // Call local
         for(const callback of this.localCalls)
-            callback()            
+            callback()
+        
+        // Call local
+        for(const callback of customCalls)
+            callback()    
    
         // Draw mesh
         this.geom.display(gl)
