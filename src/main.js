@@ -55,6 +55,8 @@ import Pass from './render/Pass'
 import PassManager from './render/PassManager'
 
 
+// Use term "compile" not "init"
+
 const canvas = document.body.querySelector('canvas')
 
 
@@ -360,6 +362,25 @@ cubeTexturedMesh.matrix.translate([1.5, 1.5, -8.0])
 scene.addMesh(cubeTexturedMesh)
 
 
+
+
+// ----------------------------
+//
+//      CUBE WOOD 2
+//
+// ----------------------------
+
+const cubeTexturedMesh2 = new Mesh(cubeTexturedGeom, texturedProgram)
+const cubeTexturedUniformMatrix2 = new UMatrix3D('uMVMatrix')
+cubeTexturedMesh2.addUniform(cubeTexturedUniformMatrix2)
+cubeTexturedMesh2.matrix = cubeTexturedUniformMatrix2.data
+cubeTexturedMesh2.addTexture(cubeTexture)
+cubeTexturedMesh2.addTexture(cubeTexture2)
+cubeTexturedMesh2.matrix.translate([0, 0, -15.0])
+scene.addMesh(cubeTexturedMesh2)
+
+
+
 // Optimize order by program (reduce calls)
 scene.sort()
 
@@ -385,6 +406,7 @@ canvas.style.height = size[1] + 'px'
 
 const PASS_ENABLE = false
 
+let passManager
 if (PASS_ENABLE)
 {
     const passVertexShader = `
@@ -413,7 +435,7 @@ if (PASS_ENABLE)
     const passProgram = new Program(passVertexShader, passFragmentShader)
     const pass = new Pass(passProgram)
 
-    const passManager = new PassManager(scene)
+    passManager = new PassManager(scene)
     passManager.resize(size[0] * resolution, size[1] * resolution)
     passManager.addPass(pass)
     // passManager.init()
@@ -431,6 +453,7 @@ function refresh()
     pyramidMesh2.matrix.rotate(-0.005, [0, 1, 0])
     cubeMesh.matrix.rotate(0.01, [0, 1, 0])
     cubeTexturedMesh.matrix.rotate(-0.01, [0, 1, 0])
+    cubeTexturedMesh2.matrix.rotate(0.025, [0.72, -0.33, 0.5])
      
     if (PASS_ENABLE)
         passManager.draw()

@@ -24,6 +24,7 @@
 
 import FrameBuffer from './FrameBuffer'
 
+// https://www.html5rocks.com/en/tutorials/webgl/webgl_fundamentals/
 
 export default class PassManager
 {
@@ -32,6 +33,7 @@ export default class PassManager
         this.frameBuffer1 = new FrameBuffer(scene.width, scene.height)
         this.frameBuffer2 = new FrameBuffer(scene.width, scene.height)
         
+        scene.autoClear = false
         this.scene = scene
         this.passList = []
         this.isEnable = false
@@ -81,14 +83,19 @@ export default class PassManager
     
     draw()
     {
+        // http://stackoverflow.com/questions/29578535/webgl-binding-of-a-framebuffer-and-renderbuffer
+        
         const gl = this.scene.gl
 
+        this.scene.clear(gl)
+        
         console.log('---')
         console.log('fb.bind')
-        // this.frameBuffer1.bind(gl)
+        this.frameBuffer1.bind(gl)
         // ? gl.uniform1f(flipYLocation, 1);
 
-        this.frameBuffer1.bind(gl)
+        
+        // this.frameBuffer1.bind(gl)
         gl.viewport(0, 0, this.scene.width, this.scene.height)
 
 
@@ -99,18 +106,18 @@ export default class PassManager
         for (const pass of this.passList)
         {
             pass.setInTexture(this.frameBuffer1.texture)
-
+            console.log(pass)
 
             console.log('pass.draw')
             pass.draw(gl)
             console.log('fb.draw')
 
-            this.frameBuffer2.bind(gl)
+            // this.frameBuffer2.bind(gl)
 
         }
         
         console.log('fb.free')
-        this.frameBuffer2.free(gl)
+        this.frameBuffer1.free(gl)
         console.log('---')
     }
 }
