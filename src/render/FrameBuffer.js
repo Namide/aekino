@@ -23,14 +23,17 @@
  */
 
 import Texture from '../data/texture/Texture'
+import RenderBuffer from './RenderBuffer'
 
 export default class FrameBuffer
 {
     constructor(width, height)
     {
-        const texture = new Texture(null)
+        const texture = new Texture('frameBuffer')
         
-        // gl.TEXTURE_WRAP_S , gl.CLAMP_TO_EDGE
+        texture.mipmap = false
+        
+        /*// gl.TEXTURE_WRAP_S , gl.CLAMP_TO_EDGE
         texture.setParam(10242, 33071)
         
         // gl.TEXTURE_WRAP_T , gl.CLAMP_TO_EDGE
@@ -40,12 +43,18 @@ export default class FrameBuffer
         texture.setParam(10241, 9728)
         
         // gl.TEXTURE_MAG_FILTER , gl.NEAREST
-        texture.setParam(10240, 9728)
+        texture.setParam(10240, 9728)*/
         
         texture.setImg(null, width, height)
         
         
         this.texture = texture
+        
+        
+        
+        this.renderBuffer = new RenderBuffer(width, height)
+        
+        
         this.pointer = null
     }
     
@@ -62,6 +71,7 @@ export default class FrameBuffer
     resize(width, height)
     {
         this.texture.setImg(null, width, height)
+        this.renderBuffer.resize(width, height)
     }
     
     isInitialized()
@@ -71,21 +81,28 @@ export default class FrameBuffer
     
     init(gl)
     {
-        this.texture.init(gl)
-        
         const frameBuffer = gl.createFramebuffer()
         gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer)
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.texture.pointer, 0)        
+        
+        this.texture.init(gl)
+        this.renderBuffer.init(gl)
+        
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.texture.pointer, 0)
+        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.renderBuffer.pointer)
+        
+        gl.bindTexture(this.texture.target, null)
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+        gl.bindFramebuffer(gl.RENDERBUFFER, null)
         
         this.pointer = frameBuffer
         
         return true
     }
 
-    draw(gl)
+    /*draw(gl)
     {
         this.texture.draw(gl)
-    }
+    }*/
     
     bind(gl)
     {

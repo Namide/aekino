@@ -125,7 +125,7 @@ export default class Program
         const label = texture.label
         if (!this.textureLocation.hasOwnProperty(label) || !this.textureIndex.hasOwnProperty(label))
         {
-            const textureLocation = gl.getUniformLocation(this.pointer, texture.label)
+            const textureLocation = gl.getUniformLocation(this.pointer, label)
             this.textureLocation[label] = textureLocation
             this.textureIndex[label] = this.textureNum
             return [textureLocation, this.textureNum++]

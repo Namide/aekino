@@ -106,6 +106,7 @@ export default class Mesh
         for (const texture of this.textures)
         {
             const [location, index] = program.getTextureLocationIndex(gl, texture)
+            console.log('///>', location, texture.label)
             this.localCalls.push(texture.draw.bind(texture, gl, location, index))
         }
         
@@ -126,17 +127,17 @@ export default class Mesh
             if (!attribute.isInitialized())
                 if (!attribute.init(gl))
                     success = false
-                    
+        
         for (const buffer of this.geom.buffers)
             if (!buffer.isInitialized())
                 if (!buffer.init(gl))
                     success = false
-            
+        
         for (const texture of this.textures)
             if (!texture.isInitialized())
                 if (!texture.init(gl))
                     success = false
-           
+        
         return success
     }
     

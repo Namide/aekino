@@ -41,6 +41,7 @@ export default class Texture
             // [9729 /* gl.LINEAR */, 9987 /* gl.LINEAR_MIPMAP_LINEAR */]
         ]
         
+        this.setInternalFormat()
         this.setFormat()
         this.setTarget()
     }
@@ -50,11 +51,7 @@ export default class Texture
         this.width = width
         this.height = height
         
-        if (this.pointer)
-        {
-            gl.bindTexture(this.target, texture)
-            gl.texImage2D(this.target, 0, gl.RGB, this.width, this.height, 0, gl.RGB, gl.UNSIGNED_BYTE, this.img)
-        }
+        this.sizeUpdated = true
     }
     
     setTempColor(color)
@@ -73,7 +70,16 @@ export default class Texture
         6407    gl.RGB
         6408    gl.RGBA
     */
-    setFormat(/*internalformat = 6408,*/ format = 6408)
+    setInternalFormat(format = 6408)
+    {
+        this.internalFormat = format
+    }
+    
+    /*
+        6407    gl.RGB
+        6408    gl.RGBA
+    */
+    setFormat(format = 6408)
     {
         // this.internalformat = internalformat
         this.format = format
@@ -136,28 +142,6 @@ export default class Texture
     {
         return (val & (val - 1)) === 0
     }
-    
-    /*static IS_MULT_OF(val, mult)
-    {
-        return Number.isInteger(val / mult)
-    }*/
-    
-    /*_setupFilterAndMipmap(gl, img)
-    {
-        if (Texture.IS_POWER_OF_2(img.width) && Texture.IS_POWER_OF_2(img.height))
-        {
-            gl.generateMipmap(gl.TEXTURE_2D)
-            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
-        }
-        else
-        {
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-        }
-    }*/
     
     static SET_DATA(gl)
     {
@@ -234,8 +218,8 @@ export default class Texture
         
         
         gl.bindTexture(this.target, texture)
-        gl.texImage2D(this.target, 0, gl.RGB, this.width, this.height, 0, gl.RGB, gl.UNSIGNED_BYTE, this.img)
-
+        gl.texImage2D(this.target, 0, this.internalFormat, this.width, this.height, 0, this.format, gl.UNSIGNED_BYTE, this.img)
+        this.initParams(gl)
         
         /*const location = program.getTextureLocation(this.label)
         const index = program.getTextureIndex(this.label)
@@ -248,6 +232,8 @@ export default class Texture
     
     draw(gl, location, index)
     {
+        
+        
         const callOptimizer = CallOptimizer.getInstance(gl)
         const optimizeTexture = callOptimizer.optimizeTexture(this)
         if (!optimizeTexture)
@@ -255,6 +241,12 @@ export default class Texture
             gl.uniform1i(location, index)
             gl.activeTexture(gl.TEXTURE0 + index)
             gl.bindTexture(this.target, this.pointer)
+        }
+        
+        if (this.sizeUpdated)
+        {
+            gl.texImage2D(this.target, 0, this.internalFormat, this.width, this.height, 0, this.format, gl.UNSIGNED_BYTE, this.img)
+            this.sizeUpdated = false
         }
         
         /*if (this === Texture.last)

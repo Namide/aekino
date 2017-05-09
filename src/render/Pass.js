@@ -47,13 +47,28 @@ export default class Pass extends Mesh
 
 
         const texture = new TextureContainer(textureLabel)
-        this.addTexture(texture)
-
         this.inTexture = texture
+        this.addTexture(texture)
     }
+    
+    /*userColorBuffer(label)
+    {
+        this.colorBuffer = 
+    }
+    
+    userDepthBuffer(label)
+    {
+        this.depthBuffer = 
+    }
+    
+    userStencilBuffer(label)
+    {
+        this.stencilBuffer = 
+    }*/
+    
 
     setInTexture(texture)
     {
-        this.inTexture.setTexture(texture)
+        this.inTexture.setTexture(texture.pointer, texture.target)
     }
 }

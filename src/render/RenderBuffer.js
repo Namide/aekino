@@ -24,20 +24,19 @@
 
 export default class RenderBuffer
 {
-    constructor(frameBuffer)
+    constructor(width, height)
     {
         this.pointer = null
-        this.frameBuffer = frameBuffer
+        this.width = width
+        this.height = height
     }
     
-    get width()
+    resize(width, height)
     {
-        return this.frameBuffer.width
-    }
-    
-    get height()
-    {
-        return this.frameBuffer.width
+        this.width = width
+        this.height = height
+        
+        this.sizeUpdated = true
     }
     
     isInitialized()
@@ -49,9 +48,20 @@ export default class RenderBuffer
     {
         const renderBuffer = gl.createRenderbuffer()
         gl.bindRenderbuffer(gl.RENDERBUFFER, renderBuffer)
-        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, frameBuffer.width, frameBuffer.height)
-
+        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width, this.height)
+        
         this.pointer = renderBuffer
+    }
+    
+    bind(gl)
+    {
+        gl.bindRenderbuffer(gl.RENDERBUFFER, renderBuffer)
+        
+        if (this.sizeUpdated)
+        {
+            gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width, this.height)
+            this.sizeUpdated = false
+        }
     }
     
     /* draw(gl, location, index)

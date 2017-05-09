@@ -391,7 +391,7 @@ scene.sort()
 
 
 // Change resolution
-const size = [500, 500]
+const size = [512, 512]
 const resolution = 1
 
 scene.resize(size[0] * resolution, size[1] * resolution)
@@ -404,7 +404,7 @@ canvas.style.height = size[1] + 'px'
 
 
 
-const PASS_ENABLE = false
+const PASS_ENABLE = true
 
 let passManager
 if (PASS_ENABLE)
@@ -424,11 +424,21 @@ if (PASS_ENABLE)
 
         varying vec2 vTextureCoord;
 
-        uniform sampler2D uSampler;
+        uniform sampler2D uSample;
+
+        vec2 SineWave(vec2 p)
+        {
+            float pi = 3.14159;
+            float A = 0.01;
+            float w = 10.0 * pi;
+            float l = 1150.0 * pi / 180.0;
+            float y = sin(l * p.x) * A;
+
+            return vec2(p.x, p.y+y);
+        }
 
         void main(void) {
-            vec4 color = texture2D(uSampler, vec2(vTextureCoord.x, vTextureCoord.y));
-            color.y = 0.5;
+            vec4 color = texture2D(uSample, SineWave(vTextureCoord.xy));
             gl_FragColor = color;
         }`
 
@@ -461,5 +471,6 @@ function refresh()
         scene.draw()
 
     // console.timeEnd('draw')
+    
     requestAnimationFrame(refresh)
 }

@@ -30,8 +30,9 @@ export default class PassManager
 {
     constructor(scene)
     {
+        console.log(scene.width, scene.height)
         this.frameBuffer1 = new FrameBuffer(scene.width, scene.height)
-        this.frameBuffer2 = new FrameBuffer(scene.width, scene.height)
+        // this.frameBuffer2 = new FrameBuffer(scene.width, scene.height)
         
         scene.autoClear = false
         this.scene = scene
@@ -43,27 +44,26 @@ export default class PassManager
     
     isInitialized()
     {
-        return this.frameBuffer1.isInitialized() && this.frameBuffer2.isInitialized()
+        return this.frameBuffer1.isInitialized() // && this.frameBuffer2.isInitialized()
     }
     
     resize(width, height)
     {
         this.scene.resize(width, height)
         this.frameBuffer1.resize(width, height)
-        this.frameBuffer2.resize(width, height)
+        // this.frameBuffer2.resize(width, height)
     }
     
     init(gl)
     {
         this.frameBuffer1.init(gl)
-        this.frameBuffer2.init(gl)
+        // this.frameBuffer2.init(gl)
 
         return true
     }
     
     addPass(pass)
     {
-        pass.addTexture(this.frameBuffer1.texture)
         pass.init(this.scene.gl, [])
 
         this.passList.push(pass)
@@ -87,37 +87,29 @@ export default class PassManager
         
         const gl = this.scene.gl
 
-        this.scene.clear(gl)
         
-        console.log('---')
-        console.log('fb.bind')
         this.frameBuffer1.bind(gl)
         // ? gl.uniform1f(flipYLocation, 1);
-
         
-        // this.frameBuffer1.bind(gl)
-        gl.viewport(0, 0, this.scene.width, this.scene.height)
-
-
-
-        console.log('scene.draw')
+        this.scene.clear(gl)
         this.scene.draw()
+
+        this.frameBuffer1.free(gl)
+        // this.frameBuffer1.bind(gl)
+        
+        
+
+
         
         for (const pass of this.passList)
         {
             pass.setInTexture(this.frameBuffer1.texture)
-            console.log(pass)
-
-            console.log('pass.draw')
             pass.draw(gl)
-            console.log('fb.draw')
 
             // this.frameBuffer2.bind(gl)
 
         }
         
-        console.log('fb.free')
         this.frameBuffer1.free(gl)
-        console.log('---')
     }
 }
