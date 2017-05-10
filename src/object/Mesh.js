@@ -106,7 +106,6 @@ export default class Mesh
         for (const texture of this.textures)
         {
             const [location, index] = program.getTextureLocationIndex(gl, texture)
-            console.log('///>', location, texture.label)
             this.localCalls.push(texture.draw.bind(texture, gl, location, index))
         }
         

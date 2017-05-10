@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-import FrameBuffer from './FrameBuffer'
+import ScreenRecorder from './ScreenRecorder'
 
 // https://www.html5rocks.com/en/tutorials/webgl/webgl_fundamentals/
 
@@ -30,8 +30,7 @@ export default class PassManager
 {
     constructor(scene)
     {
-        console.log(scene.width, scene.height)
-        this.frameBuffer1 = new FrameBuffer(scene.width, scene.height)
+        this.screenRecorder = new ScreenRecorder(scene.width, scene.height)
         // this.frameBuffer2 = new FrameBuffer(scene.width, scene.height)
         
         scene.autoClear = false
@@ -44,19 +43,19 @@ export default class PassManager
     
     isInitialized()
     {
-        return this.frameBuffer1.isInitialized() // && this.frameBuffer2.isInitialized()
+        return this.screenRecorder.isInitialized() // && this.frameBuffer2.isInitialized()
     }
     
     resize(width, height)
     {
         this.scene.resize(width, height)
-        this.frameBuffer1.resize(width, height)
+        this.screenRecorder.resize(width, height)
         // this.frameBuffer2.resize(width, height)
     }
     
     init(gl)
     {
-        this.frameBuffer1.init(gl)
+        this.screenRecorder.init(gl)
         // this.frameBuffer2.init(gl)
 
         return true
@@ -88,14 +87,14 @@ export default class PassManager
         const gl = this.scene.gl
 
         
-        this.frameBuffer1.bind(gl)
+        this.screenRecorder.bind(gl)
         // ? gl.uniform1f(flipYLocation, 1);
         
         this.scene.clear(gl)
         this.scene.draw()
 
-        this.frameBuffer1.free(gl)
-        // this.frameBuffer1.bind(gl)
+        this.screenRecorder.free(gl)
+        // this.screenRecorder.bind(gl)
         
         
 
@@ -103,13 +102,13 @@ export default class PassManager
         
         for (const pass of this.passList)
         {
-            pass.setInTexture(this.frameBuffer1.texture)
+            pass.setInTexture(this.screenRecorder.texture)
             pass.draw(gl)
 
             // this.frameBuffer2.bind(gl)
 
         }
         
-        this.frameBuffer1.free(gl)
+        this.screenRecorder.free(gl)
     }
 }

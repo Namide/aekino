@@ -431,7 +431,7 @@ if (PASS_ENABLE)
             float pi = 3.14159;
             float A = 0.01;
             float w = 10.0 * pi;
-            float l = 1150.0 * pi / 180.0;
+            float l = 3000.0 * pi / 180.0;
             float y = sin(l * p.x) * A;
 
             return vec2(p.x, p.y+y);
