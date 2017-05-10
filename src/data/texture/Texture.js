@@ -41,6 +41,7 @@ export default class Texture
             // [9729 /* gl.LINEAR */, 9987 /* gl.LINEAR_MIPMAP_LINEAR */]
         ]
         
+        this.setType()
         this.setInternalFormat()
         this.setFormat()
         this.setTarget()
@@ -59,6 +60,8 @@ export default class Texture
         this.setImg(new Uint8Array(color), 1, 1)
     }
     
+    
+    
     setImg(img = new Uint8Array([255, 255, 255, 255]), width = 1, height = 1)
     {
         this.img = img
@@ -67,8 +70,18 @@ export default class Texture
     }
     
     /*
+        5121    gl.UNSIGNED_BYTE
+        5123    gl.UNSIGNED_SHORT
+    */
+    setType(type = 5121)
+    {
+        this.type = type
+    }
+    
+    /*
         6407    gl.RGB
         6408    gl.RGBA
+        6402    gl.DEPTH_COMPONENT
     */
     setInternalFormat(format = 6408)
     {
@@ -78,6 +91,7 @@ export default class Texture
     /*
         6407    gl.RGB
         6408    gl.RGBA
+        6402    gl.DEPTH_COMPONENT
     */
     setFormat(format = 6408)
     {
@@ -218,7 +232,7 @@ export default class Texture
         
         
         gl.bindTexture(this.target, texture)
-        gl.texImage2D(this.target, 0, this.internalFormat, this.width, this.height, 0, this.format, gl.UNSIGNED_BYTE, this.img)
+        gl.texImage2D(this.target, 0, this.internalFormat, this.width, this.height, 0, this.format, this.type, this.img)
         this.initParams(gl)
         
         /*const location = program.getTextureLocation(this.label)

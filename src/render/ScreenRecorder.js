@@ -30,28 +30,50 @@ export default class ScreenRecorder
 {
     constructor(width, height)
     {
-        const texture = new Texture('frameBuffer')
+        const colorTexture = new Texture('frameBuffer')
         
-        texture.mipmap = false
+        colorTexture.mipmap = false
         
         /*// gl.TEXTURE_WRAP_S , gl.CLAMP_TO_EDGE
-        texture.setParam(10242, 33071)
+        colorTexture.setParam(10242, 33071)
         
         // gl.TEXTURE_WRAP_T , gl.CLAMP_TO_EDGE
-        texture.setParam(10243, 33071)
+        colorTexture.setParam(10243, 33071)
         
         // gl.TEXTURE_MIN_FILTER , gl.NEAREST
-        texture.setParam(10241, 9728)
+        colorTexture.setParam(10241, 9728)
         
         // gl.TEXTURE_MAG_FILTER , gl.NEAREST
-        texture.setParam(10240, 9728)*/
+        colorTexture.setParam(10240, 9728)*/
         
-        texture.setImg(null, width, height)
-        
-        
-        this.texture = texture
+        colorTexture.setImg(null, width, height)
         
         
+        this.colorTexture = colorTexture
+        
+        /*
+        const indexTexture = new Texture('frameBuffer')
+        indexTexture.mipmap = false
+    
+        indexTexture.setInternalFormat(6402)
+        indexTexture.setFormat(6402)
+        indexTexture.setType(5123)
+        
+        // gl.TEXTURE_WRAP_S , gl.CLAMP_TO_EDGE
+        indexTexture.setParam(10242, 33071)
+        
+        // gl.TEXTURE_WRAP_T , gl.CLAMP_TO_EDGE
+        indexTexture.setParam(10243, 33071)
+        
+        // gl.TEXTURE_MIN_FILTER , gl.NEAREST
+        indexTexture.setParam(10241, 9728)
+        
+        // gl.TEXTURE_MAG_FILTER , gl.NEAREST
+        indexTexture.setParam(10240, 9728)
+        
+        indexTexture.setImg(null, width, height)
+        this.indexTexture = indexTexture
+        */
         
         this.renderBuffer = new RenderBuffer(width, height)
         this.frameBuffer = new FrameBuffer(width, height)
@@ -62,17 +84,18 @@ export default class ScreenRecorder
     
     get width()
     {
-        return this.texture.width
+        return this.colorTexture.width
     }
     
     get height()
     {
-        return this.texture.width
+        return this.colorTexture.width
     }
     
     resize(width, height)
     {
-        this.texture.setImg(null, width, height)
+        this.colorTexture.setImg(null, width, height)
+        // this.indexTexture.setImg(null, width, height)
         this.renderBuffer.resize(width, height)
     }
     
@@ -84,13 +107,17 @@ export default class ScreenRecorder
     init(gl)
     {
         this.frameBuffer.init(gl)
-        this.texture.init(gl)
+        this.colorTexture.init(gl)
+        // this.indexTexture.init(gl)
         this.renderBuffer.init(gl)
         
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.texture.pointer, 0)
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.colorTexture.pointer, 0)
+        // gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.indexTexture.pointer, 0)
         gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.renderBuffer.pointer)
         
-        gl.bindTexture(this.texture.target, null)
+        
+        gl.bindTexture(this.colorTexture.target, null)
+        // gl.bindTexture(this.indexTexture.target, null)
         gl.bindFramebuffer(gl.FRAMEBUFFER, null)
         gl.bindRenderbuffer(gl.RENDERBUFFER, null)
         

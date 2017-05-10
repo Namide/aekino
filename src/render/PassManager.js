@@ -102,7 +102,7 @@ export default class PassManager
         
         for (const pass of this.passList)
         {
-            pass.setInTexture(this.screenRecorder.texture)
+            pass.setInTexture(this.screenRecorder.colorTexture)
             pass.draw(gl)
 
             // this.frameBuffer2.bind(gl)
