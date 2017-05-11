@@ -39,15 +39,10 @@ export default class TextureContainer
         return true
     }
 
-    /*
-        Target
-            3553    gl.TEXTURE_2D           A two-dimensional texture.
-            34067   gl.TEXTURE_CUBE_MAP     A cube-mapped texture.
-    */
-    setTexture(pointer, target = 3553)
+    setTexture(texture)
     {
-        this.target = target
-        this.pointer = pointer
+        this.pointer = texture.pointer
+        this.target = texture.target
     }
     
     draw(gl, location, index)

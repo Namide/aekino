@@ -246,8 +246,6 @@ export default class Texture
     
     draw(gl, location, index)
     {
-        
-        
         const callOptimizer = CallOptimizer.getInstance(gl)
         const optimizeTexture = callOptimizer.optimizeTexture(this)
         if (!optimizeTexture)
@@ -259,7 +257,7 @@ export default class Texture
         
         if (this.sizeUpdated)
         {
-            gl.texImage2D(this.target, 0, this.internalFormat, this.width, this.height, 0, this.format, gl.UNSIGNED_BYTE, this.img)
+            gl.texImage2D(this.target, 0, this.internalFormat, this.width, this.height, 0, this.format, this.type, this.img)
             this.sizeUpdated = false
         }
         

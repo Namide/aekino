@@ -26,9 +26,6 @@ export default class FrameBuffer
 {
     constructor(width, height)
     {
-        this.width = width
-        this.height = height
-        
         this.pointer = null
     }
     

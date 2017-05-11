@@ -42,12 +42,20 @@ export default class Pass extends Mesh
         ]
         geom.addVertices(vertexLabel, quadVertices, 2)
         
-
         super(geom, program)
-
-
-        const texture = new TextureContainer(textureLabel)
-        this.inTexture = texture
+    }
+    
+    useColorTexture(label)
+    {
+        const texture = new TextureContainer(label)
+        this.inColorTexture = texture
+        this.addTexture(texture)
+    }
+    
+    useDepthTexture(label)
+    {
+        const texture = new TextureContainer(label)
+        this.inDepthTexture = texture
         this.addTexture(texture)
     }
     
@@ -67,8 +75,8 @@ export default class Pass extends Mesh
     }*/
     
 
-    setInTexture(texture)
+    /*setInTexture(texture)
     {
         this.inTexture.setTexture(texture.pointer, texture.target)
-    }
+    }*/
 }

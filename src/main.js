@@ -424,7 +424,8 @@ if (PASS_ENABLE)
 
         varying vec2 vTextureCoord;
 
-        uniform sampler2D uSample;
+        uniform sampler2D uColor;
+        uniform sampler2D uDepth;
 
         vec2 SineWave(vec2 p)
         {
@@ -437,17 +438,28 @@ if (PASS_ENABLE)
             return vec2(p.x, p.y+y);
         }
 
-        void main(void) {
-            vec4 color = texture2D(uSample, SineWave(vTextureCoord.xy));
-            gl_FragColor = color;
+        void main(void)
+        {
+            vec4 color = texture2D(uColor, SineWave(vTextureCoord.xy));
+
+            vec4 depth = texture2D(uDepth, SineWave(vTextureCoord.xy));
+            float depthValue = depth.x * 100.0 - 98.5;
+
+            vec3 bg = vec3(1.0, 1.0, 1.0);
+
+            gl_FragColor = vec4(mix(color.xyz, bg, depthValue), 1.0);
         }`
 
     const passProgram = new Program(passVertexShader, passFragmentShader)
     const pass = new Pass(passProgram)
-
+    pass.useColorTexture('uColor')
+    pass.useDepthTexture('uDepth')
+    pass.passManager
+    
     passManager = new PassManager(scene)
     passManager.resize(size[0] * resolution, size[1] * resolution)
     passManager.addPass(pass)
+    
     // passManager.init()
 }
 

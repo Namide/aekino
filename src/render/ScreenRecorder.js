@@ -28,55 +28,62 @@ import FrameBuffer from './FrameBuffer'
 
 export default class ScreenRecorder
 {
-    constructor(width, height)
+    constructor(width, height, depth = false)
     {
-        const colorTexture = new Texture('frameBuffer')
+        this.depth = depth
         
+        
+        
+        
+        const colorTexture = new Texture('frameBufferColor')
         colorTexture.mipmap = false
-        
-        /*// gl.TEXTURE_WRAP_S , gl.CLAMP_TO_EDGE
-        colorTexture.setParam(10242, 33071)
-        
-        // gl.TEXTURE_WRAP_T , gl.CLAMP_TO_EDGE
-        colorTexture.setParam(10243, 33071)
-        
-        // gl.TEXTURE_MIN_FILTER , gl.NEAREST
-        colorTexture.setParam(10241, 9728)
-        
-        // gl.TEXTURE_MAG_FILTER , gl.NEAREST
-        colorTexture.setParam(10240, 9728)*/
-        
+        // Delete linear filter
+        if (false)
+        {
+            // gl.TEXTURE_WRAP_S , gl.CLAMP_TO_EDGE
+            colorTexture.setParam(10242, 33071)
+            // gl.TEXTURE_WRAP_T , gl.CLAMP_TO_EDGE
+            colorTexture.setParam(10243, 33071)
+            // gl.TEXTURE_MIN_FILTER , gl.NEAREST
+            colorTexture.setParam(10241, 9728)
+            // gl.TEXTURE_MAG_FILTER , gl.NEAREST
+            colorTexture.setParam(10240, 9728)
+        } 
         colorTexture.setImg(null, width, height)
-        
-        
         this.colorTexture = colorTexture
         
-        /*
-        const indexTexture = new Texture('frameBuffer')
-        indexTexture.mipmap = false
-    
-        indexTexture.setInternalFormat(6402)
-        indexTexture.setFormat(6402)
-        indexTexture.setType(5123)
         
-        // gl.TEXTURE_WRAP_S , gl.CLAMP_TO_EDGE
-        indexTexture.setParam(10242, 33071)
         
-        // gl.TEXTURE_WRAP_T , gl.CLAMP_TO_EDGE
-        indexTexture.setParam(10243, 33071)
         
-        // gl.TEXTURE_MIN_FILTER , gl.NEAREST
-        indexTexture.setParam(10241, 9728)
         
-        // gl.TEXTURE_MAG_FILTER , gl.NEAREST
-        indexTexture.setParam(10240, 9728)
+        if (depth)
+        {
+            const depthTexture = new Texture('frameBufferDepth')
+            depthTexture.mipmap = false
+            depthTexture.setInternalFormat(6402)
+            depthTexture.setFormat(6402)
+            depthTexture.setType(5123)
+            // gl.TEXTURE_WRAP_S , gl.CLAMP_TO_EDGE
+            depthTexture.setParam(10242, 33071)
+            // gl.TEXTURE_WRAP_T , gl.CLAMP_TO_EDGE
+            depthTexture.setParam(10243, 33071)
+            // gl.TEXTURE_MIN_FILTER , gl.NEAREST
+            depthTexture.setParam(10241, 9728)
+            // gl.TEXTURE_MAG_FILTER , gl.NEAREST
+            depthTexture.setParam(10240, 9728)
+            depthTexture.setImg(null, width, height)
+            this.depthTexture = depthTexture
+        }
+        else
+        {
+            this.renderBuffer = new RenderBuffer(width, height)
+        }
         
-        indexTexture.setImg(null, width, height)
-        this.indexTexture = indexTexture
-        */
         
-        this.renderBuffer = new RenderBuffer(width, height)
-        this.frameBuffer = new FrameBuffer(width, height)
+        
+        
+        this.frameBuffer = new FrameBuffer()
+        // this.frameBufferIndex = new FrameBuffer()
         
         
         // this.pointer = null
@@ -95,8 +102,11 @@ export default class ScreenRecorder
     resize(width, height)
     {
         this.colorTexture.setImg(null, width, height)
-        // this.indexTexture.setImg(null, width, height)
-        this.renderBuffer.resize(width, height)
+        
+        if (this.depth)
+            this.depthTexture.setImg(null, width, height)
+        else
+            this.renderBuffer.resize(width, height)
     }
     
     isInitialized()
@@ -106,18 +116,39 @@ export default class ScreenRecorder
     
     init(gl)
     {
+        if (this.depth)
+        {
+            const DepthEXT = gl.getExtension( 'WEBGL_depth_texture' ) ||
+                    gl.getExtension( 'WEBKIT_WEBGL_depth_texture' ) ||
+                    gl.getExtension( 'MOZ_WEBGL_depth_texture' )
+            
+            if (!DepthEXT)
+            { 
+                console.warn('WEBGL_depth_texture Extension not available!')
+                this.depth = false
+            }
+            
+            this.depthTexture.init(gl)
+        }
+        else
+        {
+            this.renderBuffer.init(gl)
+        }
+        
         this.frameBuffer.init(gl)
         this.colorTexture.init(gl)
-        // this.indexTexture.init(gl)
-        this.renderBuffer.init(gl)
+        
         
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.colorTexture.pointer, 0)
-        // gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.indexTexture.pointer, 0)
-        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.renderBuffer.pointer)
         
         
-        gl.bindTexture(this.colorTexture.target, null)
-        // gl.bindTexture(this.indexTexture.target, null)
+        if (this.depth)
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this.depthTexture.pointer, 0)
+        else
+            gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.renderBuffer.pointer)
+        
+        
+        gl.bindTexture(gl.TEXTURE_2D, null)
         gl.bindFramebuffer(gl.FRAMEBUFFER, null)
         gl.bindRenderbuffer(gl.RENDERBUFFER, null)
         
@@ -132,11 +163,13 @@ export default class ScreenRecorder
     bind(gl)
     {
         this.frameBuffer.bind(gl)
+        // this.frameBufferIndex.bind(gl)
     }
     
     free(gl)
     {
         this.frameBuffer.free(gl)
+        // this.frameBufferIndex.free(gl)
     }
     
     /* draw(gl, location, index)

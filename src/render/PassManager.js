@@ -30,7 +30,7 @@ export default class PassManager
 {
     constructor(scene)
     {
-        this.screenRecorder = new ScreenRecorder(scene.width, scene.height)
+        this.screenRecorder = new ScreenRecorder(scene.width, scene.height, true)
         // this.frameBuffer2 = new FrameBuffer(scene.width, scene.height)
         
         scene.autoClear = false
@@ -102,7 +102,10 @@ export default class PassManager
         
         for (const pass of this.passList)
         {
-            pass.setInTexture(this.screenRecorder.colorTexture)
+            pass.inColorTexture.setTexture(this.screenRecorder.colorTexture)
+            pass.inDepthTexture.setTexture(this.screenRecorder.depthTexture)
+            
+            
             pass.draw(gl)
 
             // this.frameBuffer2.bind(gl)
