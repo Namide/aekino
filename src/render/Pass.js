@@ -45,6 +45,16 @@ export default class Pass extends Mesh
         super(geom, program)
     }
     
+    hasColorTexture()
+    {
+        return !!this.inColorTexture
+    }
+    
+    hasDepthTexture()
+    {
+        return !!this.inDepthTexture
+    }
+    
     useColorTexture(label)
     {
         const texture = new TextureContainer(label)
@@ -57,6 +67,16 @@ export default class Pass extends Mesh
         const texture = new TextureContainer(label)
         this.inDepthTexture = texture
         this.addTexture(texture)
+    }
+    
+    disableColorTexture()
+    {
+        return !!this.inColorTexture
+    }
+    
+    disableDepthTexture()
+    {
+        return !!this.inDepthTexture
     }
     
     /*userColorBuffer(label)

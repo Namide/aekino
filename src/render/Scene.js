@@ -35,7 +35,6 @@ export default class Scene
         this.cam = cam
         this.uniforms = [cam]
         this.depthTest = true
-        this.autoClear = true
         this.sortCompare = (mesh1, mesh2) =>
         {
             return mesh1.program.id - mesh2.program.id
@@ -138,19 +137,13 @@ export default class Scene
         return this._bgColor
     }
     
-    clear(gl)
-    {
-        gl.viewport(0, 0, this.width, this.height)
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-    }
-    
     draw()
     {
         const gl = this.gl        
 
-        // Test without
-        if (this.autoClear)
-            this.clear(gl)
+        gl.viewport(0, 0, this.width, this.height)
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+        
         
         if (this.cam.updated)
             this.cam.update(this.width, this.height)

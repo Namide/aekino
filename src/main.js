@@ -443,22 +443,82 @@ if (PASS_ENABLE)
             vec4 color = texture2D(uColor, SineWave(vTextureCoord.xy));
 
             vec4 depth = texture2D(uDepth, SineWave(vTextureCoord.xy));
-            float depthValue = depth.x * 100.0 - 98.5;
+            float depthValue = pow(depth.x, 100.0);//  * 100.0 - 98.7;
 
             vec3 bg = vec3(1.0, 1.0, 1.0);
 
-            gl_FragColor = vec4(mix(color.xyz, bg, depthValue), 1.0);
+/*
+            int blurPower = int(depthValue * 6.0) + 1;
+
+            for (int i = 0; i < blurPower; i++)
+            {
+                for (int j = 0; j < blurPower; j++)
+                {
+
+                }
+            }
+            */
+
+            gl_FragColor = vec4(mix(color.rgb, vec3(1.0, 1.0, 1.0), depthValue), 1.0); // vec4(mix(color.xyz, bg, depthValue), 1.0);
+        }`
+    
+    const pass2FragmentShader = `
+        precision mediump float;
+
+        varying vec2 vTextureCoord;
+
+        uniform sampler2D uColor;
+
+        vec2 SineWave(vec2 p)
+        {
+            float pi = 3.14159;
+            float A = 0.01;
+            float w = 10.0 * pi;
+            float l = 3000.0 * pi / 180.0;
+            float x = sin(l * p.x) * A;
+
+            return vec2(p.x + x, p.y);
+        }
+
+        void main(void)
+        {
+            vec4 color = texture2D(uColor, SineWave(vTextureCoord.xy));
+            gl_FragColor = vec4(color.xyz, 1.0);
+        }`
+    
+    const pass3FragmentShader = `
+        precision mediump float;
+
+        varying vec2 vTextureCoord;
+
+        uniform sampler2D uColor;
+
+        void main(void)
+        {
+            vec4 color = texture2D(uColor, vTextureCoord.xy);
+            color.x *= 0.5;
+            gl_FragColor = vec4(color.xyz, 1.0);
         }`
 
     const passProgram = new Program(passVertexShader, passFragmentShader)
     const pass = new Pass(passProgram)
     pass.useColorTexture('uColor')
     pass.useDepthTexture('uDepth')
-    pass.passManager
+    
+    const passProgram2 = new Program(passVertexShader, pass2FragmentShader)
+    const pass2 = new Pass(passProgram2)
+    pass2.useColorTexture('uColor')
+    
+    const passProgram3 = new Program(passVertexShader, pass3FragmentShader)
+    const pass3 = new Pass(passProgram3)
+    pass3.useColorTexture('uColor')
+    
     
     passManager = new PassManager(scene)
     passManager.resize(size[0] * resolution, size[1] * resolution)
     passManager.addPass(pass)
+    passManager.addPass(pass2)
+    passManager.addPass(pass3)
     
     // passManager.init()
 }
@@ -469,19 +529,21 @@ if (PASS_ENABLE)
 
 refresh()
 function refresh()
-{
+{    
     // console.time('draw')
     pyramidMesh.matrix.rotate(0.005, [0, 1, 0])
     pyramidMesh2.matrix.rotate(-0.005, [0, 1, 0])
     cubeMesh.matrix.rotate(0.01, [0, 1, 0])
     cubeTexturedMesh.matrix.rotate(-0.01, [0, 1, 0])
     cubeTexturedMesh2.matrix.rotate(0.025, [0.72, -0.33, 0.5])
-     
+    
+    
     if (PASS_ENABLE)
         passManager.draw()
     else
         scene.draw()
 
+    
     // console.timeEnd('draw')
     
     requestAnimationFrame(refresh)

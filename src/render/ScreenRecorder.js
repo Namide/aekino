@@ -33,46 +33,17 @@ export default class ScreenRecorder
         this.depth = depth
         
         
-        
-        
-        const colorTexture = new Texture('frameBufferColor')
-        colorTexture.mipmap = false
-        // Delete linear filter
-        if (false)
-        {
-            // gl.TEXTURE_WRAP_S , gl.CLAMP_TO_EDGE
-            colorTexture.setParam(10242, 33071)
-            // gl.TEXTURE_WRAP_T , gl.CLAMP_TO_EDGE
-            colorTexture.setParam(10243, 33071)
-            // gl.TEXTURE_MIN_FILTER , gl.NEAREST
-            colorTexture.setParam(10241, 9728)
-            // gl.TEXTURE_MAG_FILTER , gl.NEAREST
-            colorTexture.setParam(10240, 9728)
-        } 
-        colorTexture.setImg(null, width, height)
-        this.colorTexture = colorTexture
-        
-        
+        this._pingpong = false
+        this._colorTextures = [
+            this._genColorTexture('frameBufferColor0', width, height),
+            this._genColorTexture('frameBufferColor1', width, height)
+        ]
         
         
         
         if (depth)
         {
-            const depthTexture = new Texture('frameBufferDepth')
-            depthTexture.mipmap = false
-            depthTexture.setInternalFormat(6402)
-            depthTexture.setFormat(6402)
-            depthTexture.setType(5123)
-            // gl.TEXTURE_WRAP_S , gl.CLAMP_TO_EDGE
-            depthTexture.setParam(10242, 33071)
-            // gl.TEXTURE_WRAP_T , gl.CLAMP_TO_EDGE
-            depthTexture.setParam(10243, 33071)
-            // gl.TEXTURE_MIN_FILTER , gl.NEAREST
-            depthTexture.setParam(10241, 9728)
-            // gl.TEXTURE_MAG_FILTER , gl.NEAREST
-            depthTexture.setParam(10240, 9728)
-            depthTexture.setImg(null, width, height)
-            this.depthTexture = depthTexture
+            this.depthTexture = this._genDepthTexture('frameBufferDepth', width, height)
         }
         else
         {
@@ -89,6 +60,74 @@ export default class ScreenRecorder
         // this.pointer = null
     }
     
+    _genDepthTexture(label, width, height)
+    {
+        const depthTexture = new Texture()
+        
+        depthTexture.mipmap = false
+        depthTexture.setInternalFormat(6402)
+        depthTexture.setFormat(6402)
+        depthTexture.setType(5123)
+        
+        // gl.TEXTURE_WRAP_S , gl.CLAMP_TO_EDGE
+        depthTexture.setParam(10242, 33071)
+        
+        // gl.TEXTURE_WRAP_T , gl.CLAMP_TO_EDGE
+        depthTexture.setParam(10243, 33071)
+        
+        // gl.TEXTURE_MIN_FILTER , gl.NEAREST
+        depthTexture.setParam(10241, 9728)
+        
+        // gl.TEXTURE_MAG_FILTER , gl.NEAREST
+        depthTexture.setParam(10240, 9728)
+        
+        depthTexture.setImg(null, width, height)
+        
+        return depthTexture
+    }
+    
+    _genColorTexture(label, width, height)
+    {
+        const colorTexture = new Texture(label)
+        
+        colorTexture.mipmap = false
+        
+        // Delete linear filter
+        if (false)
+        {
+            // gl.TEXTURE_WRAP_S , gl.CLAMP_TO_EDGE
+            colorTexture.setParam(10242, 33071)
+            
+            // gl.TEXTURE_WRAP_T , gl.CLAMP_TO_EDGE
+            colorTexture.setParam(10243, 33071)
+            
+            // gl.TEXTURE_MIN_FILTER , gl.NEAREST
+            colorTexture.setParam(10241, 9728)
+            
+            // gl.TEXTURE_MAG_FILTER , gl.NEAREST
+            colorTexture.setParam(10240, 9728)
+        }
+        
+        colorTexture.setImg(null, width, height)
+        
+        return colorTexture
+    }
+    
+    restartPingpong()
+    {
+        this._pingpong = false
+    }
+    
+    pingpong()
+    {
+        this._pingpong = !this._pingpong
+    }
+    
+    get colorTexture()
+    {
+        return this._colorTextures[this._pingpong ? 1 : 0]
+    }
+    
     get width()
     {
         return this.colorTexture.width
@@ -96,12 +135,17 @@ export default class ScreenRecorder
     
     get height()
     {
-        return this.colorTexture.width
+        return this.colorTexture.height
     }
     
     resize(width, height)
     {
+        this.pingpong()
         this.colorTexture.setImg(null, width, height)
+        
+        this.pingpong()
+        this.colorTexture.setImg(null, width, height)
+        
         
         if (this.depth)
             this.depthTexture.setImg(null, width, height)
@@ -136,10 +180,15 @@ export default class ScreenRecorder
         }
         
         this.frameBuffer.init(gl)
+        
+        this.pingpong()
+        this.colorTexture.init(gl)
+        
+        this.pingpong()
         this.colorTexture.init(gl)
         
         
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.colorTexture.pointer, 0)
+        // gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.colorTexture.pointer, 0)
         
         
         if (this.depth)
@@ -160,13 +209,22 @@ export default class ScreenRecorder
         this.texture.draw(gl)
     }*/
     
-    bind(gl)
+    start(gl, depth = true)
     {
         this.frameBuffer.bind(gl)
+        
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.colorTexture.pointer, 0)
+        
+        if (this.depth)
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, depth ? this.depthTexture.pointer : null, 0)
+        else
+            gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depth ? this.renderBuffer.pointer : null)
+        
+            
         // this.frameBufferIndex.bind(gl)
     }
     
-    free(gl)
+    stop(gl)
     {
         this.frameBuffer.free(gl)
         // this.frameBufferIndex.free(gl)

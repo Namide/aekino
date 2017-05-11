@@ -33,7 +33,6 @@ export default class PassManager
         this.screenRecorder = new ScreenRecorder(scene.width, scene.height, true)
         // this.frameBuffer2 = new FrameBuffer(scene.width, scene.height)
         
-        scene.autoClear = false
         this.scene = scene
         this.passList = []
         this.isEnable = false
@@ -80,38 +79,41 @@ export default class PassManager
         this.isEnable = this.passList.length > 0
     }
     
+    // http://stackoverflow.com/questions/29578535/webgl-binding-of-a-framebuffer-and-renderbuffer
     draw()
     {
-        // http://stackoverflow.com/questions/29578535/webgl-binding-of-a-framebuffer-and-renderbuffer
-        
         const gl = this.scene.gl
-
         
-        this.screenRecorder.bind(gl)
-        // ? gl.uniform1f(flipYLocation, 1);
+        this.screenRecorder.restartPingpong()
         
-        this.scene.clear(gl)
+        this.screenRecorder.start(gl, true)
         this.scene.draw()
-
-        this.screenRecorder.free(gl)
-        // this.screenRecorder.bind(gl)
+        this.screenRecorder.stop(gl)
+        this.screenRecorder.pingpong()
         
-        
-
-
-        
-        for (const pass of this.passList)
+        for (let i = 0; i < this.passList.length; i++)
         {
-            pass.inColorTexture.setTexture(this.screenRecorder.colorTexture)
-            pass.inDepthTexture.setTexture(this.screenRecorder.depthTexture)
+            const pass = this.passList[i]
+            const last = i > (this.passList.length - 2)
             
+            // console.log(this.screenRecorder._pingpong)
+            
+            if (!last)
+                this.screenRecorder.start(gl, false)
+            
+            this.screenRecorder.pingpong()
+            
+            if (pass.inColorTexture)
+                pass.inColorTexture.setTexture(this.screenRecorder.colorTexture)
+            
+            if (pass.inDepthTexture)
+                pass.inDepthTexture.setTexture(this.screenRecorder.depthTexture)
             
             pass.draw(gl)
-
-            // this.frameBuffer2.bind(gl)
-
+            
+            
+            this.screenRecorder.stop(gl)
+            
         }
-        
-        this.screenRecorder.free(gl)
     }
 }
