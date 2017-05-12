@@ -28,10 +28,13 @@ import FrameBuffer from './FrameBuffer'
 
 export default class ScreenRecorder
 {
-    constructor(width, height, depth = false)
+    constructor(width, height, captureDepth = true, recordDepth = false)
     {
-        this.depth = depth
+        this.captureDepth = captureDepth
+        this.recordDepth = recordDepth
         
+        this.width = width
+        this.height = height
         
         this._pingpong = false
         this._colorTextures = [
@@ -41,21 +44,8 @@ export default class ScreenRecorder
         
         
         
-        if (depth)
-        {
-            this.depthTexture = this._genDepthTexture('frameBufferDepth', width, height)
-        }
-        else
-        {
-            this.renderBuffer = new RenderBuffer(width, height)
-        }
-        
-        
-        
-        
         this.frameBuffer = new FrameBuffer()
         // this.frameBufferIndex = new FrameBuffer()
-        
         
         // this.pointer = null
     }
@@ -128,16 +118,6 @@ export default class ScreenRecorder
         return this._colorTextures[this._pingpong ? 1 : 0]
     }
     
-    get width()
-    {
-        return this.colorTexture.width
-    }
-    
-    get height()
-    {
-        return this.colorTexture.height
-    }
-    
     resize(width, height)
     {
         this.pingpong()
@@ -147,9 +127,10 @@ export default class ScreenRecorder
         this.colorTexture.setImg(null, width, height)
         
         
-        if (this.depth)
+        if (this.depthTexture)
             this.depthTexture.setImg(null, width, height)
-        else
+        
+        if (this.renderBuffer)
             this.renderBuffer.resize(width, height)
     }
     
@@ -158,24 +139,39 @@ export default class ScreenRecorder
         return !!this.frameBuffer.pointer
     }
     
+    static SET_DATA(gl)
+    {
+        ScreenRecorder.WEBGL_depth_texture = gl.getExtension( 'WEBGL_depth_texture' ) ||
+            gl.getExtension( 'WEBKIT_WEBGL_depth_texture' ) ||
+            gl.getExtension( 'MOZ_WEBGL_depth_texture' )
+
+        ScreenRecorder._DATA_INITIALIZED = true
+    }
+    
     init(gl)
     {
-        if (this.depth)
+        if (!ScreenRecorder._DATA_INITIALIZED)
         {
-            const DepthEXT = gl.getExtension( 'WEBGL_depth_texture' ) ||
-                    gl.getExtension( 'WEBKIT_WEBGL_depth_texture' ) ||
-                    gl.getExtension( 'MOZ_WEBGL_depth_texture' )
-            
-            if (!DepthEXT)
+            ScreenRecorder.SET_DATA(gl)
+        }
+        
+        if (this.recordDepth)
+        {
+            if (!ScreenRecorder.WEBGL_depth_texture)
             { 
                 console.warn('WEBGL_depth_texture Extension not available!')
-                this.depth = false
+                this.recordDepth = false
             }
-            
-            this.depthTexture.init(gl)
+            else
+            {
+                this.depthTexture = this._genDepthTexture('frameBufferDepth', this.width, this.height)
+                this.depthTexture.init(gl)
+            }
         }
-        else
+        
+        if (this.captureDepth)
         {
+            this.renderBuffer = new RenderBuffer(this.width, this.height)
             this.renderBuffer.init(gl)
         }
         
@@ -191,9 +187,9 @@ export default class ScreenRecorder
         // gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.colorTexture.pointer, 0)
         
         
-        if (this.depth)
+        if (this.depthTexture)
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this.depthTexture.pointer, 0)
-        else
+        else if (this.renderBuffer)
             gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.renderBuffer.pointer)
         
         
@@ -209,16 +205,17 @@ export default class ScreenRecorder
         this.texture.draw(gl)
     }*/
     
-    start(gl, depth = true)
+    start(gl, captureDepth = true)
     {
         this.frameBuffer.bind(gl)
         
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.colorTexture.pointer, 0)
         
-        if (this.depth)
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, depth ? this.depthTexture.pointer : null, 0)
-        else
-            gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depth ? this.renderBuffer.pointer : null)
+        
+        if (this.depthTexture)
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, captureDepth ? this.depthTexture.pointer : null, 0)
+        else if (this.renderBuffer)
+            gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, captureDepth ? this.renderBuffer.pointer : null)
         
             
         // this.frameBufferIndex.bind(gl)

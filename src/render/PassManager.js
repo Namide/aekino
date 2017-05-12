@@ -30,7 +30,7 @@ export default class PassManager
 {
     constructor(scene)
     {
-        this.screenRecorder = new ScreenRecorder(scene.width, scene.height, true)
+        this.screenRecorder = new ScreenRecorder(scene.width, scene.height, true, true)
         // this.frameBuffer2 = new FrameBuffer(scene.width, scene.height)
         
         this.scene = scene
@@ -106,14 +106,14 @@ export default class PassManager
             if (pass.inColorTexture)
                 pass.inColorTexture.setTexture(this.screenRecorder.colorTexture)
             
-            if (pass.inDepthTexture)
+                
+            if (pass.inDepthTexture && this.screenRecorder.depthTexture)
                 pass.inDepthTexture.setTexture(this.screenRecorder.depthTexture)
             
             pass.draw(gl)
             
             
             this.screenRecorder.stop(gl)
-            
         }
     }
 }
