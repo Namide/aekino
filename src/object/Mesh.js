@@ -33,6 +33,7 @@ export default class Mesh
         this.program = program
 
         this.uniforms = []
+        this.globalUniforms = []
         this.textures = []
         
         this.localCalls = []
@@ -48,11 +49,24 @@ export default class Mesh
         this.uniforms.push(uniform)
     }
     
+    rmUniform(uniform)
+    {
+        const i = this.uniforms.indexOf(uniform)
+        if (i > -1)
+            this.uniforms.splice(i, 1)
+    }
+    
     addTexture(texture)
     {
         this.textures.push(texture)
     }
     
+    rmTexture(texture)
+    {
+        const i = this.textures.indexOf(texture)
+        if (i > -1)
+            this.textures.splice(i, 1)
+    }
     
     isInitialized()
     {
@@ -140,6 +154,12 @@ export default class Mesh
         return success
     }
     
+    dispose()
+    {
+        this._isInitialized = false
+        this.localCalls.length = 0
+    }
+    
     init(gl, globalUniforms)
     {
         const program = this.program
@@ -147,10 +167,14 @@ export default class Mesh
 
         // Use program
         if (!this.program.isInitialized())
+        {
             if (!this.program.init(gl))
                 success = false
+        }
         else
+        {
             this.program.draw(gl)
+        }
         
         
         // Init all mesh data (textures, buffers, attributes, uniforms)
@@ -162,6 +186,10 @@ export default class Mesh
         if (success && this.localCalls.length < 1)
             this._setCalls(gl, globalUniforms)
         
+        
+        // Save global uniforms
+        this.globalUniforms = [...globalUniforms]
+            
         
         this._isInitialized = success
         return success

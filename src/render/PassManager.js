@@ -52,10 +52,22 @@ export default class PassManager
         // this.frameBuffer2.resize(width, height)
     }
     
+    _disableDepthInTexture(pass, gl)
+    {
+        if (pass.inDepthTexture)
+            pass.setDepthTexture(false, gl)
+    }
+    
     init(gl)
     {
         this.screenRecorder.init(gl)
         // this.frameBuffer2.init(gl)
+        
+        if (!this.screenRecorder.depthTexture)
+        {
+            for (const pass of this.passList)
+                this._disableDepthInTexture(pass, gl)
+        }
 
         return true
     }
@@ -63,8 +75,12 @@ export default class PassManager
     addPass(pass)
     {
         pass.init(this.scene.gl, [])
-
+        
+        if (this.screenRecorder.isInitialized() && !this.screenRecorder.depthTexture)
+            this._disableDepthInTexture(pass, this.scene.gl)
+            
         this.passList.push(pass)
+        
 
         this.isEnable = true
     }

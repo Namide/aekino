@@ -426,6 +426,7 @@ if (PASS_ENABLE)
 
         uniform sampler2D uColor;
         uniform sampler2D uDepth;
+        uniform int uDepthEnable;
 
         vec2 SineWave(vec2 p)
         {
@@ -442,23 +443,15 @@ if (PASS_ENABLE)
         {
             vec4 color = texture2D(uColor, SineWave(vTextureCoord.xy));
 
-            vec4 depth = texture2D(uDepth, SineWave(vTextureCoord.xy));
-            float depthValue = pow(depth.x, 100.0);//  * 100.0 - 98.7;
+            float depthValue = 0.0;
+            if (uDepthEnable >= 0)
+            {
+                vec4 depth = texture2D(uDepth, SineWave(vTextureCoord.xy));
+                depthValue = pow(depth.x, 100.0);//  * 100.0 - 98.7;
+            }
+                
 
             vec3 bg = vec3(1.0, 1.0, 1.0);
-
-/*
-            int blurPower = int(depthValue * 6.0) + 1;
-
-            for (int i = 0; i < blurPower; i++)
-            {
-                for (int j = 0; j < blurPower; j++)
-                {
-
-                }
-            }
-            */
-
             gl_FragColor = vec4(mix(color.rgb, vec3(1.0, 1.0, 1.0), depthValue), 1.0); // vec4(mix(color.xyz, bg, depthValue), 1.0);
         }`
     
@@ -503,7 +496,7 @@ if (PASS_ENABLE)
     const passProgram = new Program(passVertexShader, passFragmentShader)
     const pass = new Pass(passProgram)
     pass.useColorTexture('uColor')
-    pass.useDepthTexture('uDepth')
+    pass.useDepthTexture('uDepth', 'uDepthEnable')
     
     const passProgram2 = new Program(passVertexShader, pass2FragmentShader)
     const pass2 = new Pass(passProgram2)

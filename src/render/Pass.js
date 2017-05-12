@@ -24,6 +24,7 @@
 
 import Mesh from '../object/Mesh'
 import Geom from '../data/geom/Geom'
+import Uniform from '../data/core/Uniform'
 import TextureContainer from '../data/texture/TextureContainer'
 
 // https://www.wanadev.fr/34-trucs-et-astuces-webgl/
@@ -45,7 +46,7 @@ export default class Pass extends Mesh
         super(geom, program)
     }
     
-    hasColorTexture()
+    /*hasColorTexture()
     {
         return !!this.inColorTexture
     }
@@ -53,7 +54,7 @@ export default class Pass extends Mesh
     hasDepthTexture()
     {
         return !!this.inDepthTexture
-    }
+    }*/
     
     useColorTexture(label)
     {
@@ -62,14 +63,35 @@ export default class Pass extends Mesh
         this.addTexture(texture)
     }
     
-    useDepthTexture(label)
+    useDepthTexture(labelTexture, labelEnable)
     {
-        const texture = new TextureContainer(label)
+        const texture = new TextureContainer(labelTexture)
         this.inDepthTexture = texture
         this.addTexture(texture)
+        
+        const detpthTextureEnable = new Uniform(labelEnable, 5124 /* gl.INT */, 1)
+        this._inDetpthEnableUniform = detpthTextureEnable
+        this.addUniform(detpthTextureEnable)
     }
     
-    disableColorTexture()
+    /**
+     * Enable or disable depth texture
+     */
+    setDepthTexture(enable, gl)
+    {
+        this.rmTexture(this.inDepthTexture)
+        
+        if (enable)
+            this.addTexture(this.inDepthTexture)
+            
+        this._inDetpthEnableUniform.data = enable ? 1 : 0
+        
+        const globalUniforms = this.globalUniforms
+        this.dispose()
+        this.init(gl, globalUniforms)
+    }
+    
+    /*disableColorTexture()
     {
         return !!this.inColorTexture
     }
@@ -77,7 +99,7 @@ export default class Pass extends Mesh
     disableDepthTexture()
     {
         return !!this.inDepthTexture
-    }
+    }*/
     
     /*userColorBuffer(label)
     {

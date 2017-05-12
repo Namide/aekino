@@ -51,7 +51,10 @@ export default class Uniform
                 // const location = program.getUniformLocation(this.label)
                 gl.uniform3f(location, ...this.data)
                 break
-            } 
+            }
+            case 5124 : // gl.INT
+                gl.uniform1i(location, this.data)
+                break
             default:
                 console.error('Uniform type unknow: {label:', this.label,
                     ', type:', this.type, '}')
