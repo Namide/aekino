@@ -22,10 +22,10 @@
  * THE SOFTWARE.
  */
 
-import Mesh from '../object/Mesh'
-import Geom from '../data/geom/Geom'
-import Uniform from '../data/core/Uniform'
-import TextureContainer from '../data/texture/TextureContainer'
+import Mesh from '../../data/object/Mesh'
+import Geom from '../../data/geom/Geom'
+import Uniform from '../../data/uniform/Uniform'
+import TextureContainer from '../../data/texture/TextureContainer'
 
 // https://www.wanadev.fr/34-trucs-et-astuces-webgl/
 export default class Pass extends Mesh
@@ -45,16 +45,6 @@ export default class Pass extends Mesh
         
         super(geom, program)
     }
-    
-    /*hasColorTexture()
-    {
-        return !!this.inColorTexture
-    }
-    
-    hasDepthTexture()
-    {
-        return !!this.inDepthTexture
-    }*/
     
     useColorTexture(label)
     {
@@ -90,35 +80,4 @@ export default class Pass extends Mesh
         this.dispose()
         this.init(gl, globalUniforms)
     }
-    
-    /*disableColorTexture()
-    {
-        return !!this.inColorTexture
-    }
-    
-    disableDepthTexture()
-    {
-        return !!this.inDepthTexture
-    }*/
-    
-    /*userColorBuffer(label)
-    {
-        this.colorBuffer = 
-    }
-    
-    userDepthBuffer(label)
-    {
-        this.depthBuffer = 
-    }
-    
-    userStencilBuffer(label)
-    {
-        this.stencilBuffer = 
-    }*/
-    
-
-    /*setInTexture(texture)
-    {
-        this.inTexture.setTexture(texture.pointer, texture.target)
-    }*/
 }

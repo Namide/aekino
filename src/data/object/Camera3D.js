@@ -22,19 +22,20 @@
  * THE SOFTWARE.
  */
 
-import Matrix4x4 from '../math/Matrix4x4'
-import Uniform from '../data/core/Uniform'
+import Matrix4 from '../../math/Matrix4'
+import Uniform from '../uniform/Uniform'
 
-export default class Cam3D extends Uniform
+
+export default class Camera3D extends Uniform
 {
     constructor(label)
     {
-        super(label, 35676, new Matrix4x4())
+        super(label, 35676, new Matrix4())
        
         this.fovy = 45
         this.near = 0.1
         this.far = 1000
-        this._matrix = new Matrix4x4()
+        this._matrix = new Matrix4()
         
         this.updated = true
     }

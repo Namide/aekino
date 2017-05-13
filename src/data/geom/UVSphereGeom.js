@@ -22,14 +22,12 @@
  * THE SOFTWARE.
  */
 
-import Matrix4x4 from '../math/Matrix4x4'
-import Uniform from './core/Uniform'
+import Geom from '../Geom'
 
-
-export default class UMatrix3D extends Uniform
+export default class UVSphereGeom extends Geom
 {
-    constructor(label)
+    constructor()
     {
-        super(label, 35676 /* gl.FLOAT_MAT4 */, new Matrix4x4().identity())
+        // Todo
     }
 }

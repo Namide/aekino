@@ -103,11 +103,6 @@ export default class ScreenRecorder
         return colorTexture
     }
     
-    restartPingpong()
-    {
-        this._pingpong = false
-    }
-    
     pingpong()
     {
         this._pingpong = !this._pingpong

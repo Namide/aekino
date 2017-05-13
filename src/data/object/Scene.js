@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-import CallOptimizer from './CallOptimizer'
+import CallOptimizer from '../../render/CallOptimizer'
 
 
 export default class Scene

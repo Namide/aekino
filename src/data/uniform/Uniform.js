@@ -28,36 +28,55 @@ export default class Uniform
      * type
      *      gl.FLOAT_MAT4       35676
      */
-    constructor(label, type, data)
+    constructor(label, type, data, isArray = false)
     {
         this.label = label
         this.type = type
         this.data = data
         // this.location = null
+        
+        this._init(type, isArray)
     }
     
-    draw(gl, location)
+    // Generate draw function
+    _init(type, isArray)
     {
         switch(this.type)
         {
             case 35676: // gl.FLOAT_MAT4
             {
-                // const location = program.getUniformLocation(this.label)
-                gl.uniformMatrix4fv(location, false, this.data)
+                this.draw = (gl, location) =>
+                {
+                    gl.uniformMatrix4fv(location, false, this.data)
+                }
                 break
             }
             case 35665: // gl.FLOAT_VEC3
             {
-                // const location = program.getUniformLocation(this.label)
-                gl.uniform3f(location, ...this.data)
+                this.draw = (gl, location) =>
+                {
+                    gl.uniform3f(location, ...this.data)
+                }
+                
                 break
             }
             case 5124 : // gl.INT
-                gl.uniform1i(location, this.data)
+                this.draw = (gl, location) =>
+                {
+                    gl.uniform1i(location, this.data)
+                }
                 break
+                
+            case -1 :
+                this.draw = (gl, location) =>
+                {
+                    gl.uniform1fv(location, this.data)
+                } 
+                break
+            
             default:
                 console.error('Uniform type unknow: {label:', this.label,
-                    ', type:', this.type, '}')
+                    ', type:', type, '}')
         }
     }
 }

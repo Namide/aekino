@@ -22,12 +22,14 @@
  * THE SOFTWARE.
  */
 
-import Geom from '../Geom'
+import Matrix4 from '../../math/Matrix4'
+import Uniform from '../uniform/Uniform'
 
-export default class UVSphere extends Geom
+
+export default class Transform3D extends Uniform
 {
-    constructor()
+    constructor(label)
     {
-        // Todo
+        super(label, 35676 /* gl.FLOAT_MAT4 */, new Matrix4().identity())
     }
 }

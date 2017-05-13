@@ -40,19 +40,24 @@ exports.vec2 = require("./gl-matrix/vec2.js");
 exports.vec3 = require("./gl-matrix/vec3.js");
 exports.vec4 = require("./gl-matrix/vec4.js");*/
 
-import Uniform from './data/core/Uniform'
-import UMatrix3D from './data/UMatrix3D'
+import Uniform from './data/uniform/Uniform'
+import Transform3D from './data/uniform/Transform3D'
 
 import Attribute from './data/core/Attribute'
-import Program from './render/Program'
+import Program from './shader/material/Program'
 import Geom from './data/geom/Geom'
 import SmartTexture from './data/texture/SmartTexture'
 
-import Mesh from './object/Mesh'
-import Cam3D from './object/Cam3D'
-import Scene from './render/Scene'
-import Pass from './render/Pass'
+import Mesh from './data/object/Mesh'
+import Camera3D from './data/object/Camera3D'
+import Scene from './data/object/Scene'
+import Pass from './shader/filter/Pass'
 import PassManager from './render/PassManager'
+
+
+import GaussianBlurPass from './shader/filter/GaussianBlurPass'
+
+const test = new GaussianBlurPass(0.1, 0.2, 5)
 
 
 // Use term "compile" not "init"
@@ -61,7 +66,7 @@ const canvas = document.body.querySelector('canvas')
 
 
 // Camera
-const cam3D = new Cam3D('uPMatrix')
+const cam3D = new Camera3D('uPMatrix')
 // cam3D.matrix.translate([-1.5, 0.0, -7.0])
 
 
@@ -151,7 +156,7 @@ pyramidGeom.addVertices('aVertexPosition', pyramidVertices, 3)
 pyramidGeom.addVertices('aVertexColor', pyramidColors, 4)
     
 const pyramidMesh = new Mesh(pyramidGeom, colorProgram)
-const pyramidUniformMatrix = new UMatrix3D('uMVMatrix')
+const pyramidUniformMatrix = new Transform3D('uMVMatrix')
 pyramidMesh.addUniform(pyramidUniformMatrix)
 pyramidMesh.matrix = pyramidUniformMatrix.data
 pyramidMesh.matrix.translate([-1.5, -1.5, -8.0])
@@ -237,7 +242,7 @@ cubeGeom.addVertices('aVertexColor', unpackedCubeColors, 4)
 cubeGeom.addIndices(cubeIndices)
 
 const cubeMesh = new Mesh(cubeGeom, fogProgram)
-const cubeUniformMatrix = new UMatrix3D('uMVMatrix')
+const cubeUniformMatrix = new Transform3D('uMVMatrix')
 cubeMesh.addUniform(cubeUniformMatrix)
 cubeMesh.matrix = cubeUniformMatrix.data
 cubeMesh.matrix.translate([1.5, -1.5, -8.0])
@@ -253,7 +258,7 @@ scene.addMesh(cubeMesh)
 // ----------------------------
 
 const pyramidMesh2 = new Mesh(pyramidGeom, colorProgram)
-const pyramidUniformMatrix2 = new UMatrix3D('uMVMatrix')
+const pyramidUniformMatrix2 = new Transform3D('uMVMatrix')
 pyramidMesh2.addUniform(pyramidUniformMatrix2)
 pyramidMesh2.matrix = pyramidUniformMatrix2.data
 pyramidMesh2.matrix.translate([-1.5, 1.5, -8.0])
@@ -353,7 +358,7 @@ cubeTexturedGeom.addVertices('aTextureCoord', cubeUV, 2)
 cubeTexturedGeom.addIndices(cubeIndices)
 
 const cubeTexturedMesh = new Mesh(cubeTexturedGeom, texturedProgram)
-const cubeTexturedUniformMatrix = new UMatrix3D('uMVMatrix')
+const cubeTexturedUniformMatrix = new Transform3D('uMVMatrix')
 cubeTexturedMesh.addUniform(cubeTexturedUniformMatrix)
 cubeTexturedMesh.matrix = cubeTexturedUniformMatrix.data
 cubeTexturedMesh.addTexture(cubeTexture)
@@ -371,7 +376,7 @@ scene.addMesh(cubeTexturedMesh)
 // ----------------------------
 
 const cubeTexturedMesh2 = new Mesh(cubeTexturedGeom, texturedProgram)
-const cubeTexturedUniformMatrix2 = new UMatrix3D('uMVMatrix')
+const cubeTexturedUniformMatrix2 = new Transform3D('uMVMatrix')
 cubeTexturedMesh2.addUniform(cubeTexturedUniformMatrix2)
 cubeTexturedMesh2.matrix = cubeTexturedUniformMatrix2.data
 cubeTexturedMesh2.addTexture(cubeTexture)
@@ -512,8 +517,6 @@ if (PASS_ENABLE)
     passManager.addPass(pass)
     passManager.addPass(pass2)
     passManager.addPass(pass3)
-    
-    // passManager.init()
 }
 
 

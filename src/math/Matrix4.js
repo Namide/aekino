@@ -22,7 +22,7 @@ function setMat(a, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m
     a[15] = m15
 }
 
-export default class Matrix4x4 extends Float32Array
+export default class Matrix4 extends Float32Array
 {
     constructor()
     {
@@ -36,7 +36,7 @@ export default class Matrix4x4 extends Float32Array
 
     clone()
     {
-        const clone = new Matrix4x4()
+        const clone = new Matrix4()
         clone.set(this)
 
         return clone

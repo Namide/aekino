@@ -24,14 +24,13 @@
 
 import ScreenRecorder from './ScreenRecorder'
 
-// https://www.html5rocks.com/en/tutorials/webgl/webgl_fundamentals/
 
+// https://www.html5rocks.com/en/tutorials/webgl/webgl_fundamentals/
 export default class PassManager
 {
     constructor(scene)
     {
         this.screenRecorder = new ScreenRecorder(scene.width, scene.height, true, true)
-        // this.frameBuffer2 = new FrameBuffer(scene.width, scene.height)
         
         this.scene = scene
         this.passList = []
@@ -42,14 +41,13 @@ export default class PassManager
     
     isInitialized()
     {
-        return this.screenRecorder.isInitialized() // && this.frameBuffer2.isInitialized()
+        return this.screenRecorder.isInitialized()
     }
     
     resize(width, height)
     {
         this.scene.resize(width, height)
         this.screenRecorder.resize(width, height)
-        // this.frameBuffer2.resize(width, height)
     }
     
     _disableDepthInTexture(pass, gl)
@@ -61,7 +59,6 @@ export default class PassManager
     init(gl)
     {
         this.screenRecorder.init(gl)
-        // this.frameBuffer2.init(gl)
         
         if (!this.screenRecorder.depthTexture)
         {
@@ -85,7 +82,7 @@ export default class PassManager
         this.isEnable = true
     }
     
-    rmPass(pass)
+    removePass(pass)
     {
         const i = this.passList.indexOf(pass)
         
@@ -99,37 +96,41 @@ export default class PassManager
     draw()
     {
         const gl = this.scene.gl
+        const passNumber = this.passList.length
         
-        this.screenRecorder.restartPingpong()
-        
-        this.screenRecorder.start(gl, true)
-        this.scene.draw()
-        this.screenRecorder.stop(gl)
-        this.screenRecorder.pingpong()
-        
-        for (let i = 0; i < this.passList.length; i++)
+        if (passNumber > 0)
         {
-            const pass = this.passList[i]
-            const last = i > (this.passList.length - 2)
-            
-            // console.log(this.screenRecorder._pingpong)
-            
-            if (!last)
-                this.screenRecorder.start(gl, false)
-            
-            this.screenRecorder.pingpong()
-            
-            if (pass.inColorTexture)
-                pass.inColorTexture.setTexture(this.screenRecorder.colorTexture)
-            
-                
-            if (pass.inDepthTexture && this.screenRecorder.depthTexture)
-                pass.inDepthTexture.setTexture(this.screenRecorder.depthTexture)
-            
-            pass.draw(gl)
-            
-            
+            this.screenRecorder.start(gl, true)
+            this.scene.draw()
             this.screenRecorder.stop(gl)
+            this.screenRecorder.pingpong()
+
+            for (let i = 0; i < passNumber; i++)
+            {
+                const pass = this.passList[i]
+                const last = i > (passNumber - 2)
+
+                if (!last)
+                    this.screenRecorder.start(gl, false)
+
+                this.screenRecorder.pingpong()
+
+                if (pass.inColorTexture)
+                    pass.inColorTexture.setTexture(this.screenRecorder.colorTexture)
+
+
+                if (pass.inDepthTexture && this.screenRecorder.depthTexture)
+                    pass.inDepthTexture.setTexture(this.screenRecorder.depthTexture)
+
+                pass.draw(gl)
+
+
+                this.screenRecorder.stop(gl)
+            }
+        }
+        else
+        {
+            this.scene.draw()
         }
     }
 }
