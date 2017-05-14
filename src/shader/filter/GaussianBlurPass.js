@@ -52,7 +52,10 @@ const FRAGMENT_SHADER = `
         gl_FragColor = color;
     }`
 
-
+function f(num)
+{
+    return Number.isInteger(num) ? num.toFixed(1) : num
+}
 
 // https://www.wanadev.fr/34-trucs-et-astuces-webgl/
 export default class GaussianBlurPass extends Pass
@@ -76,7 +79,6 @@ export default class GaussianBlurPass extends Pass
         this.useDepthTexture('uDepth', 'uDepthEnable')
         
         const fragmentShader = this._initFragmentShader(minDepth, maxDepth, samples)
-        console.log(fragmentShader)
         this.program = new Program(VERTEX_SHADER, fragmentShader)
         
         if (xBlur)
@@ -85,14 +87,12 @@ export default class GaussianBlurPass extends Pass
             this.useUHeight('uSize', 1)
     }
     
-    _numToF(num)
-    {
-        return Number.isInteger(num) ? num.toFixed(1) : num
-    }
+    
     
     _initFragmentShader(minDepth = 0.1, maxDepth = 0.3, samples = 5)
     {
         const xBlur = this.xBlur
+        const powerStr = f(this.power)
         const kernels = []
         for (let i = 0; i < samples; i++)
         {
@@ -105,43 +105,48 @@ export default class GaussianBlurPass extends Pass
         for (let i = 0; i < kernels.length; i++)
         {
             const kernel = kernels[i]
-            chunkFct += 'vec4 blur' + (i + 1) + '(sampler2D image, sampler2D depth, vec2 uv) {\n'
-            chunkFct += 'vec2 move;\n'
-            chunkFct += 'float depthPrev;\n'
-            chunkFct += 'float depthNext;\n'
-            chunkFct += '\tvec4 color = texture2D(image, uv) * ' + this._numToF(kernel[0]) + ';\n'
+            chunkFct += `
+            vec4 blur${i + 1}(sampler2D image, vec2 uv) {
+                vec2 move;
+                vec4 colorCurrent = texture2D(image, uv);
+                vec4 color = colorCurrent * ${f(kernel[0])};`
+
             for (let j = 1; j < kernel.length; j++)
             {
-                const powerStr = this._numToF(this.power)
-                chunkFct += '\tmove = ' + (xBlur ? 'vec2(' + j + '.0 * ' + powerStr + ' / float(uSize), 0.0)' : ('vec2(0.0, ' + j + '.0 * ' + powerStr + ' / float(uSize))')) + ';\n'
-                
-                chunkFct += '\tdepthPrev = texture2D(depth, uv + move).x;\n'
-                chunkFct += '\tcolor += texture2D(image, uv + move) * ' + this._numToF(kernel[j]) + ';\n'
-                
-                chunkFct += '\tdepthNext = texture2D(depth, uv - move).x;\n'
-                chunkFct += '\tcolor += texture2D(image, uv - move) * ' + this._numToF(kernel[j]) + ';\n'
+                chunkFct += `
+                move = ${xBlur ? 'vec2(' + j + '.0 * ' + powerStr + ' / float(uSize), 0.0)' : ('vec2(0.0, ' + j + '.0 * ' + powerStr + ' / float(uSize))')};
+                color += texture2D(image, uv + move) * ${ f(kernel[j]) };
+                color += texture2D(image, uv - move) * ${ f(kernel[j]) };`
             }
-            chunkFct += '\treturn color;\n'
-            chunkFct += '}\n'
+            
+            chunkFct += 'return color; }'
             
         }
         
         
-        let chunkCall = 'float depthValue = 0.0;\n'
-        chunkCall += 'if (uDepthEnable >= 0) {\n'
-        chunkCall += '\tvec4 depth = texture2D(uDepth, vTextureCoord.xy);\n'
-        chunkCall += '\tdepthValue = pow(depth.x, ' + this._numToF(this.depthCurve) + ');\n'
-        chunkCall += '}\n'
-        chunkCall += 'int blurPower = int(floor(0.5 + (depthValue - ' + this._numToF(minDepth) + ') * ' +  this._numToF(samples) + ' / ' + this._numToF(maxDepth - minDepth) + '));\n'
-        chunkCall += 'vec4 color = vec4(1.0, 1.0, 1.0, 1.0);\n'
+        let chunkCall = `
+            float depthValue = 0.0;
+            vec4 color;
+            if (uDepthEnable >= 0) {
+                vec4 depth = texture2D(uDepth, vTextureCoord.xy);
+                depthValue = pow(depth.x, ${f(this.depthCurve)});
+                
+                int blurPower = int(floor(0.5 + (depthValue - ${f(minDepth)}) * ${f(samples)} / ${f(maxDepth - minDepth)}));   
+        `
+
         for (let i = 0; i < samples; i++)
         {
             const condition = 'blurPower' + ((i > samples - 2 ) ? (' >= ' + i ) : (i < 1) ? (' < 1') : (' == ' + i) );
-            chunkCall += (i > 0 ? ' else if' : 'if' ) + '(' + condition + ') {\n'
-            chunkCall += '\tcolor = blur' + (i + 1) + '(uColor, uDepth, vTextureCoord.xy);\n'
-            chunkCall += '}'
+            
+            chunkCall += `${i > 0 ? ' else if' : 'if'} ( ${condition}) {
+                color = blur${i + 1}(uColor, vTextureCoord.xy);
+            }`
         }
-        chunkCall += '\n'
+        chunkCall += `
+        } else {
+            color = texture2D(uColor, vTextureCoord.xy);
+        }
+        `
         
         
         const fs = FRAGMENT_SHADER.replace('$chunkfct', chunkFct).replace('$chunkcall', chunkCall)

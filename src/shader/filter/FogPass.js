@@ -102,7 +102,7 @@ export default class FogPass extends Pass
             uColorFog
             vec4 color = mix(uColorFog, );
         `
-        
+         // vec4(mix(color.xyz, bg, depthValue), 1.0);
         
         const fs = FRAGMENT_SHADER.replace('$chunkcall', chunkCall)
         
