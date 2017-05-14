@@ -52,7 +52,10 @@ const FRAGMENT_SHADER = `
         gl_FragColor = color;
     }`
 
-
+function f(num)
+{
+    return Number.isInteger(num) ? num.toFixed(1) : num
+}
 
 export default class FogPass extends Pass
 {
@@ -64,13 +67,8 @@ export default class FogPass extends Pass
         depthCurve = 100,
         color = [1.0, 1.0, 1.0]})
     {
-        
-        
         super(null, 'aVertexPosition', 'uColor')
         
-        this.power = power
-        this.xBlur = xBlur
-        this.depthCurve = depthCurve
         
         this.useColorTexture('uColor')
         this.useDepthTexture('uDepth', 'uDepthEnable')
@@ -79,15 +77,11 @@ export default class FogPass extends Pass
         this.addUniform(uColor)
         
         const fragmentShader = this._initFragmentShader(minDepth, maxDepth, minPower, maxPower, depthCurve)
-        console.log(fragmentShader)
         
         this.program = new Program(VERTEX_SHADER, fragmentShader)
     }
     
-    _numToF(num)
-    {
-        return Number.isInteger(num) ? num.toFixed(1) : num
-    }
+    
     
     _initFragmentShader(minDepth, maxDepth, minPower, maxPower, depthCurve)
     {
@@ -95,12 +89,12 @@ export default class FogPass extends Pass
             float depthValue = 0.0;
             if (uDepthEnable >= 0) {
                 vec4 depth = texture2D(uDepth, vTextureCoord.xy);
-                depthValue = pow(depth.x, ' + this._numToF(this.depthCurve) + ');
-
-                float power = ${ (maxDepth - minDepth) };
+                depthValue = pow(depth.x, ${f(depthCurve)});
+                depthValue = (depthValue - ${f(minDepth)}) / ${f(maxDepth - minDepth)};
+                depthValue = clamp(depthValue, ${f(minPower)}, ${f(maxPower)});
             }
-            uColorFog
-            vec4 color = mix(uColorFog, );
+            vec4 originalColor = texture2D(uColor, vTextureCoord.xy); 
+            vec4 color = vec4(mix(originalColor.xyz, uColorFog, depthValue), originalColor.w);
         `
          // vec4(mix(color.xyz, bg, depthValue), 1.0);
         

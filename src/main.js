@@ -56,6 +56,7 @@ import PassManager from './render/PassManager'
 
 
 import GaussianBlurPass from './shader/filter/GaussianBlurPass'
+import FogPass from './shader/filter/FogPass'
 
 
 
@@ -395,7 +396,7 @@ scene.sort()
 
 
 // Change resolution
-const size = [512, 512]
+const size = [window.innerWidth, window.innerHeight]
 const resolution = 1
 
 scene.resize(size[0] * resolution, size[1] * resolution)
@@ -413,7 +414,7 @@ const PASS_ENABLE = true
 let passManager
 if (PASS_ENABLE)
 {
-    const passVertexShader = `
+    /*const passVertexShader = `
         attribute vec3 aVertexPosition;
 
         varying vec2 vTextureCoord;
@@ -508,26 +509,39 @@ if (PASS_ENABLE)
     
     const passProgram3 = new Program(passVertexShader, pass3FragmentShader)
     const pass3 = new Pass(passProgram3)
-    pass3.useColorTexture('uColor')
+    pass3.useColorTexture('uColor')*/
     
+        
     
     passManager = new PassManager(scene)
     passManager.resize(size[0] * resolution, size[1] * resolution)
     // passManager.addPass(pass)
     // passManager.addPass(pass2)
     // passManager.addPass(pass3)
+    
+    const fogPass = new FogPass({
+        minDepth: 0.50,
+        maxDepth: 0.6,
+        minPower: 0,
+        maxPower: 1,
+        depthCurve: 100,
+        color: [1.0, 1.0, 1.0]
+    })
+    passManager.addPass(fogPass)
+    
     const gaussianOptions = {
         minDepth: 0.52,
         maxDepth: 0.7,
-        samples: 20,
+        samples: 10,
         xBlur: true,
-        power: 1,
+        power: 2,
         depthCurve: 50
     }
     const gaussianBlurX = new GaussianBlurPass(gaussianOptions)
+    passManager.addPass(gaussianBlurX)
+    
     gaussianOptions.xBlur = false
     const gaussianBlurY = new GaussianBlurPass(gaussianOptions)
-    passManager.addPass(gaussianBlurX)
     passManager.addPass(gaussianBlurY)
 }
 

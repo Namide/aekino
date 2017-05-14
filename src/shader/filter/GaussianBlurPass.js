@@ -68,8 +68,6 @@ export default class GaussianBlurPass extends Pass
         power = 1,
         depthCurve = 100 })
     {
-        
-        
         super(null, 'aVertexPosition', 'uColor')
         
         this.power = power
@@ -106,17 +104,16 @@ export default class GaussianBlurPass extends Pass
         {
             const kernel = kernels[i]
             chunkFct += `
-            vec4 blur${i + 1}(sampler2D image, vec2 uv) {
-                vec2 move;
-                vec4 colorCurrent = texture2D(image, uv);
-                vec4 color = colorCurrent * ${f(kernel[0])};`
+            vec4 blur${i + 1}(sampler2D i, vec2 uv) {
+                vec2 m;
+                vec4 color = texture2D(i, uv) * ${f(kernel[0])};`
 
             for (let j = 1; j < kernel.length; j++)
             {
                 chunkFct += `
-                move = ${xBlur ? 'vec2(' + j + '.0 * ' + powerStr + ' / float(uSize), 0.0)' : ('vec2(0.0, ' + j + '.0 * ' + powerStr + ' / float(uSize))')};
-                color += texture2D(image, uv + move) * ${ f(kernel[j]) };
-                color += texture2D(image, uv - move) * ${ f(kernel[j]) };`
+                m = ${xBlur ? 'vec2(' + j + '.0 * ' + powerStr + ' / float(uSize), 0.0)' : ('vec2(0.0, ' + j + '.0 * ' + powerStr + ' / float(uSize))')};
+                color += texture2D(i, uv + m) * ${ f(kernel[j]) };
+                color += texture2D(i, uv - m) * ${ f(kernel[j]) };`
             }
             
             chunkFct += 'return color; }'
