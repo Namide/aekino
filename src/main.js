@@ -57,7 +57,6 @@ import PassManager from './render/PassManager'
 
 import GaussianBlurPass from './shader/filter/GaussianBlurPass'
 
-const test = new GaussianBlurPass(0.1, 0.2, 5)
 
 
 // Use term "compile" not "init"
@@ -514,9 +513,22 @@ if (PASS_ENABLE)
     
     passManager = new PassManager(scene)
     passManager.resize(size[0] * resolution, size[1] * resolution)
-    passManager.addPass(pass)
-    passManager.addPass(pass2)
-    passManager.addPass(pass3)
+    // passManager.addPass(pass)
+    // passManager.addPass(pass2)
+    // passManager.addPass(pass3)
+    const gaussianOptions = {
+        minDepth: 0.52,
+        maxDepth: 0.7,
+        samples: 20,
+        xBlur: true,
+        power: 1,
+        depthCurve: 50
+    }
+    const gaussianBlurX = new GaussianBlurPass(gaussianOptions)
+    gaussianOptions.xBlur = false
+    const gaussianBlurY = new GaussianBlurPass(gaussianOptions)
+    passManager.addPass(gaussianBlurX)
+    passManager.addPass(gaussianBlurY)
 }
 
 

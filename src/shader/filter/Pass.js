@@ -46,6 +46,20 @@ export default class Pass extends Mesh
         super(geom, program)
     }
     
+    useUWidth(label, width)
+    {
+        const uniform = new Uniform(label, 5124 /* gl.INT */, width)
+        this.uWidth = uniform
+        this.addUniform(uniform)
+    }
+    
+    useUHeight(label, height)
+    {
+        const uniform = new Uniform(label, 5124 /* gl.INT */, height)
+        this.uHeight = uniform
+        this.addUniform(uniform)
+    }
+    
     useColorTexture(label)
     {
         const texture = new TextureContainer(label)
