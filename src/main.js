@@ -57,6 +57,7 @@ import PassManager from './render/PassManager'
 
 import GaussianBlurPass from './shader/filter/GaussianBlurPass'
 import FogPass from './shader/filter/FogPass'
+// import FXAAPass from './shader/filter/FXAAPass'
 
 
 
@@ -520,21 +521,21 @@ if (PASS_ENABLE)
     // passManager.addPass(pass3)
     
     const fogPass = new FogPass({
-        minDepth: 0.50,
+        minDepth: 0.5,
         maxDepth: 0.6,
         minPower: 0,
         maxPower: 1,
         depthCurve: 100,
-        color: [1.0, 1.0, 1.0]
+        color: [0.9, 0.95, 1.0]
     })
     passManager.addPass(fogPass)
     
     const gaussianOptions = {
         minDepth: 0.52,
         maxDepth: 0.7,
-        samples: 10,
+        samples: 20,
         xBlur: true,
-        power: 2,
+        power: 1,
         depthCurve: 50
     }
     const gaussianBlurX = new GaussianBlurPass(gaussianOptions)
@@ -543,6 +544,10 @@ if (PASS_ENABLE)
     gaussianOptions.xBlur = false
     const gaussianBlurY = new GaussianBlurPass(gaussianOptions)
     passManager.addPass(gaussianBlurY)
+    
+    // const fxaaPass = new FXAAPass()
+    // passManager.addPass(fxaaPass)
+    
 }
 
 
