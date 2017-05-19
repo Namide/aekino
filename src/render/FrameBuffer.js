@@ -43,11 +43,6 @@ export default class FrameBuffer
         
         return true
     }
-
-    /*draw(gl)
-    {
-        this.texture.draw(gl)
-    }*/
     
     bind(gl)
     {
@@ -58,9 +53,4 @@ export default class FrameBuffer
     {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null)
     }
-    
-    /* draw(gl, location, index)
-    {
-        
-    }*/
 }

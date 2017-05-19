@@ -47,12 +47,20 @@ export default class Texture
         this.setTarget()
     }
     
-    resize(width, height)
+    resize(width, height, gl = null)
     {
         this.width = width
         this.height = height
         
-        this.sizeUpdated = true
+        if (gl)
+        {
+            gl.bindTexture(this.target, this.pointer)
+            gl.texImage2D(this.target, 0, this.internalFormat, this.width, this.height, 0, this.format, this.type, this.img)
+        }
+        else
+        {
+            this.updated = true
+        }
     }
     
     setTempColor(color)
@@ -141,6 +149,7 @@ export default class Texture
     setParam(label, value)
     {
         const i = this.parameters.find(p => p[0] === label)
+
         if (i > -1)
             this.parameters[i][1] = value
         else
@@ -253,13 +262,15 @@ export default class Texture
             gl.uniform1i(location, index)
             gl.activeTexture(gl.TEXTURE0 + index)
             gl.bindTexture(this.target, this.pointer)
+
+            if (this.updated)
+            {
+                gl.texImage2D(this.target, 0, this.internalFormat, this.width, this.height, 0, this.format, this.type, this.img)
+                this.updated = false
+            }
         }
         
-        if (this.sizeUpdated)
-        {
-            gl.texImage2D(this.target, 0, this.internalFormat, this.width, this.height, 0, this.format, this.type, this.img)
-            this.sizeUpdated = false
-        }
+
         
         /*if (this === Texture.last)
             return false*/

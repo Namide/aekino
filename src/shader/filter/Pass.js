@@ -45,6 +45,15 @@ export default class Pass extends Mesh
         
         super(geom, program)
     }
+
+    resize(width, height)
+    {
+        if (this.uWidth)
+            this.uWidth.data = width
+        
+        if (this.uHeight)
+            this.uHeight.data = height
+    }
     
     useUWidth(label, width)
     {

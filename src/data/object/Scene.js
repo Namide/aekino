@@ -48,12 +48,7 @@ export default class Scene
         const cam = this.cam
         this.uniforms.push(cam)
     }
-    
-    /*addCam(cam)
-    {
-        this.cam = cam
-    }*/
-    
+        
     addMesh(mesh)
     {
         this.meshs.push(mesh)

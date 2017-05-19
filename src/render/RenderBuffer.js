@@ -36,7 +36,7 @@ export default class RenderBuffer
         this.width = width
         this.height = height
         
-        this.sizeUpdated = true
+        this.updated = true
     }
     
     isInitialized()
@@ -57,15 +57,10 @@ export default class RenderBuffer
     {
         gl.bindRenderbuffer(gl.RENDERBUFFER, renderBuffer)
         
-        if (this.sizeUpdated)
+        if (this.updated)
         {
             gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width, this.height)
-            this.sizeUpdated = false
+            this.updated = false
         }
     }
-    
-    /* draw(gl, location, index)
-    {
-        
-    }*/
 }

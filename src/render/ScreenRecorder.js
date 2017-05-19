@@ -36,6 +36,8 @@ export default class ScreenRecorder
         this.width = width
         this.height = height
         
+        this.updated = false
+
         this._pingpong = false
         this._colorTextures = [
             this._genColorTexture('frameBufferColor0', width, height),
@@ -115,18 +117,10 @@ export default class ScreenRecorder
     
     resize(width, height)
     {
-        this.pingpong()
-        this.colorTexture.setImg(null, width, height)
-        
-        this.pingpong()
-        this.colorTexture.setImg(null, width, height)
-        
-        
-        if (this.depthTexture)
-            this.depthTexture.setImg(null, width, height)
-        
-        if (this.renderBuffer)
-            this.renderBuffer.resize(width, height)
+        this.width = width
+        this.height = height
+
+        this.updated = true
     }
     
     isInitialized()
@@ -199,9 +193,34 @@ export default class ScreenRecorder
     {
         this.texture.draw(gl)
     }*/
+
+    _update(gl)
+    {
+        const width = this.width
+        const height = this.height
+
+        this.pingpong()
+        this.colorTexture.resize(width, height, gl)
+        
+        this.pingpong()
+        this.colorTexture.resize(width, height, gl)
+        
+        
+        if (this.depthTexture)
+            this.depthTexture.resize(width, height, gl)
+        
+        if (this.renderBuffer)
+            this.renderBuffer.resize(width, height, gl)
+
+        this.updated = false
+    }
     
     start(gl, captureDepth = true)
     {
+        if (this.updated)
+            this._update(gl)
+
+
         this.frameBuffer.bind(gl)
         
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.colorTexture.pointer, 0)
