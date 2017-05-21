@@ -49,6 +49,8 @@ import Geom from './data/geom/Geom'
 import SmartTexture from './data/texture/SmartTexture'
 
 import Mesh from './data/object/Mesh'
+import Mesh3D from './data/object/Mesh3D'
+import Background3D from './data/object/Background3D'
 import Camera3D from './data/object/Camera3D'
 import Scene from './data/object/Scene'
 import Pass from './shader/filter/Pass'
@@ -68,7 +70,7 @@ const canvas = document.body.querySelector('canvas')
 
 // Camera
 const cam3D = new Camera3D('uPMatrix')
-// cam3D.matrix.translate([-1.5, 0.0, -7.0])
+// cam3D.matrix.translate([0, 0, -7.0])
 
 
 // Scene
@@ -182,11 +184,8 @@ const pyramidGeom = new Geom()
 pyramidGeom.addVertices('aVertexPosition', pyramidVertices, 3)
 pyramidGeom.addVertices('aVertexColor', pyramidColors, 4)
     
-const pyramidMesh = new Mesh(pyramidGeom, colorProgram)
-const pyramidUniformMatrix = new Transform3D('uMVMatrix')
-pyramidMesh.addUniform(pyramidUniformMatrix)
-pyramidMesh.matrix = pyramidUniformMatrix.data
-pyramidMesh.matrix.translate([-1.5, -1.5, -8.0])
+const pyramidMesh = new Mesh3D(pyramidGeom, colorProgram)
+pyramidMesh.translate([-1.5, -1.5, 0])
 scene.addMesh(pyramidMesh)
 
 
@@ -269,7 +268,7 @@ const cubeMesh = new Mesh(cubeGeom, fogProgram)
 const cubeUniformMatrix = new Transform3D('uMVMatrix')
 cubeMesh.addUniform(cubeUniformMatrix)
 cubeMesh.matrix = cubeUniformMatrix.data
-cubeMesh.matrix.translate([1.5, -1.5, -8.0])
+cubeMesh.matrix.translate([1.5, -1.5, 0])
 scene.addMesh(cubeMesh)
 
 
@@ -285,7 +284,7 @@ const pyramidMesh2 = new Mesh(pyramidGeom, colorProgram)
 const pyramidUniformMatrix2 = new Transform3D('uMVMatrix')
 pyramidMesh2.addUniform(pyramidUniformMatrix2)
 pyramidMesh2.matrix = pyramidUniformMatrix2.data
-pyramidMesh2.matrix.translate([-1.5, 1.5, -8.0])
+pyramidMesh2.matrix.translate([-1.5, 1.5, 0])
 pyramidMesh2.matrix.scale([1, -1, 1])
 
 scene.addMesh(pyramidMesh2)
@@ -387,7 +386,7 @@ cubeTexturedMesh.addUniform(cubeTexturedUniformMatrix)
 cubeTexturedMesh.matrix = cubeTexturedUniformMatrix.data
 cubeTexturedMesh.addTexture(cubeTexture)
 cubeTexturedMesh.addTexture(cubeTexture2)
-cubeTexturedMesh.matrix.translate([1.5, 1.5, -8.0])
+cubeTexturedMesh.matrix.translate([1.5, 1.5, 0])
 scene.addMesh(cubeTexturedMesh)
 
 
@@ -405,8 +404,103 @@ cubeTexturedMesh2.addUniform(cubeTexturedUniformMatrix2)
 cubeTexturedMesh2.matrix = cubeTexturedUniformMatrix2.data
 cubeTexturedMesh2.addTexture(cubeTexture)
 cubeTexturedMesh2.addTexture(cubeTexture2)
-cubeTexturedMesh2.matrix.translate([0, 0, -15.0])
+cubeTexturedMesh2.matrix.translate([0, 0, -8.0])
 scene.addMesh(cubeTexturedMesh2)
+
+
+// Optimize order by program (reduce calls)
+scene.sort()
+
+
+
+
+
+
+
+// ----------------------------
+//
+//      SKYBOX
+//
+// ----------------------------
+
+const skyboxVertexShader = `   
+    attribute vec3 aVertexPosition;
+    attribute vec2 aTextureCoord;
+
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+
+    varying vec2 vTextureCoord;
+
+    void main(void) {
+
+        mat4 persp = uPMatrix;
+/*
+        // persp[0][0] = 1.0;
+        persp[0][1] = 0.0;
+        persp[0][2] = 0.0;
+        persp[0][3] = 0.0;
+        persp[1][0] = 0.0;
+        // persp[1][1] = 1.0;
+        persp[1][2] = 0.0;
+        persp[1][3] = 0.0;
+        persp[2][0] = 0.0;
+        persp[2][1] = 0.0;
+        // persp[2][2] = 1.0;
+        // persp[2][3] = 0.0;
+        persp[3][0] = 0.0;
+        persp[3][1] = 0.0;
+        // persp[3][2] = 0.0;
+        // persp[3][3] = 0.0; // 1.0;
+*/
+
+        /*persp[3][0] = 0.0;
+        persp[3][1] = 0.0;
+        persp[3][2] = 0.0;
+
+        persp[0][0] *= 100.0;
+        persp[0][1] *= 100.0;
+        persp[0][2] *= 100.0;
+        persp[0][3] *= 100.0;
+        persp[1][0] *= 100.0;
+        persp[1][1] *= 100.0;
+        persp[1][2] *= 100.0;
+        persp[1][3] *= 100.0;
+        persp[2][0] *= 100.0;
+        persp[2][1] *= 100.0;
+        persp[2][2] *= 100.0;
+        persp[2][3] *= 100.0;*/
+
+
+        // persp[3][3] = 0.0;
+
+        gl_Position = persp * uMVMatrix * vec4(aVertexPosition, 1.0);
+        vTextureCoord = aTextureCoord;
+    }`
+
+const skyboxFragmentShader = `
+    precision mediump float;
+
+    varying vec2 vTextureCoord;
+
+    uniform sampler2D uDiffuse1;
+
+    void main(void) {
+        vec4 color1 = texture2D(uDiffuse1, vec2(vTextureCoord.s, vTextureCoord.t));
+        gl_FragColor = color1;
+    }`
+
+const skyboxProgram = new Program(skyboxVertexShader, skyboxFragmentShader)
+const skybox = new Background3D(cubeTexturedGeom, skyboxProgram)
+skybox.addTexture(cubeTexture)
+// skybox.addTexture(cubeTexture2)
+skybox.translate([0, 0, 0])
+skybox.scale([10, 10, 10])
+scene.addMesh(skybox)
+
+
+
+
 
 
 // Optimize order by program (reduce calls)
@@ -435,19 +529,19 @@ if (PASS_ENABLE)
         minDepth: 0.5,
         maxDepth: 0.6,
         minPower: 0,
-        maxPower: 1,
+        maxPower: 0.5,
         depthCurve: 100,
         color: [0.9, 0.95, 1.0]
     })
     passManager.addPass(fogPass)
     
     const gaussianOptions = {
-        minDepth: 0.52,
-        maxDepth: 0.7,
+        minDepth: 0.95,
+        maxDepth: 1,
         samples: 20,
         xBlur: true,
         power: 1,
-        depthCurve: 50
+        depthCurve: 1
     }
     const gaussianBlurX = new GaussianBlurPass(gaussianOptions)
     passManager.addPass(gaussianBlurX)
@@ -460,24 +554,127 @@ if (PASS_ENABLE)
 
 
 
-const resize = () =>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// CAMERA ROTATION
+
+let rotX = 0
+let rotY = 0
+let zoom = 2.5
+
+const winSize = [0, 0]
+const mousePos = [0, 0]
+
+
+document.body.addEventListener('mousedown', down)
+window.addEventListener('wheel', wheel)
+
+function wheel(event = null)
 {
-    const size = [window.innerWidth, window.innerHeight]
+    let delta = 0
+    if (event)
+    {
+        if (event.wheelDelta)
+            delta = event.wheelDelta
+        else if (event.detail)
+            delta = -40 * event.detail
+        else if (event.deltaY)
+            delta = -40 * event.deltaY
+    }
+    
+    zoom -= delta / 1000
+    zoom = Math.min(Math.max(zoom, 0.37), 3)
+    cam3D.fovy = zoom * 45
+}
+
+
+function down(event)
+{   
+    const body = document.body
+
+    mousePos[0] = event.clientX
+    mousePos[1] = event.clientY
+    
+    body.removeEventListener('mousemove', move)
+    body.removeEventListener('mouseup', up)
+    body.removeEventListener('mouseleave', up)
+    
+    body.addEventListener('mousemove', move)
+    body.addEventListener('mouseup', up)
+    body.addEventListener('mouseleave', up)
+    
+    body.classList.add('is-grabbing')
+}
+
+function move(event)
+{
+    const x = event.clientX
+    const y = event.clientY
+    
+    const sx = (x - mousePos[0]) / winSize[0]
+    const sy = (y - mousePos[1]) / winSize[1]
+    
+    mousePos[0] = x
+    mousePos[1] = y
+    
+    rotX += sx * Math.PI * 2
+    rotY += sy * Math.PI
+    
+    rotY = Math.max(Math.min(rotY, Math.PI * 0.3), -Math.PI * 0.3)
+}
+
+function up(event)
+{
+    const body = document.body
+
+    body.removeEventListener('mousemove', move)
+    body.removeEventListener('mouseup', up)
+    body.removeEventListener('mouseleave', up)
+    body.classList.remove('is-grabbing')
+}
+
+function resize()
+{
     const resolution = 1
 
+    winSize[0] = window.innerWidth
+    winSize[1] = window.innerHeight
+
     if (PASS_ENABLE)
-        passManager.resize(size[0] * resolution, size[1] * resolution)
+        passManager.resize(winSize[0] * resolution, winSize[1] * resolution)
     else
-        scene.resize(size[0] * resolution, size[1] * resolution)
+        scene.resize(winSize[0] * resolution, winSize[1] * resolution)
 
 
-    canvas.width = size[0] * resolution
-    canvas.height = size[1] * resolution
+    canvas.width = winSize[0] * resolution
+    canvas.height = winSize[1] * resolution
 
-    cam3D.update(...size)
+    // cam3D.update(...size)
 }
+
 window.onresize = resize
 resize()
+wheel()
+
+
+
+
+
+
+
 
 
 
@@ -492,7 +689,18 @@ refresh()
 function refresh()
 {    
     // console.time('draw')
-    pyramidMesh.matrix.rotate(0.005, [0, 1, 0])
+
+
+    // Camera
+    cam3D.matrix.identity()
+    cam3D.matrix.translate([0.0, 0.0, -zoom])
+    cam3D.matrix.rotate(rotY, [1, 0, 0])
+    cam3D.matrix.rotate(rotX, [0, 1, 0])
+
+
+    // Objects
+    skybox.rotateZ(0.001)
+    pyramidMesh.rotateY(0.005)
     pyramidMesh2.matrix.rotate(-0.005, [0, 1, 0])
     cubeMesh.matrix.rotate(0.01, [0, 1, 0])
     cubeTexturedMesh.matrix.rotate(-0.01, [0, 1, 0])

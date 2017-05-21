@@ -89,6 +89,12 @@ export default class Scene
         gl.viewportHeight = h*/
         this.width = w
         this.height = h
+
+        if (this.cam)
+        {
+            this.cam.ratio = this.width / this.height
+            this.cam.update()
+        }
     }
     
     init(canvas)
@@ -144,9 +150,14 @@ export default class Scene
         gl.viewport(0, 0, this.width, this.height)
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
         
-        
         if (this.cam.updated)
-            this.cam.update(this.width, this.height)
+        {
+            if (this.cam.ratio <= 0)
+                this.cam.ratio = this.width / this.height
+
+            this.cam.update()
+        }
+        
         
         for (const mesh of this.meshs)
         {

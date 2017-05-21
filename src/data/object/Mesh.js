@@ -39,7 +39,7 @@ export default class Mesh
         this.localCalls = []
         this.globalCalls = []
         
-        this.order = 0
+        this.order = 1
         this.visible = true
         this.depthTest = null
         

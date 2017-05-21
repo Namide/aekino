@@ -445,14 +445,11 @@ export default class Matrix4 extends Float32Array
     {
         const s = Math.sin(rad)
         const c = Math.cos(rad)
-        const a00 = a[0]
-        const a01 = a[1]
-        const a02 = a[2]
-        const a03 = a[3]
-        const a20 = a[8]
-        const a21 = a[9]
-        const a22 = a[10]
-        const a23 = a[11]
+        const [a00, a01, a02, a03] = this
+        const a20 = this[8]
+        const a21 = this[9]
+        const a22 = this[10]
+        const a23 = this[11]
 
         // Perform axis-specific matrix multiplication
         this[0] = a00 * c - a20 * s
@@ -471,7 +468,7 @@ export default class Matrix4 extends Float32Array
     {
         const s = Math.sin(rad)
         const c = Math.cos(rad)
-        const [a00, a01, a0, a03, a10, a11, a12, a13] = this
+        const [a00, a01, a02, a03, a10, a11, a12, a13] = this
 
         // Perform axis-specific matrix multiplication
         this[0] = a00 * c + a10 * s
@@ -680,7 +677,7 @@ export default class Matrix4 extends Float32Array
         return this
     }
 
-    getTranslation(mat, vec3 = new Float32Array(3))
+    getTranslation(vec3 = new Float32Array(3))
     {
         vec3[0] = this[12]
         vec3[1] = this[13]

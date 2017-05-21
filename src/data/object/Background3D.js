@@ -22,47 +22,16 @@
  * THE SOFTWARE.
  */
 
-import Matrix4 from '../../math/Matrix4'
-import Uniform from '../uniform/Uniform'
+import Mesh3D from './Mesh3D'
 
 
-export default class Camera3D extends Uniform
+export default class Background3D extends Mesh3D
 {
-    constructor(label)
+    constructor(geom, program)
     {
-        super(label, 35676, new Matrix4())
-       
-        this.fovy = 45
-        this.near = 0.1
-        this.far = 1000
-        this._matrix = new Matrix4()
-        
-        this.updated = true
+        super(geom, program)
 
-        this._ratio = 0
-    }
-
-    get matrix()
-    {
-        this.updated = true
-        return this._matrix
-    }
-
-    get ratio()
-    {
-        return this._ratio
-    }
-
-    set ratio(ratio)
-    {
-        this._ratio = ratio
-        this.updated = true
-    }
-    
-    update()
-    {
-        this.data.perspective(this.fovy * Math.PI / 180, this._ratio, 0.1, 100.0)
-        this.data.multiply(this._matrix)
-        this.updated = false
+        this.depthTest = false
+        this.order = -1
     }
 }
