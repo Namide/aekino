@@ -25,16 +25,18 @@
 import CallOptimizer from '../../render/CallOptimizer'
 
 
-export default class Scene
+export default class Group
 {
-    constructor(canvas, cam)
+    constructor()
     {
-        this.canvas = canvas
-        this.init(canvas)
         this.meshs = []
-        this.cam = cam
-        this.uniforms = [cam]
-        this.depthTest = true
+                
+        this.order = 0
+        this.visible = true
+        this.depthTest = null
+        
+        this._isInitialized = false
+
         this.sortCompare = (mesh1, mesh2) =>
         {
             if (mesh1.order !== mesh2.order)
@@ -52,88 +54,59 @@ export default class Scene
 
             return 0
         }
-        
-        this.resize(canvas.width, canvas.height)
     }
-    
-    _addCamToMeshs()
-    {
-        const cam = this.cam
-        this.uniforms.push(cam)
-    }
-        
+
     addMesh(mesh)
     {
         this.meshs.push(mesh)
-        
-        if (!mesh.isInitialized())
-            mesh.init(this.gl, this.uniforms)
     }
-    
-    rmMesh(mesh)
+
+    rmMesh()
     {
         const id = this.meshs.indexOf(mesh)
         if (id > -1)
             this.meshs.splice(id, 1)
     }
-    
+
     sort()
     {
         this.meshs.sort(this.sortCompare)
     }
     
-    resize(w, h)
+    isInitialized()
     {
-        /*const gl = this.gl
-        gl.viewportWidth = w
-        gl.viewportHeight = h*/
-        this.width = w
-        this.height = h
+        for (const mesh of this.meshs)
+            if (!mesh.isInitialized())
+                return false
+        
+        return true
     }
     
-    init(canvas)
+    dispose()
     {
-        let gl
-        
-        try
-        {
-            gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
-            // gl.viewportWidth = canvas.width
-            // gl.viewportHeight = canvas.height
-            // console.log(gl.viewportWidth)
-        }
-        catch(e)
-        {
-            console.error('Could not initialise WebGL:', e.message)
-        }
-        
-        if (!gl)
-        {
-            console.error('Could not initialise WebGL')
-        }
+        for (const mesh of this.meshs)
+            mesh.dispose()
 
-        
+        return true
+    }
+    
+    init(gl, globalUniforms)
+    {
+        let success = true
+
+
+        for (const mesh of this.meshs)
+            if (!mesh.init(gl, globalUniforms))
+                success = false
+
         this._callOptimizer = CallOptimizer.getInstance(gl)
-        
-        this.gl = gl
-    }
-    
-    set bgColor([r, g, b, a = 1])
-    {
-        this.gl.clearColor(r, g, b, a)
-        this._bgColor = [r, g, b, a]
-    }
-    
-    get bgColor()
-    {
-        return this._bgColor
-    }
-    
-    draw()
-    {
-        const gl = this.gl        
 
-        if (!this._callOptimizer.optimizeDepthTest(this.depthTest))
+        return success
+    }
+    
+    draw(gl, customCalls = [])
+    {
+        if (this.depthTest !== null && !this._callOptimizer.optimizeDepthTest(this.depthTest))
         {
             if (this.depthTest)
                 gl.enable(gl.DEPTH_TEST)
@@ -141,22 +114,7 @@ export default class Scene
                 gl.disable(gl.DEPTH_TEST)
         }
 
-        gl.viewport(0, 0, this.width, this.height)
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-        
-        
-        if (this.cam.updated)
-            this.cam.update(this.width, this.height)
-        
         for (const mesh of this.meshs)
-        {
-            if (mesh.visible)
-            {
-                if (mesh.isInitialized())
-                    mesh.draw(gl)
-                else
-                    mesh.init(gl, this.uniforms)
-            }
-        }        
+            mesh.draw(gl, customCalls)
     }
 }

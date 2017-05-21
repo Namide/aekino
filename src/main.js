@@ -409,7 +409,6 @@ cubeTexturedMesh2.matrix.translate([0, 0, -15.0])
 scene.addMesh(cubeTexturedMesh2)
 
 
-
 // Optimize order by program (reduce calls)
 scene.sort()
 

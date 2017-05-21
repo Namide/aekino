@@ -40,6 +40,8 @@ export default class Mesh
         this.globalCalls = []
         
         this.order = 0
+        this.visible = true
+        this.depthTest = null
         
         this._isInitialized = false
     }
@@ -189,20 +191,29 @@ export default class Mesh
         
         // Save global uniforms
         this.globalUniforms = [...globalUniforms]
-            
         
+
+        this._callOptimizer = CallOptimizer.getInstance(gl)
+        
+
         this._isInitialized = success
+
         return success
     }
     
     draw(gl, customCalls = [])
     {
-        const callOptimizer = CallOptimizer.getInstance(gl)
+        if (this.depthTest !== null && !this._callOptimizer.optimizeDepthTest(this.depthTest))
+        {
+            if (this.depthTest)
+                gl.enable(gl.DEPTH_TEST)
+            else
+                gl.disable(gl.DEPTH_TEST)
+        }
 
         // Use program, if ok call globals
         const program = this.program
-        const optimizeProgram = callOptimizer.optimizeProgram(program)
-        if (!optimizeProgram)
+        if (!this._callOptimizer.optimizeProgram(program))
         {
             this.program.bind(gl)
             

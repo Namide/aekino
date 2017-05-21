@@ -28,6 +28,7 @@ class CallOptimizer
     {
         this.lastTexture = null
         this.lastProgram = null
+        this.lastDepthTest = false
     }
     
     optimizeTexture(texture)
@@ -44,6 +45,14 @@ class CallOptimizer
         this.lastProgram = program
         
         return program === lastProgram
+    }
+
+    optimizeDepthTest(value)
+    {
+        const lastDepthTest = this.lastDepthTest
+        this.lastDepthTest = value
+
+        return lastDepthTest === value
     }
     
     static getInstance(gl)

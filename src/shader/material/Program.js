@@ -49,7 +49,7 @@ const fs = `
 `
 */
 
-let num = 0
+let _ID = 0
 
 export default class Program
 {
@@ -64,7 +64,7 @@ export default class Program
         this.textureIndex = {}
         this.textureNum = 0
         
-        this.id = ++num
+        this.id = _ID++
     }
     
     isInitialized()

@@ -24,11 +24,13 @@
 
 import CallOptimizer from '../../render/CallOptimizer'
 
+let _ID = 0
 
 export default class Texture
 {
     constructor(label)
     {
+        this.id = _ID++
         this.label = label
         this.mipmap = true
         
@@ -51,7 +53,7 @@ export default class Texture
     {
         this.width = width
         this.height = height
-        
+
         if (gl)
         {
             gl.bindTexture(this.target, this.pointer)
@@ -232,6 +234,7 @@ export default class Texture
         {
             Texture.SET_DATA(gl)
         }
+
         
         /*
             gl.getParameter(gl.MAX_TEXTURE_SIZE)
@@ -245,6 +248,7 @@ export default class Texture
         this.initParams(gl)
         
         
+        this._callOptimizer = CallOptimizer.getInstance(gl)
         this.pointer = texture
         
         return true
@@ -252,9 +256,7 @@ export default class Texture
 
     bind(gl, location, index)
     {
-        const callOptimizer = CallOptimizer.getInstance(gl)
-        const optimizeTexture = callOptimizer.optimizeTexture(this)
-        if (!optimizeTexture)
+        if (!this._callOptimizer.optimizeTexture(this))
         {
             gl.uniform1i(location, index)
             gl.activeTexture(gl.TEXTURE0 + index)

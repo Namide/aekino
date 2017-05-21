@@ -314,7 +314,6 @@ export default class Matrix4 extends Float32Array
         b1 = mat4x4[5]
         b2 = mat4x4[6]
         b3 = mat4x4[7]
-
         this[4] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30
         this[5] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31
         this[6] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32
