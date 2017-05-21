@@ -234,9 +234,9 @@ export default class Texture
         }
         
         /*
-        gl.getParameter(gl.MAX_TEXTURE_SIZE)
-        gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS)
-        gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS)
+            gl.getParameter(gl.MAX_TEXTURE_SIZE)
+            gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS)
+            gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS)
         */
         
         
@@ -244,16 +244,13 @@ export default class Texture
         gl.texImage2D(this.target, 0, this.internalFormat, this.width, this.height, 0, this.format, this.type, this.img)
         this.initParams(gl)
         
-        /*const location = program.getTextureLocation(this.label)
-        const index = program.getTextureIndex(this.label)
-        gl.uniform1i(location, index)*/
         
         this.pointer = texture
         
         return true
     }
-    
-    draw(gl, location, index)
+
+    bind(gl, location, index)
     {
         const callOptimizer = CallOptimizer.getInstance(gl)
         const optimizeTexture = callOptimizer.optimizeTexture(this)
@@ -269,18 +266,6 @@ export default class Texture
                 this.updated = false
             }
         }
-        
-
-        
-        /*if (this === Texture.last)
-            return false*/
-        
-        // const index = program.getTextureIndex(this.label)
-            
-        // gl.uniform1i(program.getTextureLocation(this.label), 0)
-        
-        /*Texture.last = this
-        return true*/
     }
     
     free(gl)

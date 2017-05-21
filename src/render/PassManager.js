@@ -47,7 +47,7 @@ export default class PassManager
     resize(width, height)
     {
         this.scene.resize(width, height)
-        this.screenRecorder.resize(width, height)
+        this.screenRecorder.resize(width, height, this.scene.gl)
         
         for (const pass of this.passList)
             pass.resize(width, height)
@@ -62,7 +62,7 @@ export default class PassManager
     init(gl)
     {
         this.screenRecorder.init(gl)
-        
+
         if (!this.screenRecorder.depthTexture)
             for (const pass of this.passList)
                 this._disableDepthInTexture(pass, gl)
@@ -125,7 +125,6 @@ export default class PassManager
 
                 if (pass.inColorTexture)
                     pass.inColorTexture.setTexture(this.screenRecorder.colorTexture)
-
 
                 if (pass.inDepthTexture && this.screenRecorder.depthTexture)
                     pass.inDepthTexture.setTexture(this.screenRecorder.depthTexture)

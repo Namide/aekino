@@ -36,15 +36,6 @@ export default class Geom
         this.numItems = 0
     }
     
-    /*isInitialized()
-    {
-        for (const buffer of this.attributes)
-            if (!buffer.isInitialized())
-                return false
-        
-        return true
-    }*/
-    
     addVertices(label, vertices, dimension)
     {
         const attribute = new Attribute(label)
@@ -71,37 +62,22 @@ export default class Geom
         this.numItems = indices.length
     }
     
-    /*init(gl, program)
-    {
-        let success = true
-        
-        for (const attribute of this.attributes)
-            if (!attribute.isInitialized())
-                if (!attribute.init(gl, program))
-                    success = false
-                    
-        for (const buffer of this.buffers)
-            if (!buffer.isInitialized())
-                if (!buffer.init(gl, program))
-                    success = false      
-                    
-        return success
-    }*/
-    
-    /*draw(gl, program)
-    {
-        for(const attribute of this.attributes)
-            attribute.draw(gl, program)
-                    
-        for (const buffer of this.buffers)
-            buffer.draw(gl, program)
-    }*/
-    
     display(gl)
     {
         if (this.hasIndices)
             gl.drawElements(gl.TRIANGLES, this.numItems, gl.UNSIGNED_SHORT, 0);
         else
             gl.drawArrays(gl.TRIANGLES, 0, this.numItems)
-    }   
+    }
+
+    clone(geom = new Geom())
+    {
+        geom.attributes = this.attributes.map(a => a.clone())
+        geom.buffers = this.buffers.map(b => b.clone())
+        
+        geom.hasIndices = this.hasIndices
+        geom.numItems = this.numItems
+
+        return geom
+    }
 }

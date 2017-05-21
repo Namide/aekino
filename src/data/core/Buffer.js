@@ -26,12 +26,17 @@ export default class Buffer
 {
     constructor()
     {
-        this.buffer = null
+        this.pointer = null
+        this.gl = null
+
+        this.arrayType = 34962
+        this.data = null
+        this.arrayUsage = 35044
     }
     
     isInitialized()
     {
-        return !!this.buffer
+        return !!this.pointer
     }
     
     /**
@@ -56,11 +61,18 @@ export default class Buffer
      *      Contents of the buffer are likely to not be used often.
      *      Contents are written to the buffer, but not read.
      */
-    setArray(data, type = 34962, usage = 35044)
+    setArray(data, type = this.arrayType, usage = this.arrayUsage)
     {
         this.arrayType = type
         this.data = data
         this.arrayUsage = usage
+
+        const gl = this.gl
+        if (gl)
+        {
+            gl.bindBuffer(type, this.pointer)
+            gl.bufferData(type, data, arrayUsage)
+        }
     }
     
     /**
@@ -94,19 +106,26 @@ export default class Buffer
     
     init(gl)
     {
-        // Create buffer
         const buffer = gl.createBuffer()
         gl.bindBuffer(this.arrayType, buffer)
         gl.bufferData(this.arrayType, this.data, this.arrayUsage)
         
-        
-        this.buffer = buffer
-        
+        this.pointer = buffer
+        this.gl = gl
+
         return true
     }
     
-    draw(gl)
+    bind(gl)
     {
-        gl.bindBuffer(this.arrayType, this.buffer)
+        gl.bindBuffer(this.arrayType, this.pointer)
+    }
+
+    clone(buffer = new Buffer())
+    {
+        buffer.setArray(this.data, this.arrayType, this.arrayUsage)
+        buffer.setItems(this.itemType, this.itemSize)
+
+        return buffer
     }
 }

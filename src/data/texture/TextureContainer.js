@@ -45,14 +45,10 @@ export default class TextureContainer
         this.target = texture.target
     }
     
-    draw(gl, location, index)
+    bind(gl, location, index)
     {
         gl.uniform1i(location, index)
         gl.activeTexture(gl.TEXTURE0 + index)
         gl.bindTexture(this.target, this.pointer)
-        
-        // console.log('CONT -', this.label)
-        // this.texture.draw(gl, location, index)
-        // console.log('- CONT')
     }
 }

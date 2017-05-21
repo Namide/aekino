@@ -103,30 +103,30 @@ export default class Mesh
         for (const attribute of this.geom.attributes)
         {
             const location = program.getAttribLocation(gl, attribute)
-            this.localCalls.push(attribute.draw.bind(attribute, gl, location))
+            this.localCalls.push(attribute.bind.bind(attribute, gl, location))
         }
         
         for (const buffer of this.geom.buffers)
         {
-            this.localCalls.push(buffer.draw.bind(buffer, gl))
+            this.localCalls.push(buffer.bind.bind(buffer, gl))
         }
         
         for (const uniform of this.uniforms)
         {
             const location = program.getUniformLocation(gl, uniform)
-            this.localCalls.push(uniform.draw.bind(uniform, gl, location))
+            this.localCalls.push(uniform.bind.bind(uniform, gl, location))
         }
         
         for (const texture of this.textures)
         {
             const [location, index] = program.getTextureLocationIndex(gl, texture)
-            this.localCalls.push(texture.draw.bind(texture, gl, location, index))
+            this.localCalls.push(texture.bind.bind(texture, gl, location, index))
         }
         
         for (const uniform of globalUniforms)
         {
             const location = program.getUniformLocation(gl, uniform)
-            this.globalCalls.push(uniform.draw.bind(uniform, gl, location))
+            this.globalCalls.push(uniform.bind.bind(uniform, gl, location))
         }
     }
     
@@ -173,7 +173,7 @@ export default class Mesh
         }
         else
         {
-            this.program.draw(gl)
+            this.program.bind(gl)
         }
         
         
@@ -204,7 +204,7 @@ export default class Mesh
         const optimizeProgram = callOptimizer.optimizeProgram(program)
         if (!optimizeProgram)
         {
-            this.program.draw(gl)
+            this.program.bind(gl)
             
             for(const callback of this.globalCalls)
                 callback()

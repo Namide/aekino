@@ -31,12 +31,20 @@ export default class RenderBuffer
         this.height = height
     }
     
-    resize(width, height)
+    resize(width, height, gl = null)
     {
         this.width = width
         this.height = height
         
-        this.updated = true
+        if (gl)
+        {
+            gl.bindRenderbuffer(gl.RENDERBUFFER, this.pointer)
+            gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height)
+        }
+        else
+        {
+            this.updated = true
+        }
     }
     
     isInitialized()

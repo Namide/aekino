@@ -435,9 +435,6 @@ if (PASS_ENABLE)
 
 
 
-
-
-
 const resize = () =>
 {
     const size = [window.innerWidth, window.innerHeight]
@@ -448,10 +445,9 @@ const resize = () =>
     else
         scene.resize(size[0] * resolution, size[1] * resolution)
 
+
     canvas.width = size[0] * resolution
     canvas.height = size[1] * resolution
-    canvas.style.width = size[0] + 'px'
-    canvas.style.height = size[1] + 'px'
 
     cam3D.update(...size)
 }
@@ -483,7 +479,6 @@ function refresh()
     else
         scene.draw()
 
-    
     // console.timeEnd('draw')
     
     requestAnimationFrame(refresh)

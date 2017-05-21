@@ -24,7 +24,7 @@
 
 export default class FrameBuffer
 {
-    constructor(width, height)
+    constructor()
     {
         this.pointer = null
     }
@@ -38,7 +38,7 @@ export default class FrameBuffer
     {
         const frameBuffer = gl.createFramebuffer()
         gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer)
-        
+
         this.pointer = frameBuffer
         
         return true

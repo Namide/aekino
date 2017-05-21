@@ -38,14 +38,14 @@ export default class Uniform
         this._init(type, isArray)
     }
     
-    // Generate draw function
+    // Generate bind function
     _init(type, isArray)
     {
         switch(this.type)
         {
             case 35676: // gl.FLOAT_MAT4
             {
-                this.draw = (gl, location) =>
+                this.bind = (gl, location) =>
                 {
                     gl.uniformMatrix4fv(location, false, this.data)
                 }
@@ -53,7 +53,7 @@ export default class Uniform
             }
             case 35665: // gl.FLOAT_VEC3
             {
-                this.draw = (gl, location) =>
+                this.bind = (gl, location) =>
                 {
                     gl.uniform3f(location, ...this.data)
                 }
@@ -61,14 +61,14 @@ export default class Uniform
                 break
             }
             case 5124 : // gl.INT
-                this.draw = (gl, location) =>
+                this.bind = (gl, location) =>
                 {
                     gl.uniform1i(location, this.data)
                 }
                 break
                 
             case -1 :
-                this.draw = (gl, location) =>
+                this.bind = (gl, location) =>
                 {
                     gl.uniform1fv(location, this.data)
                 } 

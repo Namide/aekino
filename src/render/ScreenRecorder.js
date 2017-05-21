@@ -115,12 +115,24 @@ export default class ScreenRecorder
         return this._colorTextures[this._pingpong ? 1 : 0]
     }
     
-    resize(width, height)
+    resize(width, height, gl)
     {
         this.width = width
         this.height = height
 
-        this.updated = true
+
+        this.pingpong()
+        this.colorTexture.resize(width, height, gl)
+        
+        this.pingpong()
+        this.colorTexture.resize(width, height, gl)
+        
+        
+        if (this.depthTexture)
+            this.depthTexture.resize(width, height, gl)
+        
+        if (this.renderBuffer)
+            this.renderBuffer.resize(width, height, gl)
     }
     
     isInitialized()
@@ -188,55 +200,26 @@ export default class ScreenRecorder
         
         return true
     }
-
-    /*draw(gl)
-    {
-        this.texture.draw(gl)
-    }*/
-
-    _update(gl)
-    {
-        const width = this.width
-        const height = this.height
-
-        this.pingpong()
-        this.colorTexture.resize(width, height, gl)
-        
-        this.pingpong()
-        this.colorTexture.resize(width, height, gl)
-        
-        
-        if (this.depthTexture)
-            this.depthTexture.resize(width, height, gl)
-        
-        if (this.renderBuffer)
-            this.renderBuffer.resize(width, height, gl)
-
-        this.updated = false
-    }
     
     start(gl, captureDepth = true)
     {
-        if (this.updated)
-            this._update(gl)
-
-
         this.frameBuffer.bind(gl)
         
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.colorTexture.pointer, 0)
-        
         
         if (this.depthTexture)
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, captureDepth ? this.depthTexture.pointer : null, 0)
         else if (this.renderBuffer)
             gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, captureDepth ? this.renderBuffer.pointer : null)
         
-            
+           
         // this.frameBufferIndex.bind(gl)
     }
     
     stop(gl)
     {
+        // console.log(gl.FRAMEBUFFER_COMPLETE, gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT, gl.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT, gl.FRAMEBUFFER_INCOMPLETE_DIMENSIONS, gl.FRAMEBUFFER_UNSUPPORTED)
+        // console.log(gl.checkFramebufferStatus(gl.FRAMEBUFFER))
         this.frameBuffer.free(gl)
         // this.frameBufferIndex.free(gl)
     }

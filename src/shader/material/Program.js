@@ -134,7 +134,7 @@ export default class Program
         return [this.textureLocation[label], this.textureIndex[label]]
     }
     
-    draw(gl)
+    bind(gl)
     {
         gl.useProgram(this.pointer)
     }
