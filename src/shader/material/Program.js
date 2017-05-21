@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  */
 
+/*
 const vs = `      
     attribute vec3 aVertexPosition;
     attribute vec4 aVertexColor;
@@ -46,12 +47,13 @@ const fs = `
         gl_FragColor = vColor;
     }
 `
+*/
 
 let num = 0
 
 export default class Program
 {
-    constructor(vertexShaderSrc = vs, fragmentShaderSrc = fs)
+    constructor(vertexShaderSrc, fragmentShaderSrc)
     {
         this.vertexShaderSrc = vertexShaderSrc
         this.fragmentShaderSrc = fragmentShaderSrc

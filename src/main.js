@@ -77,9 +77,35 @@ scene.bgColor = [0.0, 0.0, 0.1, 1.0]
 scene.depthTest = true
 
 
+const vertexShader = `      
+    attribute vec3 aVertexPosition;
+    attribute vec4 aVertexColor;
+
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+
+    varying vec4 vColor;
+
+    void main(void) {
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+        vColor = aVertexColor;
+    }
+`
+
+const fragmentShader = `
+    precision mediump float;
+
+    varying vec4 vColor;
+
+    void main(void) {
+        gl_FragColor = vColor;
+    }
+`
+
+
 
 // Programs
-const colorProgram = new Program()
+const colorProgram = new Program(vertexShader, fragmentShader)
 
 const fogVertexShader = `
     attribute vec3 aVertexPosition;
@@ -97,7 +123,7 @@ const fogVertexShader = `
         vColor = modifyColor;
     }
 `
-const fogProgram = new Program(fogVertexShader)
+const fogProgram = new Program(fogVertexShader, fragmentShader)
 
 
 
