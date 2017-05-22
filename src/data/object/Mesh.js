@@ -58,6 +58,18 @@ export default class Mesh
             this.uniforms.splice(i, 1)
     }
     
+    addGlobalUniform(uniform)
+    {
+        this.globalUniforms.push(uniform)
+    }
+    
+    rmGlobalUniform(uniform)
+    {
+        const i = this.globalUniforms.indexOf(uniform)
+        if (i > -1)
+            this.globalUniforms.splice(i, 1)
+    }
+    
     addTexture(texture)
     {
         this.textures.push(texture)
@@ -98,7 +110,7 @@ export default class Mesh
     }
     
     // GET LOCATIONS (AND INDEX) AND SAVE IT FOR CALLS
-    _setCalls(gl, globalUniforms)
+    _setCalls(gl)
     {
         const program = this.program
         
@@ -125,7 +137,7 @@ export default class Mesh
             this.localCalls.push(texture.bind.bind(texture, gl, location, index))
         }
         
-        for (const uniform of globalUniforms)
+        for (const uniform of this.globalUniforms)
         {
             const location = program.getUniformLocation(gl, uniform)
             this.globalCalls.push(uniform.bind.bind(uniform, gl, location))
@@ -162,7 +174,7 @@ export default class Mesh
         this.localCalls.length = 0
     }
     
-    init(gl, globalUniforms)
+    init(gl)
     {
         const program = this.program
         let success = true
@@ -186,12 +198,8 @@ export default class Mesh
         
         // Store all calls (mesh data + global data)
         if (success && this.localCalls.length < 1)
-            this._setCalls(gl, globalUniforms)
-        
-        
-        // Save global uniforms
-        this.globalUniforms = [...globalUniforms]
-        
+            this._setCalls(gl)
+                
 
         this._callOptimizer = CallOptimizer.getInstance(gl)
         
@@ -225,7 +233,7 @@ export default class Mesh
         for(const callback of this.localCalls)
             callback()
         
-        // Call local
+        // Call custom
         for(const callback of customCalls)
             callback()    
    

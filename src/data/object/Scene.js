@@ -27,13 +27,11 @@ import CallOptimizer from '../../render/CallOptimizer'
 
 export default class Scene
 {
-    constructor(canvas, cam)
+    constructor(canvas)
     {
         this.canvas = canvas
         this.init(canvas)
         this.meshs = []
-        this.cam = cam
-        this.uniforms = [cam]
         this.depthTest = true
         this.sortCompare = (mesh1, mesh2) =>
         {
@@ -54,12 +52,6 @@ export default class Scene
         }
         
         this.resize(canvas.width, canvas.height)
-    }
-    
-    _addCamToMeshs()
-    {
-        const cam = this.cam
-        this.uniforms.push(cam)
     }
         
     addMesh(mesh)
@@ -89,12 +81,6 @@ export default class Scene
         gl.viewportHeight = h*/
         this.width = w
         this.height = h
-
-        if (this.cam)
-        {
-            this.cam.ratio = this.width / this.height
-            this.cam.update()
-        }
     }
     
     init(canvas)
@@ -149,14 +135,6 @@ export default class Scene
 
         gl.viewport(0, 0, this.width, this.height)
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-        
-        if (this.cam.updated)
-        {
-            if (this.cam.ratio <= 0)
-                this.cam.ratio = this.width / this.height
-
-            this.cam.update()
-        }
         
         
         for (const mesh of this.meshs)

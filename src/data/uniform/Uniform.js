@@ -32,10 +32,20 @@ export default class Uniform
     {
         this.label = label
         this.type = type
-        this.data = data
+        this._data = data
         // this.location = null
         
         this._init(type, isArray)
+    }
+
+    get data()
+    {
+        return this._data
+    }
+
+    set data(data)
+    {
+        this._data = data
     }
     
     // Generate bind function
