@@ -25,7 +25,7 @@
 import CallOptimizer from '../../render/CallOptimizer'
 
 
-export default class Group
+export default class Layer
 {
     constructor()
     {
@@ -90,13 +90,12 @@ export default class Group
         return true
     }
     
-    init(gl, globalUniforms)
+    init(gl)
     {
         let success = true
 
-
         for (const mesh of this.meshs)
-            if (!mesh.init(gl, globalUniforms))
+            if (!mesh.init(gl))
                 success = false
 
         this._callOptimizer = CallOptimizer.getInstance(gl)
