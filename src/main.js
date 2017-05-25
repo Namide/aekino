@@ -51,6 +51,7 @@ import SmartTexture from './data/texture/SmartTexture'
 
 import Mesh from './data/object/Mesh'
 import Mesh3D from './data/object/Mesh3D'
+import Layer from './data/object/Layer'
 import Background3D from './data/object/Background3D'
 import Camera3D from './data/uniform/Camera3D'
 import Scene from './data/object/Scene'
@@ -188,8 +189,11 @@ pyramidGeom.addVertices('aVertexColor', pyramidColors, 4)
 const pyramidMesh = new Mesh3D(pyramidGeom, colorProgram)
 pyramidMesh.translate([-1.5, -1.5, 0])
 pyramidMesh.addGlobalUniform(cam3D)
-scene.addMesh(pyramidMesh)
 
+
+const layer = new Layer()
+layer.addMesh(pyramidMesh)
+scene.addMesh(layer)
 
 
 
@@ -484,7 +488,7 @@ scene.sort()
 
 
 
-const PASS_ENABLE = true
+const PASS_ENABLE = false
 
 let passManager
 if (PASS_ENABLE)

@@ -27,10 +27,10 @@ import CallOptimizer from '../../render/CallOptimizer'
 
 export default class Scene
 {
-    constructor(canvas)
+    constructor(canvas, options = { antialias: true, stencil: true })
     {
         this.canvas = canvas
-        this.init(canvas)
+        this.init(canvas, options)
         this.meshs = []
         this.depthTest = true
         this.sortCompare = (mesh1, mesh2) =>
@@ -83,13 +83,13 @@ export default class Scene
         this.height = h
     }
     
-    init(canvas)
+    init(canvas, options)
     {
         let gl
         
         try
         {
-            gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
+            gl = canvas.getContext('webgl', options) || canvas.getContext('experimental-webgl', options)
             // gl.viewportWidth = canvas.width
             // gl.viewportHeight = canvas.height
             // console.log(gl.viewportWidth)
