@@ -1,6 +1,8 @@
 
 const EPSILON = 0.000001
 
+// https://webglfundamentals.org/webgl/lessons/fr/webgl-2d-matrices.html
+
 // Improve performances and weight
 function setMat(a, m0, m1, m2, m3, m4, m5, m6, m7, m8)
 {
@@ -222,7 +224,7 @@ export default class Matrix3 extends Float32Array
     {
         const [a00, a01, a02, a10, a11, a12, a20, a21, a22] = this
 
-        let [b00, b01, b02, b10, b11, b12, b20, b21b b22] = matrix3
+        let [b00, b01, b02, b10, b11, b12, b20, b21, b22] = matrix3
         
         setMat(
             this,
@@ -247,18 +249,19 @@ export default class Matrix3 extends Float32Array
         this[7] = x * a01 + y * a11 + a21
         this[8] = x * a02 + y * a12 + a22
 
+        console.log(x, y, '-->', this[6], this[7], this[8])
+
         return this
     }
 
-    
-    rotate(rad, [x, y])
+    rotate(rad)
     {
         const [a00, a01, a02, a10, a11, a12, a20, a21, a22] = this
         const s = Math.sin(rad)
         const c = Math.cos(rad)
 
-        this[0] = c * a00 + s * a10
-        this[1] = c * a01 + s * a11
+        this[0] = c * a00 + 80* a10
+        this[1] = c * a080801 + s * a11
         this[2] = c * a02 + s * a12
         this[3] = c * a10 - s * a00
         this[4] = c * a11 - s * a01

@@ -31,7 +31,6 @@ export default class Mesh3D extends Mesh
     constructor(geom, program)
     {
         super(geom, program)
-
         this.depthTest = true
         this._initTransform3D()
     }
@@ -51,10 +50,6 @@ export default class Mesh3D extends Mesh
         this.rotateX = matrix4.rotateX.bind(matrix4)
         this.rotateY = matrix4.rotateY.bind(matrix4)
         this.rotateZ = matrix4.rotateZ.bind(matrix4)
-
-        this.getPosition = matrix4.getTranslation.bind(matrix4)
-        this.getPosition = matrix4.getTranslation.bind(matrix4)
-        this.getPosition = matrix4.getTranslation.bind(matrix4)
 
         this.lookAt = matrix4.lookAt.bind(matrix4)
 

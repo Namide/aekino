@@ -33,7 +33,8 @@ export default class Layer
                 
         this.order = 0
         this.visible = true
-        this.depthTest = null
+        // this.depthTest = null
+        this.mask = null
         
         this._isInitialized = false
 
@@ -56,6 +57,11 @@ export default class Layer
         }
     }
 
+    setMask(mask)
+    {
+        this.mask = mask
+    }
+
     addMesh(mesh)
     {
         this.meshs.push(mesh)
@@ -75,6 +81,10 @@ export default class Layer
     
     isInitialized()
     {
+        if (this.mask !== null)
+            if (!this.mask.isInitialized())
+                return false
+
         for (const mesh of this.meshs)
             if (!mesh.isInitialized())
                 return false
@@ -94,6 +104,9 @@ export default class Layer
     {
         let success = true
 
+        if (this.mask !== null)
+            this.mask.init(gl)
+
         for (const mesh of this.meshs)
             if (!mesh.init(gl))
                 success = false
@@ -105,15 +118,22 @@ export default class Layer
     
     draw(gl, customCalls = [])
     {
-        if (this.depthTest !== null && !this._callOptimizer.optimizeDepthTest(this.depthTest))
+        if (this.mask)
+            this.mask.before(gl)
+
+        /*if (this.depthTest !== null && !this._callOptimizer.optimizeDepthTest(this.depthTest))
         {
             if (this.depthTest)
                 gl.enable(gl.DEPTH_TEST)
             else
                 gl.disable(gl.DEPTH_TEST)
-        }
+        }*/
 
         for (const mesh of this.meshs)
             mesh.draw(gl, customCalls)
+
+
+        if (this.mask)
+            this.mask.after(gl)
     }
 }

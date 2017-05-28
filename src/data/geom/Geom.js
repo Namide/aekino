@@ -64,6 +64,11 @@ export default class Geom
     
     display(gl)
     {
+        /*
+            gl.enable(gl.CULL_FACE)
+            gl.cullFace(gl.BACK)
+        */
+
         if (this.hasIndices)
             gl.drawElements(gl.TRIANGLES, this.numItems, gl.UNSIGNED_SHORT, 0);
         else

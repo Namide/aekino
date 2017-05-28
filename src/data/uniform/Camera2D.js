@@ -22,26 +22,24 @@
  * THE SOFTWARE.
  */
 
-import Matrix4 from '../../math/Matrix4'
+import Matrix3 from '../../math/Matrix3'
 import Uniform from './Uniform'
 
-export default class Camera3D extends Uniform
+export default class Camera2D extends Uniform
 {
     constructor(label)
     {
-        super(label, 35676, new Matrix4())
+        super(label, 35675, new Matrix3())
        
-        this.fovy = 45
-        this.near = 0.1
-        this.far = 100
-
-        const matrix = new Matrix4()
-        this._matrix = matrix
+        this._matrix = new Matrix3()
         
         this.updated = true
         this.updateNum = 0
 
-        this._ratio = 0
+        this._minX = -1
+        this._maxX = 1
+        this._minY = -1
+        this._maxY = 1
 
 
         // Add functions
@@ -50,39 +48,19 @@ export default class Camera3D extends Uniform
             matrix.identity()
             this.updated = true
         }
-        this.translate = vec3 =>
+        this.translate = vec2 =>
         {
-            matrix.translate(vec3)
+            matrix.translate(vec2)
             this.updated = true
         }
-        this.scale = vec3 =>
+        this.scale = vec2 =>
         {
-            matrix.scale(vec3)
+            matrix.scale(vec2)
             this.updated = true
         }
-        this.rotate = (rad, vec3) =>
+        this.rotate = rad =>
         {
-            matrix.rotate(rad, vec3)
-            this.updated = true
-        }
-        this.rotateX = rad =>
-        {
-            matrix.rotateX(rad)
-            this.updated = true
-        }
-        this.rotateY = rad =>
-        {
-            matrix.rotateY(rad)
-            this.updated = true
-        }
-        this.rotateZ = rad =>
-        {
-            matrix.rotateZ(rad)
-            this.updated = true
-        }
-        this.lookAt = (eye, center, up) =>
-        {
-            matrix.lookAt(eye, center, up)
+            matrix.rotate(rad)
             this.updated = true
         }
     }
@@ -95,27 +73,36 @@ export default class Camera3D extends Uniform
         return this._data
     }
 
-    get ratio()
+    setArea(minX, minY, maxX, maxY)
     {
-        return this._ratio
-    }
+        this._minX = minX
+        this._minY = minY
+        this._maxX = maxX
+        this._maxY = maxY
 
-    set ratio(ratio)
-    {
-        this._ratio = ratio
-        this.updated = true
-    }
-
-    resize(width, height)
-    {
-        this._ratio = width / height
         this.updated = true
     }
     
     update()
     {
-        this._data.perspective(this.fovy * Math.PI / 180, this._ratio, this.near, this.far)
+        this._data.identity()
+
+        const width = this._maxX - this._minX
+        const height = this._maxY - this._minY
+
+        this._data.scale([
+            1 / width,
+            1 / height
+        ])
+
+        /*this._data.translate([
+            this._minX - width * 0.5,
+            this._minY - height * 0.5
+        ])*/
+
         this._data.multiply(this._matrix)
+
+
         this.updated = false
         this.updateNum++
     }

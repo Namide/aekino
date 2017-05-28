@@ -28,9 +28,11 @@ import CallOptimizer from '../../render/CallOptimizer'
 export default class Mask
 {
     
-    constructor(mesh, func = 516, mask = 0)
+    constructor(mesh)
     {
         this.mesh = mesh
+        this.setMaskFunc(0 /* gl.STENCIL_BITS */, 1, 519 /* gl.ALWAYS */)
+        this.setDisplayFunc(0 /* gl.STENCIL_BITS */, 0, 517 /* gl.NOTEQUAL */)
     }
 
     /**
@@ -92,16 +94,24 @@ export default class Mask
     {
         gl.enable(gl.STENCIL_TEST)
 
-        if (!this._callOptimizer.optimizeDepthTest(false))
-        {
-            gl.depthMask(false)
-        }
-        
+        gl.depthMask(false)
+        gl.clear(gl.STENCIL_BUFFER_BIT)
+        gl.colorMask(false, false, false, false)
+        gl.stencilOp(gl.KEEP, gl.KEEP, gl.INCR)
+        gl.stencilFunc(this.maskMask, this.maskRef, this.maskFunc)
 
-        if (this.mask)
-            gl.stencilFunc(this.maskMask, this.maskRef, this.maskFunc)
 
+        // Draw mask
         this.mesh.draw(gl, customCall)
+
+        // Disable program optimzation
+        this._callOptimizer.optimizeProgram(null)
+
+
+        gl.stencilFunc(this.displayMask, this.displayRef, this.displayFunc)
+        gl.depthMask(true)
+        gl.colorMask(true, true, true, true)
+        gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP)
     }
 
     after(gl)

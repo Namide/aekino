@@ -22,28 +22,14 @@
  * THE SOFTWARE.
  */
 
-import Buffer from './Buffer'
+import Matrix3 from '../../math/Matrix3'
+import Uniform from '../uniform/Uniform'
 
-export default class Attribute extends Buffer
+
+export default class Transform2D extends Uniform
 {
     constructor(label)
     {
-        super()
-        this.label = label
-    }
-    
-    bind(gl, location)
-    {
-        super.bind(gl)
-
-        gl.vertexAttribPointer(location, this.itemSize, this.itemType, false, 0, 0)
-    }
-
-    clone(attribute = new Attribute(this.label))
-    {
-        attribute.label = this.label
-        super.clone(attribute)
-
-        return attribute
+        super(label, 35675 /* gl.FLOAT_MAT3 */, new Matrix3().identity())
     }
 }

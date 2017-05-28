@@ -41,7 +41,7 @@ export default class Mesh
         
         this.order = 1
         this.visible = true
-        this.depthTest = null
+        this.depthTest = false
         
         this._isInitialized = false
     }
@@ -211,7 +211,7 @@ export default class Mesh
     
     draw(gl, customCalls = [])
     {
-        if (this.depthTest !== null && !this._callOptimizer.optimizeDepthTest(this.depthTest))
+        if (!this._callOptimizer.optimizeDepthTest(this.depthTest))
         {
             if (this.depthTest)
                 gl.enable(gl.DEPTH_TEST)

@@ -50,9 +50,12 @@ import Geom from './data/geom/Geom'
 import SmartTexture from './data/texture/SmartTexture'
 
 import Mesh from './data/object/Mesh'
+import Mesh2D from './data/object/Mesh2D'
 import Mesh3D from './data/object/Mesh3D'
 import Layer from './data/object/Layer'
+import Mask from './data/object/Mask'
 import Background3D from './data/object/Background3D'
+import Camera2D from './data/uniform/Camera2D'
 import Camera3D from './data/uniform/Camera3D'
 import Scene from './data/object/Scene'
 import Pass from './shader/filter/Pass'
@@ -72,6 +75,7 @@ const canvas = document.body.querySelector('canvas')
 
 // Camera
 const cam3D = new Camera3D('uPMatrix')
+const cam2D = new Camera2D('uPMatrix')
 // cam3D.matrix.translate([0, 0, -7.0])
 
 
@@ -133,7 +137,7 @@ const fogProgram = new Program(fogVertexShader, fragmentShader)
 
 // ----------------------------
 //
-//      PYRAMID RAINBOW
+//      PYRAMID RAINBOW (+ MASK + PLANE)
 //
 // ----------------------------
 
@@ -185,15 +189,102 @@ const pyramidColors = [
 const pyramidGeom = new Geom()
 pyramidGeom.addVertices('aVertexPosition', pyramidVertices, 3)
 pyramidGeom.addVertices('aVertexColor', pyramidColors, 4)
-    
+
 const pyramidMesh = new Mesh3D(pyramidGeom, colorProgram)
 pyramidMesh.translate([-1.5, -1.5, 0])
 pyramidMesh.addGlobalUniform(cam3D)
 
 
+
+// PLANE 2D
+
+const planeVertexShader = `      
+    attribute vec2 aVertexPosition;
+
+    uniform mat3 uMVMatrix;
+    uniform mat3 uPMatrix;
+
+    varying vec2 vTextureCoord;
+
+    void main(void) {
+        vec3 pos = uPMatrix * uMVMatrix * vec3(aVertexPosition, 0.0);
+        gl_Position = vec4(pos.xy, 0.0, 1.0);
+    }
+`
+
+const planeFragmentShader = `
+    precision mediump float;
+
+    uniform sampler2D uDiffuse1;
+
+    void main(void) {
+        gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    }
+`
+
+const planeProgram = new Program(planeVertexShader, planeFragmentShader)
+
+const planeVertices = [
+   -1, -1,
+   -1,  1,
+    1, -1,
+
+   -1,  1,
+    1,  1,
+    1, -1
+]
+
+const planeUV = [
+    0.0, 0.0,
+    0.0, 1.0,
+    1.0, 0.0,
+
+    0.0, 1.0,
+    1.0, 1.0,
+    1.0, 0.0
+]
+
+const planeGeom = new Geom()
+planeGeom.addVertices('aVertexPosition', planeVertices, 2)
+
+const plane = new Mesh2D(planeGeom, planeProgram)
+plane.order = 1
+plane.scale([320, 320])
+// plane.translate([160, 160])
+plane.addGlobalUniform(cam2D)
+// scene.addMesh(plane)
+
+
+
+
+// MASK
+
 const layer = new Layer()
 layer.addMesh(pyramidMesh)
 scene.addMesh(layer)
+
+/*const vertexShaderMask = `      
+    attribute vec3 aVertexPosition;
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+    void main(void) {
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+    }
+`
+
+const fragmentShaderMask = `
+    precision mediump float;
+    void main(void) {
+        gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    }
+`
+
+const programMask = new Program(vertexShaderMask, fragmentShaderMask)
+const maskMesh = new Mesh3D(pyramidGeom, programMask)
+maskMesh.addGlobalUniform(cam3D)
+maskMesh.translate([-1.5, -1.5, 0])
+maskMesh.scale([0.5, 0.5, 0.5])*/
+layer.setMask(new Mask(plane))
 
 
 
@@ -202,7 +293,6 @@ scene.addMesh(layer)
 //      CUBE RAINBOW
 //
 // ----------------------------
-
 
 // Square
 const cubeVertices = [
@@ -270,11 +360,8 @@ cubeGeom.addVertices('aVertexPosition', cubeVertices, 3)
 cubeGeom.addVertices('aVertexColor', unpackedCubeColors, 4)
 cubeGeom.addIndices(cubeIndices)
 
-const cubeMesh = new Mesh(cubeGeom, fogProgram)
-const cubeUniformMatrix = new Transform3D('uMVMatrix')
-cubeMesh.addUniform(cubeUniformMatrix)
-cubeMesh.matrix = cubeUniformMatrix.data
-cubeMesh.matrix.translate([1.5, -1.5, 0])
+const cubeMesh = new Mesh3D(cubeGeom, fogProgram)
+cubeMesh.translate([1.5, -1.5, 0])
 cubeMesh.addGlobalUniform(cam3D)
 scene.addMesh(cubeMesh)
 
@@ -287,12 +374,9 @@ scene.addMesh(cubeMesh)
 //
 // ----------------------------
 
-const pyramidMesh2 = new Mesh(pyramidGeom, colorProgram)
-const pyramidUniformMatrix2 = new Transform3D('uMVMatrix')
-pyramidMesh2.addUniform(pyramidUniformMatrix2)
-pyramidMesh2.matrix = pyramidUniformMatrix2.data
-pyramidMesh2.matrix.translate([-1.5, 1.5, 0])
-pyramidMesh2.matrix.scale([1, -1, 1])
+const pyramidMesh2 = new Mesh3D(pyramidGeom, colorProgram)
+pyramidMesh2.translate([-1.5, 1.5, 0])
+pyramidMesh2.scale([1, -1, 1])
 pyramidMesh2.addGlobalUniform(cam3D)
 
 scene.addMesh(pyramidMesh2)
@@ -388,13 +472,10 @@ cubeTexturedGeom.addVertices('aVertexPosition', cubeVertices, 3)
 cubeTexturedGeom.addVertices('aTextureCoord', cubeUV, 2)
 cubeTexturedGeom.addIndices(cubeIndices)
 
-const cubeTexturedMesh = new Mesh(cubeTexturedGeom, texturedProgram)
-const cubeTexturedUniformMatrix = new Transform3D('uMVMatrix')
-cubeTexturedMesh.addUniform(cubeTexturedUniformMatrix)
-cubeTexturedMesh.matrix = cubeTexturedUniformMatrix.data
+const cubeTexturedMesh = new Mesh3D(cubeTexturedGeom, texturedProgram)
 cubeTexturedMesh.addTexture(cubeTexture)
 cubeTexturedMesh.addTexture(cubeTexture2)
-cubeTexturedMesh.matrix.translate([1.5, 1.5, 0])
+cubeTexturedMesh.translate([1.5, 1.5, 0])
 cubeTexturedMesh.addGlobalUniform(cam3D)
 scene.addMesh(cubeTexturedMesh)
 
@@ -407,20 +488,12 @@ scene.addMesh(cubeTexturedMesh)
 //
 // ----------------------------
 
-const cubeTexturedMesh2 = new Mesh(cubeTexturedGeom, texturedProgram)
-const cubeTexturedUniformMatrix2 = new Transform3D('uMVMatrix')
-cubeTexturedMesh2.addUniform(cubeTexturedUniformMatrix2)
-cubeTexturedMesh2.matrix = cubeTexturedUniformMatrix2.data
+const cubeTexturedMesh2 = new Mesh3D(cubeTexturedGeom, texturedProgram)
 cubeTexturedMesh2.addTexture(cubeTexture)
 cubeTexturedMesh2.addTexture(cubeTexture2)
-cubeTexturedMesh2.matrix.translate([0, 0, -8.0])
+cubeTexturedMesh2.translate([0, 0, -8.0])
 cubeTexturedMesh2.addGlobalUniform(cam3D)
 scene.addMesh(cubeTexturedMesh2)
-
-
-// Optimize order by program (reduce calls)
-scene.sort()
-
 
 
 
@@ -634,6 +707,7 @@ function resize()
     canvas.height = winSize[1] * resolution
 
     cam3D.resize(...winSize)
+    cam2D.setArea(0, 0, ...winSize)
 }
 
 window.onresize = resize
@@ -660,20 +734,20 @@ refresh()
 function refresh()
 {
     // Camera
-    cam3D.matrix.identity()
-    cam3D.matrix.translate([0, 0, -zoom])
-    cam3D.matrix.rotate(rotY, [1, 0, 0])
-    cam3D.matrix.rotate(rotX, [0, 1, 0])
+    cam3D.clear()
+    cam3D.translate([0, 0, -zoom])
+    cam3D.rotate(rotY, [1, 0, 0])
+    cam3D.rotate(rotX, [0, 1, 0])
     // cam3D.update()
 
 
     // Objects
     // skybox.rotateZ(0.001)
     pyramidMesh.rotateY(0.005)
-    pyramidMesh2.matrix.rotate(-0.005, [0, 1, 0])
-    cubeMesh.matrix.rotate(0.01, [0, 1, 0])
-    cubeTexturedMesh.matrix.rotate(-0.01, [0, 1, 0])
-    cubeTexturedMesh2.matrix.rotate(0.025, [0.72, -0.33, 0.5])
+    pyramidMesh2.rotate(-0.005, [0, 1, 0])
+    cubeMesh.rotate(0.01, [0, 1, 0])
+    cubeTexturedMesh.rotate(-0.01, [0, 1, 0])
+    cubeTexturedMesh2.rotate(0.025, [0.72, -0.33, 0.5])
     
     
     if (PASS_ENABLE)

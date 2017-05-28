@@ -53,6 +53,14 @@ export default class Uniform
     {
         switch(this.type)
         {
+            case 35675: /* gl.FLOAT_MAT3 */
+            {
+                this.bind = (gl, location) =>
+                {
+                    gl.uniformMatrix3fv(location, false, this.data)
+                }
+                break
+            }
             case 35676: // gl.FLOAT_MAT4
             {
                 this.bind = (gl, location) =>

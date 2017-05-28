@@ -22,28 +22,43 @@
  * THE SOFTWARE.
  */
 
-import Buffer from './Buffer'
+import Mesh from './Mesh'
+import Transform2D from '../uniform/Transform2D'
 
-export default class Attribute extends Buffer
+
+export default class Mesh2D extends Mesh
 {
-    constructor(label)
+    constructor(geom, program)
     {
-        super()
-        this.label = label
-    }
-    
-    bind(gl, location)
-    {
-        super.bind(gl)
-
-        gl.vertexAttribPointer(location, this.itemSize, this.itemType, false, 0, 0)
+        super(geom, program)
+        this.depthTest = false
+        this._initTransform2D()
     }
 
-    clone(attribute = new Attribute(this.label))
+    _initTransform2D()
     {
-        attribute.label = this.label
-        super.clone(attribute)
+        const transform2D = new Transform2D('uMVMatrix')
+        const matrix3 = transform2D.data
 
-        return attribute
+        this.transform2D = transform2D
+        this.matrix3 = matrix3
+
+        // Add functions
+        this.translate = matrix3.translate.bind(matrix3)
+        this.scale = matrix3.scale.bind(matrix3)
+        this.rotate = matrix3.rotate.bind(matrix3)
+
+        // Add to uniforms
+        this.addUniform(transform2D)
+    }
+
+    get position()
+    {
+        return this.transform2D.getTranslation()
+    }
+
+    get rotation()
+    {
+        return this.transform2D.getRotation()
     }
 }

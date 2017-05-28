@@ -52,7 +52,6 @@ export default class Matrix4 extends Float32Array
     identity()
     {
         setMat(this, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
-
         return this
     }
 
