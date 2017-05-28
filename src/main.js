@@ -80,7 +80,7 @@ const cam2D = new Camera2D('uPMatrix')
 
 
 // Scene
-const scene = new Scene(canvas, cam3D)
+const scene = new Scene(canvas)
 scene.bgColor = [0.0, 0.0, 0.1, 1.0]
 scene.depthTest = true
 

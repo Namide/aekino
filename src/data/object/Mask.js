@@ -31,8 +31,10 @@ export default class Mask
     constructor(mesh)
     {
         this.mesh = mesh
-        this.setMaskFunc(0 /* gl.STENCIL_BITS */, 1, 519 /* gl.ALWAYS */)
-        this.setDisplayFunc(0 /* gl.STENCIL_BITS */, 0, 517 /* gl.NOTEQUAL */)
+        this.setMaskFunc(519 /* gl.ALWAYS */, 1, 0xFF /* gl.STENCIL_BITS */)
+        this.setDisplayFunc(517 /* gl.NOTEQUAL */, 0, 0xFF /* gl.STENCIL_BITS */)
+        // gl.EQUAL 1 0xFF
+        // gl.EQUAL 0 0xFF
     }
 
     /**
@@ -67,15 +69,15 @@ export default class Mask
     setMaskFunc(func, ref, mask)
     {
         this.maskFunc = func
+        this.maskRef = ref
         this.maskMask = mask
-        this.maskRef = 0.5
     }
 
     setDisplayFunc(func, ref, mask)
     {
         this.displayFunc = func
+        this.displayRef = ref
         this.displayMask = mask
-        this.displayRef = 0.5
     }
 
     isInitialized()
@@ -98,7 +100,7 @@ export default class Mask
         gl.clear(gl.STENCIL_BUFFER_BIT)
         gl.colorMask(false, false, false, false)
         gl.stencilOp(gl.KEEP, gl.KEEP, gl.INCR)
-        gl.stencilFunc(this.maskMask, this.maskRef, this.maskFunc)
+        gl.stencilFunc(this.maskFunc, this.maskRef, this.maskMask)
 
 
         // Draw mask
@@ -108,7 +110,7 @@ export default class Mask
         this._callOptimizer.optimizeProgram(null)
 
 
-        gl.stencilFunc(this.displayMask, this.displayRef, this.displayFunc)
+        gl.stencilFunc(this.displayFunc, this.displayRef, this.displayMask)
         gl.depthMask(true)
         gl.colorMask(true, true, true, true)
         gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP)

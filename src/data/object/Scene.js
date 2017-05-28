@@ -89,6 +89,7 @@ export default class Scene
         
         try
         {
+            console.log(options)
             gl = canvas.getContext('webgl', options) || canvas.getContext('experimental-webgl', options)
             // gl.viewportWidth = canvas.width
             // gl.viewportHeight = canvas.height
@@ -134,7 +135,7 @@ export default class Scene
         }
 
         gl.viewport(0, 0, this.width, this.height)
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT)
         
         
         for (const mesh of this.meshs)
