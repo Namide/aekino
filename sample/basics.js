@@ -40,32 +40,31 @@ exports.vec2 = require("./gl-matrix/vec2.js");
 exports.vec3 = require("./gl-matrix/vec3.js");
 exports.vec4 = require("./gl-matrix/vec4.js");*/
 
-import Uniform from './data/uniform/Uniform'
-import Transform3D from './data/uniform/Transform3D'
-import BackgroundTransform3D from './data/uniform/BackgroundTransform3D'
+import Uniform from '../src/data/uniform/Uniform'
+import Transform3D from '../src/data/uniform/Transform3D'
+import BackgroundTransform3D from '../src/data/uniform/BackgroundTransform3D'
 
-import Attribute from './data/core/Attribute'
-import Program from './shader/material/Program'
-import Geom from './data/geom/Geom'
-import SmartTexture from './data/texture/SmartTexture'
+import Attribute from '../src/data/core/Attribute'
+import Program from '../src/shader/material/Program'
+import Geom from '../src/data/geom/Geom'
+import SmartTexture from '../src/data/texture/SmartTexture'
 
-import Mesh from './data/object/Mesh'
-import Mesh2D from './data/object/Mesh2D'
-import Mesh3D from './data/object/Mesh3D'
-import Layer from './data/object/Layer'
-import Mask from './data/object/Mask'
-import Background3D from './data/object/Background3D'
-import Camera2D from './data/uniform/Camera2D'
-import Camera3D from './data/uniform/Camera3D'
-import Scene from './data/object/Scene'
-import Pass from './shader/filter/Pass'
-import PassManager from './render/PassManager'
+import Mesh from '../src/data/object/Mesh'
+import Mesh2D from '../src/data/object/Mesh2D'
+import Mesh3D from '../src/data/object/Mesh3D'
+import Layer from '../src/data/object/Layer'
+import Mask from '../src/data/object/Mask'
+import Background3D from '../src/data/object/Background3D'
+import Camera2D from '../src/data/uniform/Camera2D'
+import Camera3D from '../src/data/uniform/Camera3D'
+import Scene from '../src/data/object/Scene'
+import Pass from '../src/shader/filter/Pass'
+import PassManager from '../src/render/PassManager'
 
 
-import GaussianBlurPass from './shader/filter/GaussianBlurPass'
-import FogPass from './shader/filter/FogPass'
-// import FXAAPass from './shader/filter/FXAAPass'
-
+import GaussianBlurPass from '../src/shader/filter/GaussianBlurPass'
+import FogPass from '../src/shader/filter/FogPass'
+// import FXAAPass from '../src/shader/filter/FXAAPass'
 
 
 // Use term "compile" not "init"
@@ -74,8 +73,8 @@ const canvas = document.body.querySelector('canvas')
 
 
 // Camera
-const cam3D = new Camera3D('uPMatrix')
-const cam2D = new Camera2D('uPMatrix')
+const cam3D = new Camera3D()
+const cam2D = new Camera2D()
 // cam3D.matrix.translate([0, 0, -7.0])
 
 
@@ -218,7 +217,7 @@ const planeFragmentShader = `
     uniform sampler2D uDiffuse1;
 
     void main(void) {
-        gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+        gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);
     }
 `
 
@@ -253,6 +252,10 @@ plane.scale([320, 320])
 // plane.translate([160, 160])
 plane.addGlobalUniform(cam2D)
 // scene.addMesh(plane)
+
+
+
+
 
 
 
@@ -460,12 +463,12 @@ var cubeUV = [
 ]
 
 const cubeTexture = new SmartTexture('uDiffuse1')
-cubeTexture.addURL('cube-diffuse.jpg')
+cubeTexture.addURL('assets/cube-diffuse.jpg')
 
 const cubeTexture2 = new SmartTexture('uDiffuse2')
 cubeTexture2.setParam(10240, 9728)  // Pixelise
 cubeTexture2.setParam(10241, 9728)  // Pixelise
-cubeTexture2.addURL('cube-diffuse-2.png')
+cubeTexture2.addURL('assets/cube-diffuse-2.png')
 
 const cubeTexturedGeom = new Geom()
 cubeTexturedGeom.addVertices('aVertexPosition', cubeVertices, 3)

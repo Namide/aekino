@@ -27,9 +27,9 @@ import Uniform from './Uniform'
 
 export default class Camera2D extends Uniform
 {
-    constructor(label)
+    constructor()
     {
-        super(label, 35675, new Matrix3())
+        super('uPMatrix', 35675, new Matrix3())
        
         this._matrix = new Matrix3()
         

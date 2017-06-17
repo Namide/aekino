@@ -89,7 +89,6 @@ export default class Scene
         
         try
         {
-            console.log(options)
             gl = canvas.getContext('webgl', options) || canvas.getContext('experimental-webgl', options)
             // gl.viewportWidth = canvas.width
             // gl.viewportHeight = canvas.height

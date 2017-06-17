@@ -27,9 +27,9 @@ import Uniform from './Uniform'
 
 export default class Camera3D extends Uniform
 {
-    constructor(label)
+    constructor()
     {
-        super(label, 35676, new Matrix4())
+        super('uPMatrix', 35676, new Matrix4())
        
         this.fovy = 45
         this.near = 0.1
