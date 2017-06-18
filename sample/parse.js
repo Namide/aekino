@@ -27,6 +27,13 @@ const jsonOptions = {
                 uv: true
             }
         },
+        Cube: {
+            transform: true,
+            geom: {
+                normals: false,
+                uv: true
+            }
+        },
         Suzanne: {
             transform: true,
             geom: {

@@ -12,6 +12,7 @@ const fs = require('fs')
 // const fileOutRaw = 'suzane.raw.json'
 // const fileOutMin = 'suzane.min.json'
 
+/*
 const fbxOptions = {
     parseComments: false,   // flag to retain comments when parsing the file.
     verbose: false,         // flag to write parsing details to the nodejs console.
@@ -41,7 +42,7 @@ const parserOptions = {
         }
     }
 }
-
+*/
 
 
 
@@ -49,7 +50,7 @@ const parserOptions = {
 //
 //                  RUN
 
-function FBXParse(fbxFile, jsonFile, fbxOptions = fbxOptions, jsonOptions = parserOptions)
+function FBXParse(fbxFile, jsonFile, fbxOptions = { }, jsonOptions = { })
 {
     const fbx = readFBX(fbxFile, fbxOptions)
     if (fbx)
@@ -73,7 +74,7 @@ function FBXParse(fbxFile, jsonFile, fbxOptions = fbxOptions, jsonOptions = pars
     console.log('\t')
 }
 
-function readFBX(file, options)
+function readFBX(file, options, fbxOptions)
 {
     traceTitle('read ascii fbx')
     let fbx
@@ -103,7 +104,7 @@ function writeFile(file, data)
     try
     {
         fs.writeFileSync(file, JSON.stringify(data), 'utf8')
-        trace(file + ' saved at ' + __dirname, true)
+        trace(file + ' saved', true)
     }
     catch (error)
     {
@@ -149,13 +150,13 @@ function parseModels(models, out, options)
             }
             else
             {
-                trace(name + ' not found in file', false)
+                trace(name + ' not found in FBX', false)
                 error++
             }
         }
         
         const objLength = Object.keys(options.enable).length
-        trace( (objLength - error) + '/' + objLength + ' objects founds in file', error < 1)
+        trace( (objLength - error) + '/' + objLength + ' objects founds in FBX', error < 1)
     }
     else
     {
@@ -205,25 +206,61 @@ function parseModel(model, out, name, enableProps = null)
 
     return indices
 }*/
+       
 
-function convertUV(uvs, uvIndices, verticeIndices, verticesLength)
+function mergeIndices(verticeIndices, vertices, uvIndices, uvs)
 {
-    const realUvs = []
-    for (let i = 0; i < uvIndices.length; i++)
-    {
-        const j = uvIndices[i] * 2
-        realUvs.push(uvs[j], uvs[j + 1])
-    }
-
-    const finalUvs = new Array(Math.round(verticesLength * 2 / 3))
+    // console.log(verticeIndices.length, uvIndices.length, verticesLength / 3, uvs.length / 2)
+    const uvVertRefs = []
+    const finalUvs = new Array(Math.round(vertices.length * 2 / 3))
+    const finalVerts = [...vertices]
+    const finalIndices = [...verticeIndices]
     for (let i = 0; i < verticeIndices.length; i++)
     {
-        const j = uvIndices[i] * 2
-        finalUvs[j] = realUvs[i+i]
-        finalUvs[j+1] = realUvs[i+i+1]
+        const iVertice = verticeIndices[i]
+        const iUV = uvIndices[i]
+
+        const ref = uvVertRefs.find(ref => ref.vert === iVertice)
+
+        if (ref)
+        {
+            if (ref.uv === iUV)
+            {
+                finalUvs[iVertice + iVertice] = uvs[iUV + iUV]
+                finalUvs[iVertice + iVertice + 1] = uvs[iUV + iUV + 1]
+            }
+            else
+            {
+                const newIVertice = finalVerts.length / 3 // new vertice indice
+
+                const ref = { vert: newIVertice, uv: iUV }
+                uvVertRefs.push(ref)
+
+                finalIndices[i] = newIVertice
+
+                const iv2 = newIVertice + newIVertice
+                const iv3 = iv2 + newIVertice
+
+                finalUvs[iv2] = uvs[iUV + iUV]
+                finalUvs[iv2 + 1] = uvs[iUV + iUV + 1]
+                finalVerts[iv3] = vertices[iVertice * 3]
+                finalVerts[iv3 + 1] = vertices[iVertice * 3 + 1]
+                finalVerts[iv3 + 2] = vertices[iVertice * 3 + 2]
+            }
+        }
+        else
+        {
+            const ref = {vert: iVertice, uv: iUV}
+            uvVertRefs.push(ref)
+
+            finalUvs[iVertice + iVertice] = uvs[iUV + iUV]
+            finalUvs[iVertice + iVertice + 1] = uvs[iUV + iUV + 1]
+        }
+
+        
     }
 
-    return finalUvs
+    return { uvs: finalUvs, vertices: finalVerts, indices: finalIndices }
 }
 
 function parseMesh(model, name, enableProps)
@@ -263,7 +300,7 @@ function parseMesh(model, name, enableProps)
     if (model.Vertices)
     {
         out.geom.vertices = model.Vertices
-        trace(' - ' + model.Vertices.length + ' vertices')
+        trace(' - ' + (model.Vertices.length / 3) + ' vertices')
     }
         
     if (model.PolygonVertexIndex)
@@ -274,13 +311,13 @@ function parseMesh(model, name, enableProps)
         for (let i = 0; i < indices.length; i++)
             if (indices[i] < 0)
             {
-                indices[i] = -1 - indices[i]
+                indices[i] = ~indices[i]
 
                 if (type < 0)
                     type = i
             }
         
-        out.geom.verticesIndices = indices
+        out.geom.indices = indices
 
         if (type === 2)
             trace(' - ' + indices.length + ' indices (triangles)')
@@ -305,8 +342,9 @@ function parseMesh(model, name, enableProps)
         {
             if ( model.LayerElementUV['0'].UV)
             {
-                out.geom.uv = convertUV(model.LayerElementUV['0'].UV, model.LayerElementUV['0'].UVIndex, model.PolygonVertexIndex, model.Vertices.length)
-                trace(' - ' + model.LayerElementUV['0'].UV.length + ' uv')
+                out.geom.uv = model.LayerElementUV['0'].UV // mergeIndices(model.LayerElementUV['0'].UV, model.LayerElementUV['0'].UVIndex, model.PolygonVertexIndex, model.Vertices)
+                trace(' - ' + model.LayerElementUV['0'].UVIndex.length + ' uv indices')
+                trace(' - ' + (model.LayerElementUV['0'].UV.length >> 1) + ' uv')
             }
 
             /*if (model.LayerElementUV['0'].UVIndex)
@@ -327,6 +365,16 @@ function parseMesh(model, name, enableProps)
 
             
         }
+    }
+
+    if (out.geom.vertices && out.geom.indices && out.geom.uv && model.LayerElementUV['0'].UVIndex)
+    {
+        const {uvs, vertices, indices} = mergeIndices(out.geom.indices, out.geom.vertices, model.LayerElementUV['0'].UVIndex, out.geom.uv)
+        out.geom.vertices = vertices
+        out.geom.indices = indices
+        out.geom.uv = uvs
+
+        trace(' - => uv: ' + uvs.length / 2 + ', vertices: ' + vertices.length / 3 + ', indices: ' + indices.length)
     }
         
         

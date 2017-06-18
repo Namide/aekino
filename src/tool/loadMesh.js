@@ -73,7 +73,7 @@ function onJsonLoaded(json, onLoaded, options)
 
         const transform3D = camera3DData.transform
         camera3D.lookAt(transform3D.pos, transform3D.lookAt, transform3D.up)
-
+        
         camera.push(camera3D)
 
         if (!mainCamera)
@@ -92,9 +92,9 @@ function onJsonLoaded(json, onLoaded, options)
             mesh3D.addGlobalUniform(mainCamera)
 
         const rot = transform3D.rot
-        /*mesh3D.rotateX(rot[0])
-        mesh3D.rotateY(rot[1])
-        mesh3D.rotateZ(rot[2])*/
+        mesh3D.rotateZ(rot[2] * Math.PI / 180)
+        mesh3D.rotateY(rot[1] * Math.PI / 180)
+        mesh3D.rotateX(rot[0] * Math.PI / 180)
 
         if (mesh3DData.geom)
         {
@@ -107,12 +107,8 @@ function onJsonLoaded(json, onLoaded, options)
             if (geomData.uv)
                 geom.addVertices('aTextureCoord', geomData.uv, 2)
 
-            if (geomData.verticesIndices)
-                geom.addIndices(geomData.verticesIndices)
-
-            console.log('indices:', geomData.verticesIndices)
-            console.log('vertices:', geomData.vertices)
-            console.log('uvs:', geomData.uv)
+            if (geomData.indices)
+                geom.addIndices(geomData.indices)
         }
         
         mesh.push(mesh3D)
