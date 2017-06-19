@@ -220,20 +220,21 @@ function mergeIndices(verticeIndices, vertices, uvIndices, uvs)
         const iVertice = verticeIndices[i]
         const iUV = uvIndices[i]
 
-        const ref = uvVertRefs.find(ref => ref.vert === iVertice)
+        let ref = uvVertRefs.find(ref => ref.vert === iVertice)
 
         if (ref)
         {
-            if (ref.uv === iUV)
+            ref = uvVertRefs.find(ref => ref.vert === iVertice && ref.uv === iUV)
+
+            if (ref)
             {
-                finalUvs[iVertice + iVertice] = uvs[iUV + iUV]
-                finalUvs[iVertice + iVertice + 1] = uvs[iUV + iUV + 1]
+                finalIndices[i] = ref.final
             }
             else
             {
                 const newIVertice = finalVerts.length / 3 // new vertice indice
 
-                const ref = { vert: newIVertice, uv: iUV }
+                const ref = {vert: iVertice, uv: iUV, final: newIVertice}
                 uvVertRefs.push(ref)
 
                 finalIndices[i] = newIVertice
@@ -250,7 +251,7 @@ function mergeIndices(verticeIndices, vertices, uvIndices, uvs)
         }
         else
         {
-            const ref = {vert: iVertice, uv: iUV}
+            const ref = {vert: iVertice, uv: iUV, final: iVertice}
             uvVertRefs.push(ref)
 
             finalUvs[iVertice + iVertice] = uvs[iUV + iUV]
