@@ -207,7 +207,108 @@ function parseModel(model, out, name, enableProps = null)
     return indices
 }*/
        
+function mergeIndices(geom)
+{
+    const refs = []
+    const attrs = []
 
+    const indices = [...geom.vertices.indices]
+
+    const geomKeys = Object.keys(geom)
+    for (let i = 0; i < geomKeys.length; i++)
+    {
+        const attrName = geomKeys[i]
+        attrs.push({
+            name: attrName,
+            indices: [...geom[attrName].indices],
+            list: [...geom[attrName].list]
+        })
+    }
+
+    const attrVertices = attrs.find(attr => attr.name = 'vertices')
+
+    for (let i = 0; i < geom.vertices.indices.length; i++)
+    {
+        const iVertice = geom.vertices.indices[i]
+        let ref = refs.find(ref => ref.vertices === iVertice)
+
+        if (ref)
+        {
+            let check = refTemp =>
+            {
+                for (let j = 0; j < attrs.length; j++)
+                {
+                    const name = attrs[j].name
+                    if (refTemp[name] !== geom[name].indices[i])
+                        return false
+                }
+                
+                return true
+            }
+
+            ref = refs.find(check)
+
+            if (ref)
+            {
+                indices[i] = ref.indice
+            }
+            else
+            {
+                const base = attrVertices.list.length / 3
+                indices[i] = base
+                const newRef = {
+                    indice: base
+                }
+
+                for (let j = 0; j < attrs.length; j++)
+                {
+                    const attr = attrs[j]
+                    const name = attr.name
+                    newRef[name] = attr.indices[i]
+
+                    const thisGeom = geom[name]
+                    const num = thisGeom.num
+                    for (let k = 0; k < num; k++)
+                        attr.list[base * num + k] = thisGeom.list[thisGeom.indices[i] * num + k]
+                }
+
+                refs.push(newRef)
+            }
+        }
+        else
+        {
+            const newRef = {
+                indice: iVertice
+            }
+
+            for (let j = 0; j < attrs.length; j++)
+            {
+                const attr = attrs[j]
+                const name = attr.name
+                newRef[name] = attr.indices[i]
+
+                const thisGeom = geom[name]
+                const num = thisGeom.num
+                for (let k = 0; k < num; k++)
+                    attr.list[iVertice * num + k] = thisGeom.list[thisGeom.indices[i] * num + k]
+            }
+
+            refs.push(newRef)
+        }
+    }
+
+    geom.indices = indices
+
+    for (let j = 0; j < attrs.length; j++)
+    {
+        const attr = attrs[j]
+        const name = attr.name
+        geom[name] = attr.list
+    }
+
+    // return { uvs: finalUvs, vertices: finalVerts, indices: finalIndices }
+}
+/*
 function mergeIndices(verticeIndices, vertices, uvIndices, uvs)
 {
     // console.log(verticeIndices.length, uvIndices.length, verticesLength / 3, uvs.length / 2)
@@ -263,6 +364,7 @@ function mergeIndices(verticeIndices, vertices, uvIndices, uvs)
 
     return { uvs: finalUvs, vertices: finalVerts, indices: finalIndices }
 }
+*/
 
 function parseMesh(model, name, enableProps)
 {
@@ -300,7 +402,10 @@ function parseMesh(model, name, enableProps)
     
     if (model.Vertices)
     {
-        out.geom.vertices = model.Vertices
+        out.geom.vertices = {
+            list: model.Vertices,
+            num: 3
+        }
         trace(' - ' + (model.Vertices.length / 3) + ' vertices')
     }
         
@@ -318,7 +423,7 @@ function parseMesh(model, name, enableProps)
                     type = i
             }
         
-        out.geom.indices = indices
+        out.geom.vertices.indices = indices
 
         if (type === 2)
             trace(' - ' + indices.length + ' indices (triangles)')
@@ -332,8 +437,21 @@ function parseMesh(model, name, enableProps)
     {
         if (model.LayerElementNormal)
         {
-            out.geom.normals = model.LayerElementNormal['0'].Normals
-            trace(' - ' + out.geom.normals.length + ' normals')
+            if (model.LayerElementUV['0'].Normals)
+            {
+                out.geom.normals = {
+                    list: model.LayerElementNormal['0'].Normals,
+                    num: 3,
+                }
+
+                trace(' - ' + model.LayerElementNormal['0'].Normals.length + ' normals')
+            }
+
+            if (model.LayerElementNormal['0'].NormalsIndex)
+            {
+                 out.geom.normals.indices = model.LayerElementNormal['0'].NormalsIndex
+            }
+
         }
     }
     
@@ -341,11 +459,20 @@ function parseMesh(model, name, enableProps)
     {
         if (model.LayerElementUV)
         {
-            if ( model.LayerElementUV['0'].UV)
+            if (model.LayerElementUV['0'].UV)
             {
-                out.geom.uv = model.LayerElementUV['0'].UV // mergeIndices(model.LayerElementUV['0'].UV, model.LayerElementUV['0'].UVIndex, model.PolygonVertexIndex, model.Vertices)
-                trace(' - ' + model.LayerElementUV['0'].UVIndex.length + ' uv indices')
+                out.geom.uv = {
+                    list: model.LayerElementUV['0'].UV, // mergeIndices(model.LayerElementUV['0'].UV, model.LayerElementUV['0'].UVIndex, model.PolygonVertexIndex, model.Vertices)
+                    num: 2
+                }
+
+                // trace(' - ' + model.LayerElementUV['0'].UVIndex.length + ' uv indices')
                 trace(' - ' + (model.LayerElementUV['0'].UV.length >> 1) + ' uv')
+            }
+
+            if (model.LayerElementUV['0'].UVIndex)
+            {
+                out.geom.uv.indices = model.LayerElementUV['0'].UVIndex
             }
 
             /*if (model.LayerElementUV['0'].UVIndex)
@@ -368,7 +495,9 @@ function parseMesh(model, name, enableProps)
         }
     }
 
-    if (out.geom.vertices && out.geom.indices && out.geom.uv && model.LayerElementUV['0'].UVIndex)
+    mergeIndices(out.geom)
+
+    /*if (out.geom.vertices && out.geom.indices && out.geom.uv && model.LayerElementUV['0'].UVIndex)
     {
         const {uvs, vertices, indices} = mergeIndices(out.geom.indices, out.geom.vertices, model.LayerElementUV['0'].UVIndex, out.geom.uv)
         out.geom.vertices = vertices
@@ -376,7 +505,7 @@ function parseMesh(model, name, enableProps)
         out.geom.uv = uvs
 
         trace(' - => uv: ' + uvs.length / 2 + ', vertices: ' + vertices.length / 3 + ', indices: ' + indices.length)
-    }
+    }*/
         
         
     return out

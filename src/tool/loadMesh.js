@@ -55,7 +55,109 @@ function loadMesh(
 {
     load(url, onLoaded, {onError, initCamera3D, initdMesh3D})
 }
+/*
+function mergeIndices(geom)
+{
+    const refs = []
+    const attrs = []
 
+    const indices = [...geom.vertices.indices]
+
+    const geomKeys = Object.keys(geom)
+    for (let i = 0; i < geomKeys.length; i++)
+    {
+        const attrName = geomKeys[i]
+        attrs.push({
+            name: attrName,
+            indices: [...geom[attrName].indices],
+            list: [...geom[attrName].list]
+        })
+    }
+
+    const attrVertices = attrs.find(attr => attr.name = 'vertices')
+
+    for (let i = 0; i < geom.vertices.indices.length; i++)
+    {
+        const iVertice = geom.vertices.indices[i]
+        let ref = refs.find(ref => ref.vertices === iVertice)
+
+        if (ref)
+        {
+            let check = refTemp =>
+            {
+                for (let j = 0; j < attrs.length; j++)
+                {
+                    const name = attrs[j].name
+                    if (refTemp[name] !== geom[name].indices[i])
+                        return false
+                }
+                
+                return true
+            }
+
+            ref = refs.find(check)
+
+            if (ref)
+            {
+                indices[i] = ref.indice
+            }
+            else
+            {
+                const base = attrVertices.list.length / 3
+                indices[i] = base
+                const newRef = {
+                    indice: base
+                }
+
+                for (let j = 0; j < attrs.length; j++)
+                {
+                    const attr = attrs[j]
+                    const name = attr.name
+                    newRef[name] = attr.indices[i]
+
+                    const thisGeom = geom[name]
+                    const num = thisGeom.num
+                    for (let k = 0; k < num; k++)
+                        attr.list[base * num + k] = thisGeom.list[thisGeom.indices[i] * num + k]
+                }
+
+                refs.push(newRef)
+            }
+        }
+        else
+        {
+            const newRef = {
+                indice: iVertice
+            }
+
+            for (let j = 0; j < attrs.length; j++)
+            {
+                const attr = attrs[j]
+                const name = attr.name
+                newRef[name] = attr.indices[i]
+
+                const thisGeom = geom[name]
+                const num = thisGeom.num
+                for (let k = 0; k < num; k++)
+                    attr.list[iVertice * num + k] = thisGeom.list[thisGeom.indices[i] * num + k]
+            }
+
+            refs.push(newRef)
+        }
+    }
+
+    geom.indices = indices
+
+    for (let j = 0; j < attrs.length; j++)
+    {
+        const attr = attrs[j]
+        const name = attr.name
+        geom[name] = attr.list
+    }
+
+    // return { uvs: finalUvs, vertices: finalVerts, indices: finalIndices }
+}
+*/
 function onJsonLoaded(json, onLoaded, options)
 {
     const camera = []
@@ -82,6 +184,8 @@ function onJsonLoaded(json, onLoaded, options)
 
     for (const mesh3DData of json.mesh)
     {
+        
+
         const mesh3D = options.initdMesh3D(mesh3DData)
         mesh3D.name = mesh3DData.name
 
@@ -98,6 +202,8 @@ function onJsonLoaded(json, onLoaded, options)
 
         if (mesh3DData.geom)
         {
+            // mergeIndices(mesh3DData.geom)
+
             const geomData = mesh3DData.geom
             const geom = mesh3D.geom
 
