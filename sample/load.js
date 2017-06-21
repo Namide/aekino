@@ -57,6 +57,22 @@ const vertexShader = `
     }
 `
 
+const vertexStaticShader = `      
+    attribute vec3 aVertexPosition;
+    attribute vec2 aTextureCoord;
+
+    uniform mat4 uPMatrix;
+
+    varying vec4 vColor;
+    varying vec2 vTextureCoord;
+
+    void main(void) {
+        gl_Position = uPMatrix * vec4(aVertexPosition, 1.0);
+        vColor = vec4(normalize(aVertexPosition), 1.0);
+        vTextureCoord = aTextureCoord;
+    }
+`
+
 const fragmentShader = `
     precision mediump float;
 
@@ -79,23 +95,27 @@ suzanneText.addURL('assets/suzanne-diffuse.jpg')
 const cubeText = new SmartTexture('uDiffuse')
 cubeText.addURL('assets/suzanne-cube-diffuse.jpg')
 
-function initdMesh3D(data)
+function initdMesh(data)
 {
-    const mesh = new Mesh3D(new Geom(), new Program(vertexShader, fragmentShader))
+    let mesh
+
     switch(data.name)
     {
         case 'Suzanne':
 
+            mesh = new Mesh3D(new Geom(), new Program(vertexStaticShader, fragmentShader))
             mesh.addTexture(suzanneText)
             break
 
         case 'Cube':
 
+            mesh = new Mesh3D(new Geom(), new Program(vertexShader, fragmentShader))
             mesh.addTexture(cubeText)
             break
 
         case 'Plane':
 
+            mesh = new Mesh3D(new Geom(), new Program(vertexShader, fragmentShader))
             mesh.addTexture(planeText)
             break
 
@@ -121,7 +141,7 @@ loadMesh(
         resize()
     },
     {
-        initdMesh3D
+        initdMesh
     },
     )
 

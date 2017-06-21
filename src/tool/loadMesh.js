@@ -41,7 +41,7 @@ gl_FragColor = vec4(1.0,1.0,1.0,1.0);
 const optionsDefault = {
     onError: error => { throw new Error('Mesh load error ' + error) },
     initCamera3D: cam => new Camera3D(),
-    initdMesh3D: mesh => new Mesh3D(new Geom(), new Program(defaultVertexShader, defaultFragmentShader))
+    initdMesh: mesh => new Mesh3D(new Geom(), new Program(defaultVertexShader, defaultFragmentShader))
 }
 
 function loadMesh(
@@ -50,10 +50,10 @@ function loadMesh(
     {
         onError = error => { throw new Error('Mesh load error ' + error) },
         initCamera3D = cam => new Camera3D(),
-        initdMesh3D = mesh => new Mesh3D(new Geom(), new Program(defaultVertexShader, defaultFragmentShader))
+        initdMesh = mesh => new Mesh3D(new Geom(), new Program(defaultVertexShader, defaultFragmentShader))
     })
 {
-    load(url, onLoaded, {onError, initCamera3D, initdMesh3D})
+    load(url, onLoaded, {onError, initCamera3D, initdMesh})
 }
 /*
 function mergeIndices(geom)
@@ -184,21 +184,23 @@ function onJsonLoaded(json, onLoaded, options)
 
     for (const mesh3DData of json.mesh)
     {
-        
-
-        const mesh3D = options.initdMesh3D(mesh3DData)
+        const mesh3D = options.initdMesh(mesh3DData)
         mesh3D.name = mesh3DData.name
-
-        const transform3D = mesh3DData.transform
-        mesh3D.translate(transform3D.pos)
 
         if (mainCamera)
             mesh3D.addGlobalUniform(mainCamera)
+        
+        if (mesh3DData.transform)
+        {
+            const transform3D = mesh3DData.transform
+            mesh3D.translate(transform3D.pos)
 
-        const rot = transform3D.rot
-        mesh3D.rotateZ(rot[2] * Math.PI / 180)
-        mesh3D.rotateY(rot[1] * Math.PI / 180)
-        mesh3D.rotateX(rot[0] * Math.PI / 180)
+            const rot = transform3D.rot
+            mesh3D.rotateZ(rot[2] * Math.PI / 180)
+            mesh3D.rotateY(rot[1] * Math.PI / 180)
+            mesh3D.rotateX(rot[0] * Math.PI / 180)
+        }
+
 
         if (mesh3DData.geom)
         {

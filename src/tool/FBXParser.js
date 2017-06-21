@@ -3,6 +3,8 @@ console.time('\t-> finished')
 const parser = require('fbxasciitojs')
 const fs = require('fs')
 
+import Matrix4 from '../math/Matrix4'
+
 
 // ------------------------------------------------
 //
@@ -206,6 +208,38 @@ function parseModel(model, out, name, enableProps = null)
 
     return indices
 }*/
+
+function bakeTransform(obj3D)
+{
+    const transform = obj3D.transform
+    const rot = transform.rot
+    const scale = transform.scale
+    const vertices = obj3D.geom.vertices.list
+    const matrix4 = new Matrix4()
+    const w = 1
+
+    matrix4.scale(scale)
+    matrix4.translate(transform.pos)
+    matrix4.rotateZ(rot[2] * Math.PI / 180)
+    matrix4.rotateY(rot[1] * Math.PI / 180)
+    matrix4.rotateX(-rot[0] * Math.PI / 180)
+    
+    for (let i = 0; i < vertices.length; i += 3)
+    {
+        const oldPos = [vertices[i], vertices[i + 1], vertices[i + 2]]
+        const newPos = [
+            (oldPos[0] * matrix4[0]) + (oldPos[1] * matrix4[1]) + (oldPos[2] * matrix4[2]) + (w * matrix4[3]) + matrix4[12],
+            (oldPos[0] * matrix4[4]) + (oldPos[1] * matrix4[5]) + (oldPos[2] * matrix4[6]) + (w * matrix4[7]) + matrix4[13],
+            (oldPos[0] * matrix4[8]) + (oldPos[1] * matrix4[9]) + (oldPos[2] * matrix4[10]) + (w * matrix4[11]) + matrix4[14],
+        ]
+
+        vertices[i] = newPos[0]
+        vertices[i + 1] = newPos[1]
+        vertices[i + 2] = newPos[2]
+    }
+
+    obj3D.transform = null
+}
        
 function mergeIndices(geom)
 {
@@ -388,9 +422,6 @@ function parseMesh(model, name, enableProps)
             if (props['Lcl Scaling'])
                 out.transform.scale = props['Lcl Scaling'].value
 
-            if (props.Color)
-                out.color = props.Color.value
-
             // trace( 'Properties60 of mesh (' + name + ') parsed', true)
         }
         else
@@ -398,6 +429,10 @@ function parseMesh(model, name, enableProps)
             trace( 'Properties60 of mesh (' + name + ') not found', false)
         }
     }
+
+    
+    if ((enableProps === null || enableProps.color === true) && props.Color)
+        out.color = props.Color.value
         
     
     if (model.Vertices)
@@ -494,6 +529,9 @@ function parseMesh(model, name, enableProps)
             
         }
     }
+
+    if (enableProps === null || enableProps.transform === 'bake')
+        bakeTransform(out)
 
     mergeIndices(out.geom)
 

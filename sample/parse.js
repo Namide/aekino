@@ -35,7 +35,7 @@ const jsonOptions = {
             }
         },
         Suzanne: {
-            transform: true,
+            transform: 'bake',
             geom: {
                 normals: false,
                 uv: true
