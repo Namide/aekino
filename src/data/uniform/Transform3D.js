@@ -33,3 +33,105 @@ export default class Transform3D extends Uniform
         super(label, 35676 /* gl.FLOAT_MAT4 */, new Matrix4())
     }
 }
+
+/*
+Use children/parent
+
+export default class Transform3D extends Uniform
+{
+    constructor(label)
+    {
+        super(label, 35676 /* gl.FLOAT_MAT4 *//*, new Matrix4())
+
+        this.updateNum = 0
+        this.updated = true
+        this.local = new Matrix4()
+
+        this.parent = null
+    }
+
+    update()
+    {
+        const parent = this.parent
+        const hasParent = this.parent !== null
+
+        if (!this.updated || (hasParent && this._parentUpdateNum !== parent.updateNum))
+        {
+            const data = this._data
+            this.local.copy(this._data)
+
+            if (hasParent)
+            {
+                this._data.multiply(parent.global)
+                this._parentUpdateNum = parent.updateNum
+            }
+
+            this.updated = true
+        }
+    }
+
+    clear()
+    {
+        this.local.identity()
+        this.updateNum++
+        this.updated = true
+    }
+
+    scale(vec3)
+    {
+        this.local.scale(vec3)
+        this.updateNum++
+        this.updated = true
+    }
+
+    translate(vec3)
+    {
+        this.local.translate(vec3)
+        this.updateNum++
+        this.updated = true
+    }
+
+    rotate(rad, vec3)
+    {
+        this.local.rotate(rad, vec3)
+        this.updateNum++
+        this.updated = true
+    }
+
+    rotateX(rad)
+    {
+        this.local.rotateX(rad)
+        this.updateNum++
+        this.updated = true
+    }
+
+    rotateY(rad)
+    {
+        this.local.rotateY(rad)
+        this.updateNum++
+        this.updated = true
+    }
+
+    rotateZ(rad)
+    {
+        this.local.rotateZ(rad)
+        this.updateNum++
+        this.updated = true
+    }
+
+    attach(parent)
+    {
+        this.parent = parent
+        this._parentUpdateNum = parent.updateNum
+        this.updateNum++
+        this.updated = true
+    }
+
+    detach()
+    {
+        this.parent = null
+        this.updateNum++
+        this.updated = true
+    }
+}
+*/
