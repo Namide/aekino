@@ -31,17 +31,6 @@ export default class Transform3D extends Uniform
     constructor(label)
     {
         super(label, 35676 /* gl.FLOAT_MAT4 */, new Matrix4())
-    }
-}
-
-/*
-Use children/parent
-
-export default class Transform3D extends Uniform
-{
-    constructor(label)
-    {
-        super(label, 35676 /* gl.FLOAT_MAT4 *//*, new Matrix4())
 
         this.updateNum = 0
         this.updated = true
@@ -55,7 +44,7 @@ export default class Transform3D extends Uniform
         const parent = this.parent
         const hasParent = this.parent !== null
 
-        if (!this.updated || (hasParent && this._parentUpdateNum !== parent.updateNum))
+        if (this.updated || (hasParent && this._parentUpdateNum !== parent.updateNum))
         {
             const data = this._data
             this.local.copy(this._data)
@@ -134,4 +123,3 @@ export default class Transform3D extends Uniform
         this.updated = true
     }
 }
-*/

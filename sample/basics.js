@@ -190,7 +190,7 @@ pyramidGeom.addVertices('aVertexPosition', pyramidVertices, 3)
 pyramidGeom.addVertices('aVertexColor', pyramidColors, 4)
 
 const pyramidMesh = new Mesh3D(pyramidGeom, colorProgram)
-pyramidMesh.translate([-1.5, -1.5, 0])
+pyramidMesh.transform.translate([-1.5, -1.5, 0])
 pyramidMesh.addGlobalUniform(cam3D)
 
 
@@ -364,7 +364,7 @@ cubeGeom.addVertices('aVertexColor', unpackedCubeColors, 4)
 cubeGeom.addIndices(cubeIndices)
 
 const cubeMesh = new Mesh3D(cubeGeom, fogProgram)
-cubeMesh.translate([1.5, -1.5, 0])
+cubeMesh.transform.translate([1.5, -1.5, 0])
 cubeMesh.addGlobalUniform(cam3D)
 scene.addMesh(cubeMesh)
 
@@ -378,8 +378,8 @@ scene.addMesh(cubeMesh)
 // ----------------------------
 
 const pyramidMesh2 = new Mesh3D(pyramidGeom, colorProgram)
-pyramidMesh2.translate([-1.5, 1.5, 0])
-pyramidMesh2.scale([1, -1, 1])
+pyramidMesh2.transform.translate([-1.5, 1.5, 0])
+pyramidMesh2.transform.scale([1, -1, 1])
 pyramidMesh2.addGlobalUniform(cam3D)
 
 scene.addMesh(pyramidMesh2)
@@ -478,7 +478,7 @@ cubeTexturedGeom.addIndices(cubeIndices)
 const cubeTexturedMesh = new Mesh3D(cubeTexturedGeom, texturedProgram)
 cubeTexturedMesh.addTexture(cubeTexture)
 cubeTexturedMesh.addTexture(cubeTexture2)
-cubeTexturedMesh.translate([1.5, 1.5, 0])
+cubeTexturedMesh.transform.translate([1.5, 1.5, 0])
 cubeTexturedMesh.addGlobalUniform(cam3D)
 scene.addMesh(cubeTexturedMesh)
 
@@ -494,7 +494,7 @@ scene.addMesh(cubeTexturedMesh)
 const cubeTexturedMesh2 = new Mesh3D(cubeTexturedGeom, texturedProgram)
 cubeTexturedMesh2.addTexture(cubeTexture)
 cubeTexturedMesh2.addTexture(cubeTexture2)
-cubeTexturedMesh2.translate([0, 0, -8.0])
+cubeTexturedMesh2.transform.translate([0, 0, -8.0])
 cubeTexturedMesh2.addGlobalUniform(cam3D)
 scene.addMesh(cubeTexturedMesh2)
 
@@ -746,11 +746,11 @@ function refresh()
 
     // Objects
     // skybox.rotateZ(0.001)
-    pyramidMesh.rotateY(0.005)
-    pyramidMesh2.rotate(-0.005, [0, 1, 0])
-    cubeMesh.rotate(0.01, [0, 1, 0])
-    cubeTexturedMesh.rotate(-0.01, [0, 1, 0])
-    cubeTexturedMesh2.rotate(0.025, [0.72, -0.33, 0.5])
+    pyramidMesh.transform.rotateY(0.005)
+    pyramidMesh2.transform.rotate(-0.005, [0, 1, 0])
+    cubeMesh.transform.rotate(0.01, [0, 1, 0])
+    cubeTexturedMesh.transform.rotate(-0.01, [0, 1, 0])
+    cubeTexturedMesh2.transform.rotate(0.025, [0.72, -0.33, 0.5])
     
     
     if (PASS_ENABLE)

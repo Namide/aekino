@@ -32,10 +32,14 @@ export default class Mesh3D extends Mesh
     {
         super(geom, program)
         this.depthTest = true
-        this._initTransform3D()
+        // this._initTransform3D()
+
+        const transform =  new Transform3D('uMVMatrix')
+        this.transform = transform
+        this.addUniform(transform)
     }
 
-    _initTransform3D()
+    /*_initTransform3D()
     {
         const transform3D = new Transform3D('uMVMatrix')
         const matrix4 = transform3D.data
@@ -55,7 +59,7 @@ export default class Mesh3D extends Mesh
 
         // Add to uniforms
         this.addUniform(transform3D)
-    }
+    }*/
 
     get position()
     {
@@ -65,5 +69,13 @@ export default class Mesh3D extends Mesh
     get rotation()
     {
         return this.transform3D.getRotation()
+    }
+
+    draw(gl, customCalls = [])
+    {
+        if (this.transform)
+            this.transform.update()
+
+        super.draw(gl, customCalls)
     }
 }
