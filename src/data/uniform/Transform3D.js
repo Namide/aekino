@@ -30,6 +30,6 @@ export default class Transform3D extends Uniform
 {
     constructor(label)
     {
-        super(label, 35676 /* gl.FLOAT_MAT4 */, new Matrix4().identity())
+        super(label, 35676 /* gl.FLOAT_MAT4 */, new Matrix4())
     }
 }

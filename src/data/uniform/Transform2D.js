@@ -30,6 +30,6 @@ export default class Transform2D extends Uniform
 {
     constructor(label)
     {
-        super(label, 35675 /* gl.FLOAT_MAT3 */, new Matrix3().identity())
+        super(label, 35675 /* gl.FLOAT_MAT3 */, new Matrix3())
     }
 }
