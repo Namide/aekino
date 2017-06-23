@@ -248,7 +248,7 @@ planeGeom.addVertices('aVertexPosition', planeVertices, 2)
 
 const plane = new Mesh2D(planeGeom, planeProgram)
 plane.order = 1
-plane.scale([320, 320])
+plane.transform.scale([320, 320])
 // plane.translate([160, 160])
 plane.addGlobalUniform(cam2D)
 // scene.addMesh(plane)

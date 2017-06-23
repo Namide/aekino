@@ -249,8 +249,6 @@ export default class Matrix3 extends Float32Array
         this[7] = x * a01 + y * a11 + a21
         this[8] = x * a02 + y * a12 + a22
 
-        console.log(x, y, '-->', this[6], this[7], this[8])
-
         return this
     }
 

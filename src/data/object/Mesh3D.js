@@ -63,12 +63,12 @@ export default class Mesh3D extends Mesh
 
     get position()
     {
-        return this.transform3D.getTranslation()
+        return this.transform.getTranslation()
     }
 
     get rotation()
     {
-        return this.transform3D.getRotation()
+        return this.transform.getRotation()
     }
 
     draw(gl, customCalls = [])

@@ -32,10 +32,14 @@ export default class Mesh2D extends Mesh
     {
         super(geom, program)
         this.depthTest = false
-        this._initTransform2D()
+        // this._initTransform2D()
+
+        const transform =  new Transform2D('uMVMatrix')
+        this.transform = transform
+        this.addUniform(transform)
     }
 
-    _initTransform2D()
+    /* _initTransform2D()
     {
         const transform2D = new Transform2D('uMVMatrix')
         const matrix3 = transform2D.data
@@ -50,15 +54,23 @@ export default class Mesh2D extends Mesh
 
         // Add to uniforms
         this.addUniform(transform2D)
-    }
+    }*/
 
     get position()
     {
-        return this.transform2D.getTranslation()
+        return this.transform.getTranslation()
     }
 
     get rotation()
     {
-        return this.transform2D.getRotation()
+        return this.transform.getRotation()
+    }
+
+    draw(gl, customCalls = [])
+    {
+        if (this.transform)
+            this.transform.update()
+
+        super.draw(gl, customCalls)
     }
 }
