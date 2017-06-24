@@ -39,6 +39,12 @@ export default class Transform3D extends Uniform
         this.parent = null
     }
 
+    get global()
+    {
+        this.update()
+        return this._data
+    }
+
     update()
     {
         const parent = this.parent
@@ -47,14 +53,20 @@ export default class Transform3D extends Uniform
         if (this.updated || (hasParent && this._parentUpdateNum !== parent.updateNum))
         {
             const data = this._data
-            this.local.copy(this._data)
 
             if (hasParent)
             {
-                this._data.multiply(parent.global)
+                parent.global.copy(data)
+
+                data.multiply(this.local)
                 this._parentUpdateNum = parent.updateNum
             }
+            else
+            {
+                this.local.copy(data)
+            }
 
+            this.updateNum++
             this.updated = true
         }
     }
