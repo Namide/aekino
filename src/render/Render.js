@@ -26,7 +26,7 @@ import ScreenRecorder from './ScreenRecorder'
 
 
 // https://www.html5rocks.com/en/tutorials/webgl/webgl_fundamentals/
-export default class PassManager
+export default class Render
 {
     constructor(scene)
     {
@@ -42,6 +42,11 @@ export default class PassManager
     isInitialized()
     {
         return this.screenRecorder.isInitialized()
+    }
+
+    addScene(scene, label)
+    {
+        
     }
     
     resize(width, height)

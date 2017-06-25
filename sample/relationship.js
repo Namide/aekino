@@ -1,5 +1,6 @@
 import Program from '../src/shader/material/Program'
 import CubeGeom from '../src/data/geom/CubeGeom'
+import SmoothCubeGeom from '../src/data/geom/SmoothCubeGeom'
 
 import Mesh3D from '../src/data/object/Mesh3D'
 import Camera3D from '../src/data/uniform/Camera3D'
@@ -58,8 +59,32 @@ const cubeColors = [
     [0.0, 0.5, 1.0, 1.0]  // Left face
 ]
 
-const cubeGeom = new CubeGeom()
-cubeGeom.addColors(...cubeColors)
+// Cube data
+function getColor()
+{
+    return [Math.random(), Math.random(), Math.random(), 1.0]
+}
+const smoothCubeColors = [
+
+    getColor(), getColor(),
+    getColor(), getColor(),
+    getColor(), getColor(),
+    getColor(), getColor()
+
+
+    /*[1.0, 0.5, 0.0, 1.0],
+    [1.0, 0.0, 0.5, 1.0],
+    [0.5, 1.0, 0.0, 1.0],
+    [0.0, 1.0, 0.5, 1.0],
+    [0.5, 0.0, 1.0, 1.0],
+    [0.0, 0.5, 1.0, 1.0],
+    [1.0, 1.0, 1.0, 1.0],
+    [1.0, 1.0, 1.0, 1.0]*/
+]
+
+
+const cubeGeom = new SmoothCubeGeom()
+cubeGeom.addColors(...smoothCubeColors)
 
 
 // Cube 1

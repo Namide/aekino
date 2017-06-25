@@ -59,7 +59,7 @@ import Camera2D from '../src/data/uniform/Camera2D'
 import Camera3D from '../src/data/uniform/Camera3D'
 import Scene from '../src/data/object/Scene'
 import Pass from '../src/shader/filter/Pass'
-import PassManager from '../src/render/PassManager'
+import Render from '../src/render/Render'
 
 
 import GaussianBlurPass from '../src/shader/filter/GaussianBlurPass'
@@ -564,12 +564,12 @@ scene.sort()
 
 
 
-const PASS_ENABLE = false
+const PASS_ENABLE = true
 
 let passManager
 if (PASS_ENABLE)
 {
-    passManager = new PassManager(scene)
+    passManager = new Render(scene)
     // passManager.resize(size[0] * resolution, size[1] * resolution)
     
     const fogPass = new FogPass({
