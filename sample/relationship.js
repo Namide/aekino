@@ -37,10 +37,12 @@ const vertexShader = `
     uniform mat4 uPMatrix;
 
     varying vec4 vColor;
+    varying vec3 vPos;
 
     void main(void) {
         gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
         vColor = aVertexColor;
+        vPos = aVertexPosition;
     }
 `
 
@@ -48,9 +50,26 @@ const fragmentShader = `
     precision mediump float;
 
     varying vec4 vColor;
+    varying vec3 vPos;
 
-    void main(void) {
-        gl_FragColor = vColor;
+    // https://stackoverflow.com/questions/5149544/can-i-generate-a-random-number-inside-a-pixel-shader
+    float random( vec2 p ) // Version 2
+    {
+        // e^pi (Gelfond's constant)
+        // 2^sqrt(2) (Gelfond–Schneider constant)
+        vec2 r = vec2( 23.14069263277926, 2.665144142690225 );
+        // return fract( cos( mod( 12345678., 256. * dot(p,r) ) ) ); // ver1
+        return fract(cos(dot(p,r)) * 123456.); // ver2
+    }
+
+    void main(void)
+    {
+        vec4 noise = vec4(
+            random(vPos.xy),
+            random(vPos.yz),
+            random(vPos.xz),
+            0.0);
+        gl_FragColor = vColor + noise * 0.001;
     }
 `
 
