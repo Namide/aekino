@@ -27,10 +27,11 @@ import CallOptimizer from '../../render/CallOptimizer'
 
 export default class Scene
 {
-    constructor(canvas, options = { antialias: true, stencil: true })
+    constructor()
     {
-        this.canvas = canvas
-        this.init(canvas, options)
+        // this.canvas = canvas
+        // this.init(canvas, options)
+
         this.meshs = []
         this.depthTest = true
         this.sortCompare = (mesh1, mesh2) =>
@@ -50,16 +51,15 @@ export default class Scene
 
             return 0
         }
+
+        this._updateList = []
         
-        this.resize(canvas.width, canvas.height)
+        // this.resize(canvas.width, canvas.height)
     }
         
     addMesh(mesh)
     {
         this.meshs.push(mesh)
-        
-        if (!mesh.isInitialized())
-            mesh.init(this.gl, this.uniforms)
     }
     
     rmMesh(mesh)
@@ -74,45 +74,15 @@ export default class Scene
         this.meshs.sort(this.sortCompare)
     }
     
-    resize(w, h)
+    /* resize(w, h)
     {
-        /*const gl = this.gl
-        gl.viewportWidth = w
-        gl.viewportHeight = h*/
         this.width = w
         this.height = h
-    }
-    
-    init(canvas, options)
-    {
-        let gl
-        
-        try
-        {
-            gl = canvas.getContext('webgl', options) || canvas.getContext('experimental-webgl', options)
-            // gl.viewportWidth = canvas.width
-            // gl.viewportHeight = canvas.height
-            // console.log(gl.viewportWidth)
-        }
-        catch(e)
-        {
-            console.error('Could not initialise WebGL:', e.message)
-        }
-        
-        if (!gl)
-        {
-            console.error('Could not initialise WebGL')
-        }
-
-        
-        this._callOptimizer = CallOptimizer.getInstance(gl)
-        
-        this.gl = gl
-    }
+    }*/
     
     set bgColor([r, g, b, a = 1])
     {
-        this.gl.clearColor(r, g, b, a)
+        this._updateList.push(gl => gl.clearColor(r, g, b, a))
         this._bgColor = [r, g, b, a]
     }
     
@@ -120,10 +90,17 @@ export default class Scene
     {
         return this._bgColor
     }
-    
-    draw()
+
+    init(gl)
     {
-        const gl = this.gl        
+        this._callOptimizer = CallOptimizer.getInstance(gl)
+    }
+    
+    draw(gl)
+    {
+        while (this._updateList.length > 0)
+            this._updateList.pop()(gl)
+        
 
         if (!this._callOptimizer.optimizeDepthTest(this.depthTest))
         {
@@ -133,7 +110,7 @@ export default class Scene
                 gl.disable(gl.DEPTH_TEST)
         }
 
-        gl.viewport(0, 0, this.width, this.height)
+        // gl.viewport(0, 0, this.width, this.height)
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT)
         
         
@@ -142,9 +119,15 @@ export default class Scene
             if (mesh.visible)
             {
                 if (mesh.isInitialized())
+                {
                     mesh.draw(gl)
+                }
                 else
-                    mesh.init(gl, this.uniforms)
+                {
+                    mesh.init(gl)
+                    mesh.draw(gl)
+                }
+                    
             }
         }        
     }

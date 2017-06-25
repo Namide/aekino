@@ -27,6 +27,7 @@ import Geom from '../src/data/geom/Geom'
 import SmartTexture from '../src/data/texture/SmartTexture'
 import Mesh3D from '../src/data/object/Mesh3D'
 import Scene from '../src/data/object/Scene'
+import Render from '../src/render/Render'
 
 import loadMesh from '../src/tool/loadMesh' 
 
@@ -34,9 +35,16 @@ import loadMesh from '../src/tool/loadMesh'
 const canvas = document.body.querySelector('canvas')
 
 
-const scene = new Scene(canvas)
+const scene = new Scene()
 scene.bgColor = [1.0, 1.0, 1.0, 1.0]
 scene.depthTest = true
+
+
+// Render
+const render = new Render(canvas)
+render.passEnabled = false
+render.addScene(scene)
+
 
 let cam3D
 
@@ -155,7 +163,7 @@ function resize()
         window.innerHeight
     ]
     
-    scene.resize(winSize[0], winSize[1])
+    render.resize(winSize[0], winSize[1])
 
     canvas.width = winSize[0]
     canvas.height = winSize[1]
@@ -179,7 +187,7 @@ function refresh()
         cam3D.lookAt([x, 10, y], [0, 0, 0], [0, 1, 0])
     }
     
-    scene.draw()
+    render.draw()
     
     requestAnimationFrame(refresh)
 }

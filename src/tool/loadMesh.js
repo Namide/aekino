@@ -193,12 +193,12 @@ function onJsonLoaded(json, onLoaded, options)
         if (mesh3DData.transform)
         {
             const transform3D = mesh3DData.transform
-            mesh3D.translate(transform3D.pos)
+            mesh3D.transform.translate(transform3D.pos)
 
             const rot = transform3D.rot
-            mesh3D.rotateZ(rot[2] * Math.PI / 180)
-            mesh3D.rotateY(rot[1] * Math.PI / 180)
-            mesh3D.rotateX(rot[0] * Math.PI / 180)
+            mesh3D.transform.rotateZ(rot[2] * Math.PI / 180)
+            mesh3D.transform.rotateY(rot[1] * Math.PI / 180)
+            mesh3D.transform.rotateX(rot[0] * Math.PI / 180)
         }
 
 

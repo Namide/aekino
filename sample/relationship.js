@@ -5,6 +5,7 @@ import SmoothCubeGeom from '../src/data/geom/SmoothCubeGeom'
 import Mesh3D from '../src/data/object/Mesh3D'
 import Camera3D from '../src/data/uniform/Camera3D'
 import Scene from '../src/data/object/Scene'
+import Render from '../src/render/Render'
 
 
 const canvas = document.body.querySelector('canvas')
@@ -16,9 +17,15 @@ cam3D.translate([0, 0, -10])
 
 
 // Scene
-const scene = new Scene(canvas)
+const scene = new Scene()
 scene.bgColor = [0.5, 0, 0.5, 1.0]
 scene.depthTest = true
+
+
+// Render
+const render = new Render(canvas)
+render.passEnabled = false
+render.addScene(scene)
 
 
 const vertexShader = `      
@@ -116,7 +123,7 @@ function resize()
 {
     const resolution = 1
     const winSize = [window.innerWidth, window.innerHeight]
-    scene.resize(winSize[0] * resolution, winSize[1] * resolution)
+    render.resize(winSize[0] * resolution, winSize[1] * resolution)
     canvas.width = winSize[0] * resolution
     canvas.height = winSize[1] * resolution
     cam3D.resize(...winSize)
@@ -147,7 +154,7 @@ function refresh()
     cube2.transform.rotate(-0.1, [1.5, 0.1, 0.5])
     cube3.transform.rotate(0.1, [1, 0.5, -0.5])
     
-    scene.draw()
+    render.draw()
 
     requestAnimationFrame(refresh)
 }

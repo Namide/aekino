@@ -79,7 +79,7 @@ const cam2D = new Camera2D()
 
 
 // Scene
-const scene = new Scene(canvas)
+const scene = new Scene()
 scene.bgColor = [0.0, 0.0, 0.1, 1.0]
 scene.depthTest = true
 
@@ -564,39 +564,37 @@ scene.sort()
 
 
 
-const PASS_ENABLE = true
 
-let passManager
-if (PASS_ENABLE)
-{
-    passManager = new Render(scene)
-    // passManager.resize(size[0] * resolution, size[1] * resolution)
-    
-    const fogPass = new FogPass({
-        minDepth: 0.5,
-        maxDepth: 0.6,
-        minPower: 0,
-        maxPower: 0.5,
-        depthCurve: 100,
-        color: [0.9, 0.95, 1.0]
-    })
-    passManager.addPass(fogPass)
-    
-    const gaussianOptions = {
-        minDepth: 0.95,
-        maxDepth: 1,
-        samples: 20,
-        xBlur: true,
-        power: 1,
-        depthCurve: 1
-    }
-    const gaussianBlurX = new GaussianBlurPass(gaussianOptions)
-    passManager.addPass(gaussianBlurX)
-    
-    gaussianOptions.xBlur = false
-    const gaussianBlurY = new GaussianBlurPass(gaussianOptions)
-    passManager.addPass(gaussianBlurY)
+const render = new Render(canvas)
+render.passEnabled = true
+render.addScene(scene)
+// render.resize(size[0] * resolution, size[1] * resolution)
+
+const fogPass = new FogPass({
+    minDepth: 0.5,
+    maxDepth: 0.6,
+    minPower: 0,
+    maxPower: 0.5,
+    depthCurve: 100,
+    color: [0.9, 0.95, 1.0]
+})
+render.addPass(fogPass)
+
+const gaussianOptions = {
+    minDepth: 0.95,
+    maxDepth: 1,
+    samples: 20,
+    xBlur: true,
+    power: 1,
+    depthCurve: 1
 }
+const gaussianBlurX = new GaussianBlurPass(gaussianOptions)
+render.addPass(gaussianBlurX)
+
+gaussianOptions.xBlur = false
+const gaussianBlurY = new GaussianBlurPass(gaussianOptions)
+render.addPass(gaussianBlurY)
+
 
 
 
@@ -700,10 +698,7 @@ function resize()
     winSize[0] = window.innerWidth
     winSize[1] = window.innerHeight
 
-    if (PASS_ENABLE)
-        passManager.resize(winSize[0] * resolution, winSize[1] * resolution)
-    else
-        scene.resize(winSize[0] * resolution, winSize[1] * resolution)
+    render.resize(winSize[0] * resolution, winSize[1] * resolution)
 
 
     canvas.width = winSize[0] * resolution
@@ -731,7 +726,7 @@ wheel()
 
 // debug
 window.scene = scene
-window.passManager = passManager
+window.render = render
 
 refresh()
 function refresh()
@@ -753,10 +748,7 @@ function refresh()
     cubeTexturedMesh2.transform.rotate(0.025, [0.72, -0.33, 0.5])
     
     
-    if (PASS_ENABLE)
-        passManager.draw()
-    else
-        scene.draw()
+    render.draw()
 
     // console.timeEnd('draw')
     
