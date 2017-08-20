@@ -36,6 +36,7 @@ export default class Uniform
         // this.location = null
         
         this._init(type, isArray)
+        this.updated = true
     }
 
     get data()
@@ -46,6 +47,7 @@ export default class Uniform
     set data(data)
     {
         this._data = data
+        this.updated = true
     }
     
     // Generate bind function
@@ -67,6 +69,15 @@ export default class Uniform
                 {
                     gl.uniformMatrix4fv(location, false, this.data)
                 }
+                break
+            }
+            case 35664: // gl.FLOAT_VEC2
+            {
+                this.bind = (gl, location) =>
+                {
+                    gl.uniform2f(location, ...this.data)
+                }
+                
                 break
             }
             case 35665: // gl.FLOAT_VEC3

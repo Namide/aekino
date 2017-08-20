@@ -189,10 +189,10 @@ export default class ScreenRecorder
         
         
         if (this.depthTexture)
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this.depthTexture.pointer, 0)
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, /*gl.DEPTH_STENCIL_ATTACHMENT ||*/ gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this.depthTexture.pointer, 0)
         else if (this.renderBuffer)
-            gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.renderBuffer.pointer)
-        
+            gl.framebufferRenderbuffer(gl.FRAMEBUFFER, /*gl.DEPTH_STENCIL_ATTACHMENT ||*/ gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.renderBuffer.pointer)
+
         
         gl.bindTexture(gl.TEXTURE_2D, null)
         gl.bindFramebuffer(gl.FRAMEBUFFER, null)
@@ -208,9 +208,9 @@ export default class ScreenRecorder
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.colorTexture.pointer, 0)
         
         if (this.depthTexture)
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, captureDepth ? this.depthTexture.pointer : null, 0)
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, /*gl.DEPTH_STENCIL_ATTACHMENT ||*/ gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, captureDepth ? this.depthTexture.pointer : null, 0)
         else if (this.renderBuffer)
-            gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, captureDepth ? this.renderBuffer.pointer : null)
+            gl.framebufferRenderbuffer(gl.FRAMEBUFFER, /*gl.DEPTH_STENCIL_ATTACHMENT ||*/ gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, captureDepth ? this.renderBuffer.pointer : null)
         
            
         // this.frameBufferIndex.bind(gl)

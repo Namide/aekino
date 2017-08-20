@@ -127,7 +127,6 @@ export default class Scene
                     mesh.init(gl)
                     mesh.draw(gl)
                 }
-                    
             }
         }        
     }

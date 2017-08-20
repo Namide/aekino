@@ -140,7 +140,14 @@ export default class Mesh
         for (const uniform of this.globalUniforms)
         {
             const location = program.getUniformLocation(gl, uniform)
-            this.globalCalls.push(uniform.bind.bind(uniform, gl, location))
+            this.globalCalls.push( (force = true) =>
+            {
+                if (force || uniform.updated)
+                {
+                    uniform.bind.call(uniform, gl, location)
+                    uniform.updated = false
+                }
+            })
         }
     }
     
@@ -219,14 +226,19 @@ export default class Mesh
                 gl.disable(gl.DEPTH_TEST)
         }
 
-        // Use program, if ok call globals
+        // Use program, if ok call globals uniforms, else, test updated globals uniforms
         const program = this.program
         if (!this._callOptimizer.optimizeProgram(program))
         {
             this.program.bind(gl)
             
             for(const callback of this.globalCalls)
-                callback()
+                callback(true)
+        }
+        else
+        {
+            for(const callback of this.globalCalls)
+                callback(false)
         }
         
         // Call local

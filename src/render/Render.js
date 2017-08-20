@@ -61,7 +61,6 @@ export default class Render
             console.error('Could not initialise WebGL')
         }
 
-        
 
         this.gl = gl
         this.gl.viewport(0, 0, this.width, this.height)
