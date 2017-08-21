@@ -28,7 +28,7 @@ import ScreenRecorder from './ScreenRecorder'
 // https://www.html5rocks.com/en/tutorials/webgl/webgl_fundamentals/
 export default class Render
 {
-    constructor(canvas, options = {antialias: true, stencil: true, width: 640, height: 360})
+    constructor(canvas, options = {antialias: true, stencil: true, alpha: true, width: 640, height: 360})
     {
         this.width = options.width
         this.height = options.height
@@ -39,7 +39,7 @@ export default class Render
         this.passList = []
         this.isEnable = false
         
-        this._init(canvas, {antialias: options.antialias, stencil: options.stencil})
+        this._init(canvas, {antialias: options.antialias, stencil: options.stencil, alpha: options.alpha })
         this._initScreenRecorder(this.gl)
     }
     

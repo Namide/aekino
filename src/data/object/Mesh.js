@@ -42,8 +42,17 @@ export default class Mesh
         this.order = 1
         this.visible = true
         this.depthTest = false
+
+        this.blending = {}
         
         this._isInitialized = false
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/blendFunc
+    // 770: gl.SRC_ALPHA, 771: gl.ONE_MINUS_SRC_ALPHA
+    addBlending(sfactor, dfactor)
+    {
+        this.blending[sfactor] = dfactor
     }
     
     addUniform(uniform)
@@ -240,13 +249,20 @@ export default class Mesh
             for(const callback of this.globalCalls)
                 callback(false)
         }
+
+        // Set blending
+        const blendingKeys = Object.keys(this.blending)
+        for (const key of blendingKeys)
+            gl.blendFunc(key, this.blending[key])
+        if (blendingKeys.length > 0)
+            gl.enable(3042 /* gl.BLEND */)
         
         // Call local
-        for(const callback of this.localCalls)
+        for (const callback of this.localCalls)
             callback()
         
         // Call custom
-        for(const callback of customCalls)
+        for (const callback of customCalls)
             callback()    
    
         // Draw mesh
