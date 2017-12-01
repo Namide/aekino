@@ -215,14 +215,14 @@ function bakeTransform(obj3D)
     const rot = transform.rot
     const scale = transform.scale
     const vertices = obj3D.geom.vertices.list
-    const matrix4 = new Matrix4()
+    const matrix4 = Matrix4.create()
     const w = 1
 
-    matrix4.scale(scale)
-    matrix4.translate(transform.pos)
-    matrix4.rotateZ(rot[2] * Math.PI / 180)
-    matrix4.rotateY(rot[1] * Math.PI / 180)
-    matrix4.rotateX(-rot[0] * Math.PI / 180)
+    Matrix4.scale(matrix4, scale)
+    Matrix4.translate(matrix4, transform.pos)
+    Matrix4.rotateZ(matrix4, rot[2] * Math.PI / 180)
+    Matrix4.rotateY(matrix4, rot[1] * Math.PI / 180)
+    Matrix4.rotateX(matrix4, -rot[0] * Math.PI / 180)
     
     for (let i = 0; i < vertices.length; i += 3)
     {

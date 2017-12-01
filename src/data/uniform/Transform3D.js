@@ -30,11 +30,11 @@ export default class Transform3D extends Uniform
 {
     constructor(label)
     {
-        super(label, 35676 /* gl.FLOAT_MAT4 */, new Matrix4())
+        super(label, 35676 /* gl.FLOAT_MAT4 */, Matrix4.create())
 
         this.updateNum = 0
         this.updated = true
-        this.local = new Matrix4()
+        this.local = Matrix4.create()
 
         this.parent = null
     }
@@ -56,14 +56,14 @@ export default class Transform3D extends Uniform
 
             if (hasParent)
             {
-                parent.global.copy(data)
+                Matrix4.copy(parent.global, data)
 
-                data.multiply(this.local)
+                Matrix4.multiply(data, this.local)
                 this._parentUpdateNum = parent.updateNum
             }
             else
             {
-                this.local.copy(data)
+                Matrix4.copy(this.local, data)
             }
 
             this.updateNum++
@@ -73,49 +73,49 @@ export default class Transform3D extends Uniform
 
     clear()
     {
-        this.local.identity()
+        Matrix4.identity(this.local)
         this.updateNum++
         this.updated = true
     }
 
     scale(vec3)
     {
-        this.local.scale(vec3)
+        Matrix4.scale(this.local, vec3)
         this.updateNum++
         this.updated = true
     }
 
     translate(vec3)
     {
-        this.local.translate(vec3)
+        Matrix4.translate(this.local, vec3)
         this.updateNum++
         this.updated = true
     }
 
     rotate(rad, vec3)
     {
-        this.local.rotate(rad, vec3)
+        Matrix4.rotate(this.local, rad, vec3)
         this.updateNum++
         this.updated = true
     }
 
     rotateX(rad)
     {
-        this.local.rotateX(rad)
+        Matrix4.rotateX(this.local, rad)
         this.updateNum++
         this.updated = true
     }
 
     rotateY(rad)
     {
-        this.local.rotateY(rad)
+        Matrix4.rotateY(this.local, rad)
         this.updateNum++
         this.updated = true
     }
 
     rotateZ(rad)
     {
-        this.local.rotateZ(rad)
+        Matrix4.rotateZ(this.local, rad)
         this.updateNum++
         this.updated = true
     }

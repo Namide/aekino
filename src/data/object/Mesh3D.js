@@ -39,28 +39,6 @@ export default class Mesh3D extends Mesh
         this.addUniform(transform)
     }
 
-    /*_initTransform3D()
-    {
-        const transform3D = new Transform3D('uMVMatrix')
-        const matrix4 = transform3D.data
-
-        this.transform3D = transform3D
-        this.matrix4 = matrix4
-
-        // Add functions
-        this.translate = matrix4.translate.bind(matrix4)
-        this.scale = matrix4.scale.bind(matrix4)
-        this.rotate = matrix4.rotate.bind(matrix4)
-        this.rotateX = matrix4.rotateX.bind(matrix4)
-        this.rotateY = matrix4.rotateY.bind(matrix4)
-        this.rotateZ = matrix4.rotateZ.bind(matrix4)
-
-        this.lookAt = matrix4.lookAt.bind(matrix4)
-
-        // Add to uniforms
-        this.addUniform(transform3D)
-    }*/
-
     get position()
     {
         return this.transform.getTranslation()

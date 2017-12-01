@@ -29,13 +29,13 @@ export default class Camera3D extends Uniform
 {
     constructor()
     {
-        super('uPMatrix', 35676, new Matrix4())
+        super('uPMatrix', 35676, Matrix4.create())
        
         this.fovy = 45
         this.near = 0.1
         this.far = 100
 
-        const matrix = new Matrix4()
+        const matrix = Matrix4.create()
         this._matrix = matrix
         
         this.updated = true
@@ -47,42 +47,42 @@ export default class Camera3D extends Uniform
         // Add functions
         this.clear = () =>
         {
-            matrix.identity()
+            Matrix4.identity(matrix)
             this.updated = true
         }
         this.translate = vec3 =>
         {
-            matrix.translate(vec3)
+            Matrix4.translate(matrix, vec3)
             this.updated = true
         }
         this.scale = vec3 =>
         {
-            matrix.scale(vec3)
+            Matrix4.scale(matrix, vec3)
             this.updated = true
         }
         this.rotate = (rad, vec3) =>
         {
-            matrix.rotate(rad, vec3)
+            Matrix4.rotate(matrix, rad, vec3)
             this.updated = true
         }
         this.rotateX = rad =>
         {
-            matrix.rotateX(rad)
+            Matrix4.rotateX(matrix, rad)
             this.updated = true
         }
         this.rotateY = rad =>
         {
-            matrix.rotateY(rad)
+            Matrix4.rotateY(matrix, rad)
             this.updated = true
         }
         this.rotateZ = rad =>
         {
-            matrix.rotateZ(rad)
+            Matrix4.rotateZ(matrix, rad)
             this.updated = true
         }
         this.lookAt = (eye, center, up) =>
         {
-            matrix.lookAt(eye, center, up)
+            Matrix4.lookAt(matrix, eye, center, up)
             this.updated = true
         }
     }
@@ -114,8 +114,9 @@ export default class Camera3D extends Uniform
     
     update()
     {
-        this._data.perspective(this.fovy * Math.PI / 180, this._ratio, this.near, this.far)
-        this._data.multiply(this._matrix)
+        Matrix4.perspective(this._data, this.fovy * Math.PI / 180, this._ratio, this.near, this.far)
+        Matrix4.multiply(this._data, this._matrix)
+
         this.updated = false
         this.updateNum++
     }

@@ -20,138 +20,143 @@ function setMat(a, m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m
     a[13] = m13
     a[14] = m14
     a[15] = m15
+
+    return a
 }
 
-export default class Matrix4 extends Float32Array
+export default class Matrix4
 {
     constructor()
     {
-        super(16)
-
-        this[0] = 1
-        this[5] = 1
-        this[10] = 1
-        this[15] = 1
+        console.warn('Matrix4 is a static class')
     }
 
-    clone()
+    static create()
     {
-        const clone = new Matrix4()
-        clone.set(this)
+        const matrix = new Float32Array(16)
 
-        return clone
+        matrix[0] = 1
+        matrix[5] = 1
+        matrix[10] = 1
+        matrix[15] = 1
+
+        return matrix
     }
 
-    copy(to)
+    static clone(matrix)
     {
-        to.set(this)
-
-        return this
+        return Matrix4.copy(matrix)
     }
 
-    identity()
+    static copy(from, to = new Float32Array(16))
     {
-        setMat(this, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
-        return this
+        to.set(from)
+
+        return to
     }
 
-    add(mat4x4)
+    static identity(matrix)
     {
-        this[0] += mat4x4[0]
-        this[1] += mat4x4[1]
-        this[2] += mat4x4[2]
-        this[3] += mat4x4[3]
-        this[4] += mat4x4[4]
-        this[5] += mat4x4[5]
-        this[6] += mat4x4[6]
-        this[7] += mat4x4[7]
-        this[8] += mat4x4[8]
-        this[9] += mat4x4[9]
-        this[10] += mat4x4[10]
-        this[11] += mat4x4[11]
-        this[12] += mat4x4[12]
-        this[13] += mat4x4[13]
-        this[14] += mat4x4[14]
-        this[15] += mat4x4[15]
-
-        return this
+        return setMat(matrix, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
     }
 
-    subtract(mat4x4)
+    static add(m1, m2)
     {
-        this[0] -= mat4x4[0]
-        this[1] -= mat4x4[1]
-        this[2] -= mat4x4[2]
-        this[3] -= mat4x4[3]
-        this[4] -= mat4x4[4]
-        this[5] -= mat4x4[5]
-        this[6] -= mat4x4[6]
-        this[7] -= mat4x4[7]
-        this[8] -= mat4x4[8]
-        this[9] -= mat4x4[9]
-        this[10] -= mat4x4[10]
-        this[11] -= mat4x4[11]
-        this[12] -= mat4x4[12]
-        this[13] -= mat4x4[13]
-        this[14] -= mat4x4[14]
-        this[15] -= mat4x4[15]
+        m1[0] += m2[0]
+        m1[1] += m2[1]
+        m1[2] += m2[2]
+        m1[3] += m2[3]
+        m1[4] += m2[4]
+        m1[5] += m2[5]
+        m1[6] += m2[6]
+        m1[7] += m2[7]
+        m1[8] += m2[8]
+        m1[9] += m2[9]
+        m1[10] += m2[10]
+        m1[11] += m2[11]
+        m1[12] += m2[12]
+        m1[13] += m2[13]
+        m1[14] += m2[14]
+        m1[15] += m2[15]
 
-        return this
+        return m1
     }
 
-    multiplyScalar(scalar)
+    static subtract(m1, m2)
     {
-        this[0] *= scalar
-        this[1] *= scalar
-        this[2] *= scalar
-        this[3] *= scalar
-        this[4] *= scalar
-        this[5] *= scalar
-        this[6] *= scalar
-        this[7] *= scalar
-        this[8] *= scalar
-        this[9] *= scalar
-        this[10] *= scalar
-        this[11] *= scalar
-        this[12] *= scalar
-        this[13] *= scalar
-        this[14] *= scalar
-        this[15] *= scalar
+        m1[0] -= m2[0]
+        m1[1] -= m2[1]
+        m1[2] -= m2[2]
+        m1[3] -= m2[3]
+        m1[4] -= m2[4]
+        m1[5] -= m2[5]
+        m1[6] -= m2[6]
+        m1[7] -= m2[7]
+        m1[8] -= m2[8]
+        m1[9] -= m2[9]
+        m1[10] -= m2[10]
+        m1[11] -= m2[11]
+        m1[12] -= m2[12]
+        m1[13] -= m2[13]
+        m1[14] -= m2[14]
+        m1[15] -= m2[15]
 
-        return this
+        return m1
     }
 
-    multiplyScalarAndAdd(mat4x4, scalar)
+    static multiplyScalar(scalar)
     {
-        this[0] += mat4x4[0] * scalar
-        this[1] += mat4x4[1] * scalar
-        this[2] += mat4x4[2] * scalar
-        this[3] += mat4x4[3] * scalar
-        this[4] += mat4x4[4] * scalar
-        this[5] += mat4x4[5] * scalar
-        this[6] += mat4x4[6] * scalar
-        this[7] += mat4x4[7] * scalar
-        this[8] += mat4x4[8] * scalar
-        this[9] += mat4x4[9] * scalar
-        this[10] += mat4x4[10] * scalar
-        this[11] += mat4x4[11] * scalar
-        this[12] += mat4x4[12] * scalar
-        this[13] += mat4x4[13] * scalar
-        this[14] += mat4x4[14] * scalar
-        this[15] += mat4x4[15] * scalar
+        m1[0] *= scalar
+        m1[1] *= scalar
+        m1[2] *= scalar
+        m1[3] *= scalar
+        m1[4] *= scalar
+        m1[5] *= scalar
+        m1[6] *= scalar
+        m1[7] *= scalar
+        m1[8] *= scalar
+        m1[9] *= scalar
+        m1[10] *= scalar
+        m1[11] *= scalar
+        m1[12] *= scalar
+        m1[13] *= scalar
+        m1[14] *= scalar
+        m1[15] *= scalar
 
-        return this
+        return m1
     }
 
-    exactEquals(mat4x4)
+    static multiplyScalarAndAdd(m1, m2, scalar)
     {
-        return this[0] === mat4x4[0] && this[1] === mat4x4[1] && this[2] === mat4x4[2] && this[3] === mat4x4[3] && this[4] === mat4x4[4] && this[5] === mat4x4[5] && this[6] === mat4x4[6] && this[7] === mat4x4[7] && this[8] === mat4x4[8] && this[9] === mat4x4[9] && this[10] === mat4x4[10] && this[11] === mat4x4[11] && this[12] === mat4x4[12] && this[13] === mat4x4[13] && this[14] === mat4x4[14] && this[15] === mat4x4[15]
+        m1[0] += m2[0] * scalar
+        m1[1] += m2[1] * scalar
+        m1[2] += m2[2] * scalar
+        m1[3] += m2[3] * scalar
+        m1[4] += m2[4] * scalar
+        m1[5] += m2[5] * scalar
+        m1[6] += m2[6] * scalar
+        m1[7] += m2[7] * scalar
+        m1[8] += m2[8] * scalar
+        m1[9] += m2[9] * scalar
+        m1[10] += m2[10] * scalar
+        m1[11] += m2[11] * scalar
+        m1[12] += m2[12] * scalar
+        m1[13] += m2[13] * scalar
+        m1[14] += m2[14] * scalar
+        m1[15] += m2[15] * scalar
+
+        return m1
     }
 
-    equals(mat4x4)
+    static exactEquals(m1, m2)
     {
-        const [a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15] = this
-        const [b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13, b14, b15] = mat4x4
+        return m1[0] === m2[0] && m1[1] === m2[1] && m1[2] === m2[2] && m1[3] === m2[3] && m1[4] === m2[4] && m1[5] === m2[5] && m1[6] === m2[6] && m1[7] === m2[7] && m1[8] === m2[8] && m1[9] === m2[9] && m1[10] === m2[10] && m1[11] === m2[11] && m1[12] === m2[12] && m1[13] === m2[13] && m1[14] === m2[14] && m1[15] === m2[15]
+    }
+
+    static equals(m1, m2)
+    {
+        const [a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15] = m1
+        const [b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13, b14, b15] = m2
 
         return (Math.abs(a0 - b0) <= EPSILON * Math.max(1.0, Math.abs(a0), Math.abs(b0))
             && Math.abs(a1 - b1) <= EPSILON * Math.max(1.0, Math.abs(a1), Math.abs(b1))
@@ -171,41 +176,41 @@ export default class Matrix4 extends Float32Array
             && Math.abs(a15 - b15) <= EPSILON * Math.max(1.0, Math.abs(a15), Math.abs(b15)))
     }
 
-    transpose(mat4x4)
+    static transpose(m1, m2)
     {
-        if (mat4x4 === this)
+        if (m2 === m1)
         {
-            const m1 = mat4x4[1]
-            const m2 = mat4x4[2]
-            const m3 = mat4x4[3]
-            const m12 = mat4x4[6]
-            const m13 = mat4x4[7]
-            const m23 = mat4x4[11]
+            const ma = m2[1]
+            const mb = m2[2]
+            const mc = m2[3]
+            const md = m2[6]
+            const me = m2[7]
+            const mf = m2[11]
             
-            this[1] = mat4x4[4]
-            this[2] = mat4x4[8]
-            this[3] = mat4x4[12]
-            this[4] = m1
-            this[6] = mat4x4[9]
-            this[7] = mat4x4[13]
-            this[8] = m2
-            this[9] = m12
-            this[11] = mat4x4[14]
-            this[12] = m3
-            this[13] = m13
-            this[14] = m23
+            m1[1] = m2[4]
+            m1[2] = m2[8]
+            m1[3] = m2[12]
+            m1[4] = ma
+            m1[6] = m2[9]
+            m1[7] = m2[13]
+            m1[8] = mb
+            m1[9] = md
+            m1[11] = m2[14]
+            m1[12] = mc
+            m1[13] = me
+            m1[14] = mf
         }
         else
         {
-            setMat(this, mat4x4[0], mat4x4[4], mat4x4[8], mat4x4[12], mat4x4[1], mat4x4[5], mat4x4[9], mat4x4[13], mat4x4[2], mat4x4[6], mat4x4[10], mat4x4[14], mat4x4[3], mat4x4[7], mat4x4[11], mat4x4[15])
+            setMat(m1, m2[0], m2[4], m2[8], m2[12], m2[1], m2[5], m2[9], m2[13], m2[2], m2[6], m2[10], m2[14], m2[3], m2[7], m2[11], m2[15])
         }
 
-        return this
+        return m1
     }
 
-    invert()
+    static invert(matrix)
     {
-        const [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22,  a23,  a30,  a31,  a32,  a33] = this
+        const [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22,  a23,  a30,  a31,  a32,  a33] = matrix
 
         const b00 = a00 * a11 - a01 * a10
         const b01 = a00 * a12 - a02 * a10
@@ -224,12 +229,12 @@ export default class Matrix4 extends Float32Array
         let det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06
 
         if (!det)
-            return this
+            return matrix
 
         det = 1.0 / det
 
-        setMat(
-            this, 
+        return setMat(
+            matrix, 
             (a11 * b11 - a12 * b10 + a13 * b09) * det,
             (a02 * b10 - a01 * b11 - a03 * b09) * det,
             (a31 * b05 - a32 * b04 + a33 * b03) * det,
@@ -247,16 +252,14 @@ export default class Matrix4 extends Float32Array
             (a31 * b01 - a30 * b03 - a32 * b00) * det,
             (a20 * b03 - a21 * b01 + a22 * b00) * det
         )
-
-        return this
     }
 
-    adjoint()
+    static adjoint(matrix)
     {
-        const [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22,  a23,  a30,  a31,  a32,  a33] = this
+        const [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22,  a23,  a30,  a31,  a32,  a33] = matrix
 
-        setMat(
-             this, 
+        return setMat(
+             matrix, 
              (a11 * (a22 * a33 - a23 * a32) - a21 * (a12 * a33 - a13 * a32) + a31 * (a12 * a23 - a13 * a22)),
             -(a01 * (a22 * a33 - a23 * a32) - a21 * (a02 * a33 - a03 * a32) + a31 * (a02 * a23 - a03 * a22)),
              (a01 * (a12 * a33 - a13 * a32) - a11 * (a02 * a33 - a03 * a32) + a31 * (a02 * a13 - a03 * a12)),
@@ -274,100 +277,98 @@ export default class Matrix4 extends Float32Array
             -(a00 * (a11 * a32 - a12 * a31) - a10 * (a01 * a32 - a02 * a31) + a30 * (a01 * a12 - a02 * a11)),
              (a00 * (a11 * a22 - a12 * a21) - a10 * (a01 * a22 - a02 * a21) + a20 * (a01 * a12 - a02 * a11))
         )
-        
-        return this
     }
 
-    determinant()
+    static determinant(matrix)
     {
-        const [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22, a23, a30, a31, a32, a33] = this
+        const [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22, a23, a30, a31, a32, a33] = matrix
 
-        const b00 = a00 * a11 - a01 * a10,
-              b01 = a00 * a12 - a02 * a10,
-              b02 = a00 * a13 - a03 * a10,
-              b03 = a01 * a12 - a02 * a11,
-              b04 = a01 * a13 - a03 * a11,
-              b05 = a02 * a13 - a03 * a12,
-              b06 = a20 * a31 - a21 * a30,
-              b07 = a20 * a32 - a22 * a30,
-              b08 = a20 * a33 - a23 * a30,
-              b09 = a21 * a32 - a22 * a31,
-              b10 = a21 * a33 - a23 * a31,
-              b11 = a22 * a33 - a23 * a32
+        const b00 = a00 * a11 - a01 * a10
+        const b01 = a00 * a12 - a02 * a10
+        const b02 = a00 * a13 - a03 * a10
+        const b03 = a01 * a12 - a02 * a11
+        const b04 = a01 * a13 - a03 * a11
+        const b05 = a02 * a13 - a03 * a12
+        const b06 = a20 * a31 - a21 * a30
+        const b07 = a20 * a32 - a22 * a30
+        const b08 = a20 * a33 - a23 * a30
+        const b09 = a21 * a32 - a22 * a31
+        const b10 = a21 * a33 - a23 * a31
+        const b11 = a22 * a33 - a23 * a32
 
         return b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06
     }
 
-    multiply(mat4x4)
+    static multiply(m1, m2)
     {
-        const [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22,  a23,  a30,  a31,  a32,  a33] = this
+        const [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22,  a23,  a30,  a31,  a32,  a33] = m1
 
         // Cache only the current line of the second matrix
-        let [b0, b1, b2, b3] = mat4x4
-        this[0] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30
-        this[1] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31
-        this[2] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32
-        this[3] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33
+        let [b0, b1, b2, b3] = m2
+        m1[0] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30
+        m1[1] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31
+        m1[2] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32
+        m1[3] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33
 
-        b0 = mat4x4[4]
-        b1 = mat4x4[5]
-        b2 = mat4x4[6]
-        b3 = mat4x4[7]
-        this[4] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30
-        this[5] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31
-        this[6] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32
-        this[7] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33
+        b0 = m2[4]
+        b1 = m2[5]
+        b2 = m2[6]
+        b3 = m2[7]
+        m1[4] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30
+        m1[5] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31
+        m1[6] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32
+        m1[7] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33
 
-        b0 = mat4x4[8]
-        b1 = mat4x4[9]
-        b2 = mat4x4[10]
-        b3 = mat4x4[11]
-        this[8] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30
-        this[9] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31
-        this[10] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32
-        this[11] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33
+        b0 = m2[8]
+        b1 = m2[9]
+        b2 = m2[10]
+        b3 = m2[11]
+        m1[8] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30
+        m1[9] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31
+        m1[10] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32
+        m1[11] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33
 
-        b0 = mat4x4[12]
-        b1 = mat4x4[13]
-        b2 = mat4x4[14]
-        b3 = mat4x4[15]
-        this[12] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30
-        this[13] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31
-        this[14] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32
-        this[15] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33
+        b0 = m2[12]
+        b1 = m2[13]
+        b2 = m2[14]
+        b3 = m2[15]
+        m1[12] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30
+        m1[13] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31
+        m1[14] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32
+        m1[15] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33
 
-        return this
+        return m1
     }
 
-    translate([x, y, z])
+    static translate(matrix, [x, y, z])
     {
-        this[12] = this[0] * x + this[4] * y + this[8] * z + this[12]
-        this[13] = this[1] * x + this[5] * y + this[9] * z + this[13]
-        this[14] = this[2] * x + this[6] * y + this[10] * z + this[14]
-        this[15] = this[3] * x + this[7] * y + this[11] * z + this[15]
+        matrix[12] = matrix[0] * x + matrix[4] * y + matrix[8] * z + matrix[12]
+        matrix[13] = matrix[1] * x + matrix[5] * y + matrix[9] * z + matrix[13]
+        matrix[14] = matrix[2] * x + matrix[6] * y + matrix[10] * z + matrix[14]
+        matrix[15] = matrix[3] * x + matrix[7] * y + matrix[11] * z + matrix[15]
 
-        return this
+        return matrix
     }
 
-    scale([x, y, z])
+    static scale(matrix, [x, y, z])
     {
-        this[0] *= x
-        this[1] *= x
-        this[2] *= x
-        this[3] *= x
-        this[4] *= y
-        this[5] *= y
-        this[6] *= y
-        this[7] *= y
-        this[8] *= z
-        this[9] *= z
-        this[10] *= z
-        this[11] *= z
+        matrix[0] *= x
+        matrix[1] *= x
+        matrix[2] *= x
+        matrix[3] *= x
+        matrix[4] *= y
+        matrix[5] *= y
+        matrix[6] *= y
+        matrix[7] *= y
+        matrix[8] *= z
+        matrix[9] *= z
+        matrix[10] *= z
+        matrix[11] *= z
 
-        return this
+        return matrix
     }
 
-    rotate(rad, [x, y, z])
+    static rotate(matrix, rad, [x, y, z])
     {
         let len = Math.sqrt(x * x + y * y + z * z)
 
@@ -382,7 +383,7 @@ export default class Matrix4 extends Float32Array
             const c = Math.cos(rad)
             const t = 1 - c
 
-            const [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22, a23] = this
+            const [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22, a23] = matrix
 
             // Construct the elements of the rotation matrix
             const b00 = x * x * t + c
@@ -396,107 +397,103 @@ export default class Matrix4 extends Float32Array
             const b22 = z * z * t + c
 
             // Perform rotation-specific matrix multiplication
-            this[0] = a00 * b00 + a10 * b01 + a20 * b02
-            this[1] = a01 * b00 + a11 * b01 + a21 * b02
-            this[2] = a02 * b00 + a12 * b01 + a22 * b02
-            this[3] = a03 * b00 + a13 * b01 + a23 * b02
-            this[4] = a00 * b10 + a10 * b11 + a20 * b12
-            this[5] = a01 * b10 + a11 * b11 + a21 * b12
-            this[6] = a02 * b10 + a12 * b11 + a22 * b12
-            this[7] = a03 * b10 + a13 * b11 + a23 * b12
-            this[8] = a00 * b20 + a10 * b21 + a20 * b22
-            this[9] = a01 * b20 + a11 * b21 + a21 * b22
-            this[10] = a02 * b20 + a12 * b21 + a22 * b22
-            this[11] = a03 * b20 + a13 * b21 + a23 * b22
+            matrix[0] = a00 * b00 + a10 * b01 + a20 * b02
+            matrix[1] = a01 * b00 + a11 * b01 + a21 * b02
+            matrix[2] = a02 * b00 + a12 * b01 + a22 * b02
+            matrix[3] = a03 * b00 + a13 * b01 + a23 * b02
+            matrix[4] = a00 * b10 + a10 * b11 + a20 * b12
+            matrix[5] = a01 * b10 + a11 * b11 + a21 * b12
+            matrix[6] = a02 * b10 + a12 * b11 + a22 * b12
+            matrix[7] = a03 * b10 + a13 * b11 + a23 * b12
+            matrix[8] = a00 * b20 + a10 * b21 + a20 * b22
+            matrix[9] = a01 * b20 + a11 * b21 + a21 * b22
+            matrix[10] = a02 * b20 + a12 * b21 + a22 * b22
+            matrix[11] = a03 * b20 + a13 * b21 + a23 * b22
         }
 
-        return this
+        return matrix
     }
 
-    rotateX(rad)
+    static rotateX(matrix, rad)
     {
         const s = Math.sin(rad)
         const c = Math.cos(rad)
 
-        const a10 = this[4]
-        const a11 = this[5]
-        const a12 = this[6]
-        const a13 = this[7]
-        const a20 = this[8]
-        const a21 = this[9]
-        const a22 = this[10]
-        const a23 = this[11]
+        const a10 = matrix[4]
+        const a11 = matrix[5]
+        const a12 = matrix[6]
+        const a13 = matrix[7]
+        const a20 = matrix[8]
+        const a21 = matrix[9]
+        const a22 = matrix[10]
+        const a23 = matrix[11]
 
         // Perform axis-specific matrix multiplication
-        this[4] = a10 * c + a20 * s
-        this[5] = a11 * c + a21 * s
-        this[6] = a12 * c + a22 * s
-        this[7] = a13 * c + a23 * s
-        this[8] = a20 * c - a10 * s
-        this[9] = a21 * c - a11 * s
-        this[10] = a22 * c - a12 * s
-        this[11] = a23 * c - a13 * s
+        matrix[4] = a10 * c + a20 * s
+        matrix[5] = a11 * c + a21 * s
+        matrix[6] = a12 * c + a22 * s
+        matrix[7] = a13 * c + a23 * s
+        matrix[8] = a20 * c - a10 * s
+        matrix[9] = a21 * c - a11 * s
+        matrix[10] = a22 * c - a12 * s
+        matrix[11] = a23 * c - a13 * s
 
-        return this
+        return matrix
     }
 
-    rotateY(rad)
+    static rotateY(matrix, rad)
     {
         const s = Math.sin(rad)
         const c = Math.cos(rad)
-        const [a00, a01, a02, a03] = this
-        const a20 = this[8]
-        const a21 = this[9]
-        const a22 = this[10]
-        const a23 = this[11]
+        const [a00, a01, a02, a03] = matrix
+        const a20 = matrix[8]
+        const a21 = matrix[9]
+        const a22 = matrix[10]
+        const a23 = matrix[11]
 
         // Perform axis-specific matrix multiplication
-        this[0] = a00 * c - a20 * s
-        this[1] = a01 * c - a21 * s
-        this[2] = a02 * c - a22 * s
-        this[3] = a03 * c - a23 * s
-        this[8] = a00 * s + a20 * c
-        this[9] = a01 * s + a21 * c
-        this[10] = a02 * s + a22 * c
-        this[11] = a03 * s + a23 * c
+        matrix[0] = a00 * c - a20 * s
+        matrix[1] = a01 * c - a21 * s
+        matrix[2] = a02 * c - a22 * s
+        matrix[3] = a03 * c - a23 * s
+        matrix[8] = a00 * s + a20 * c
+        matrix[9] = a01 * s + a21 * c
+        matrix[10] = a02 * s + a22 * c
+        matrix[11] = a03 * s + a23 * c
 
-        return this
+        return matrix
     }
 
-    rotateZ(rad)
+    static rotateZ(matrix, rad)
     {
         const s = Math.sin(rad)
         const c = Math.cos(rad)
-        const [a00, a01, a02, a03, a10, a11, a12, a13] = this
+        const [a00, a01, a02, a03, a10, a11, a12, a13] = matrix
 
         // Perform axis-specific matrix multiplication
-        this[0] = a00 * c + a10 * s
-        this[1] = a01 * c + a11 * s
-        this[2] = a02 * c + a12 * s
-        this[3] = a03 * c + a13 * s
-        this[4] = a10 * c - a00 * s
-        this[5] = a11 * c - a01 * s
-        this[6] = a12 * c - a02 * s
-        this[7] = a13 * c - a03 * s
+        matrix[0] = a00 * c + a10 * s
+        matrix[1] = a01 * c + a11 * s
+        matrix[2] = a02 * c + a12 * s
+        matrix[3] = a03 * c + a13 * s
+        matrix[4] = a10 * c - a00 * s
+        matrix[5] = a11 * c - a01 * s
+        matrix[6] = a12 * c - a02 * s
+        matrix[7] = a13 * c - a03 * s
 
-        return this
+        return matrix
     }
 
-    fromTranslation(vec3)
+    static fromTranslation([x, y, z], matrix = new Float32Array(16))
     {
-        setMat(this, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, vec3[0], vec3[1], vec3[2], 1)
-
-        return this
+        return setMat(matrix, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, x, y, z, 1)
     }
 
-    fromScaling(vec3)
+    static fromScaling([x, y, z], matrix = new Float32Array(16))
     {
-        setMat(this, vec3[0], 0, 0, 0, 0, vec3[1], 0, 0, 0, 0, vec3[2], 0, 0, 0, 0, 1)
-
-        return this
+        return setMat(matrix, x, 0, 0, 0, 0, y, 0, 0, 0, 0, z, 0, 0, 0, 0, 1)
     }
 
-    fromRotation(rad, [x, y, z])
+    static fromRotation(rad, [x, y, z], matrix = new Float32Array(16))
     {
         let len = Math.sqrt(x * x + y * y + z * z)
 
@@ -512,8 +509,7 @@ export default class Matrix4 extends Float32Array
             const t = 1 - c
 
             // Perform rotation-specific matrix multiplication
-            setMat(
-                this, 
+            setMat(matrix,
                 x * x * t + c,
                 y * x * t + z * s,
                 z * x * t - y * s,
@@ -533,44 +529,38 @@ export default class Matrix4 extends Float32Array
             )
         }
 
-        return this
+        return matrix
     }
 
-    fromXRotation(rad)
+    static fromXRotation(rad, matrix = new Float32Array(16))
     {
         const s = Math.sin(rad)
         const c = Math.cos(rad)
 
         // Perform axis-specific matrix multiplication
-        setMat(this, 1, 0, 0, 0, 0, c, s, 0, 0, -s, c, 0, 0, 0, 0, 1)
-
-        return this
+        return setMat(matrix, 1, 0, 0, 0, 0, c, s, 0, 0, -s, c, 0, 0, 0, 0, 1)
     }
 
-    fromYRotation(rad)
+    static fromYRotation(rad, matrix = new Float32Array(16))
     {
         const s = Math.sin(rad)
         const c = Math.cos(rad)
 
         // Perform axis-specific matrix multiplication
-        setMat(this, c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, 0, 0, 0, 1)
-        return this
+        return setMat(matrix, c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, 0, 0, 0, 1)
     }
 
-    fromZRotation(rad)
+    static fromZRotation(rad, matrix = new Float32Array(16))
     {
         const s = Math.sin(rad)
         const c = Math.cos(rad)
 
         // Perform axis-specific matrix multiplication
-        setMat(this, c, s, 0, 0, -s, c, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
-
-        return this
+        return setMat(matrix, c, s, 0, 0, -s, c, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
     }
 
-    fromQuat(quat)
+    static fromQuat([x, y, z, w], matrix = new Float32Array(16))
     {
-        const [x, y, z, w] = quat
         const x2 = x + x
         const y2 = y + y
         const z2 = z + z
@@ -584,77 +574,65 @@ export default class Matrix4 extends Float32Array
         const wy = w * y2
         const wz = w * z2
 
-        setMat(this, 1 - yy - zz, yx + wz, zx - wy, 0, yx - wz, 1 - xx - zz, zy + wx, 0, zx + wy, zy - wx, 1 - xx - yy, 0, 0, 0, 0, 1)
-
-        return this
+        return setMat(matrix, 1 - yy - zz, yx + wz, zx - wy, 0, yx - wz, 1 - xx - zz, zy + wx, 0, zx + wy, zy - wx, 1 - xx - yy, 0, 0, 0, 0, 1)
     }
 
-    fromRotationTranslation(quat, vec3)
+    static fromQuatTranslation([qx, qy, qz, qw], [x, y, z], matrix = new Float32Array(16))
     {
         // Quaternion math
-        const [x, y, z, w] = quat
-        const x2 = x + x
-        const y2 = y + y
-        const z2 = z + z
-        const xx = x * x2
-        const xy = x * y2
-        const xz = x * z2
-        const yy = y * y2
-        const yz = y * z2
-        const zz = z * z2
-        const wx = w * x2
-        const wy = w * y2
-        const wz = w * z2
+        const x2 = qx + qx
+        const y2 = qy + qy
+        const z2 = qz + qz
+        const xx = qx * x2
+        const xy = qx * y2
+        const xz = qx * z2
+        const yy = qy * y2
+        const yz = qy * z2
+        const zz = qz * z2
+        const wx = qw * x2
+        const wy = qw * y2
+        const wz = qw * z2
 
-        setMat(this, 1 - (yy + zz), xy + wz, xz - wy, 0, xy - wz, 1 - (xx + zz), yz + wx, 0, xz + wy, yz - wx, 1 - (xx + yy), 0, vec3[0], vec3[1], vec3[2], 1)
-
-        return this
+        return setMat(matrix, 1 - (yy + zz), xy + wz, xz - wy, 0, xy - wz, 1 - (xx + zz), yz + wx, 0, xz + wy, yz - wx, 1 - (xx + yy), 0, x, y, z, 1)
     }
 
-    fromRotationTranslationScale(quat, vec3, [sx, sy, sz])
+    static fromQuatTranslationScale([qx, qy, qz, qw], [x, y, z], [sx, sy, sz], matrix = new Float32Array(16))
     {
         // Quaternion math
-        const [x, y, z, w] = quat
-        const x2 = x + x
-        const y2 = y + y
-        const z2 = z + z
-        const xx = x * x2
-        const xy = x * y2
-        const xz = x * z2
-        const yy = y * y2
-        const yz = y * z2
-        const zz = z * z2
-        const wx = w * x2
-        const wy = w * y2
-        const wz = w * z2
+        const x2 = qx + qx
+        const y2 = qy + qy
+        const z2 = qz + qz
+        const xx = qx * x2
+        const xy = qx * y2
+        const xz = qx * z2
+        const yy = qy * y2
+        const yz = qy * z2
+        const zz = qz * z2
+        const wx = qw * x2
+        const wy = qw * y2
+        const wz = qw * z2
 
-        setMat(this, (1 - (yy + zz)) * sx, (xy + wz) * sx, (xz - wy) * sx, 0, (xy - wz) * sy, (1 - (xx + zz)) * sy, (yz + wx) * sy, 0, (xz + wy) * sz, (yz - wx) * sz, (1 - (xx + yy)) * sz, 0, vec3[0], vec3[1], vec3[2], 1)
-
-        return this
+        return setMat(matrix, (1 - (yy + zz)) * sx, (xy + wz) * sx, (xz - wy) * sx, 0, (xy - wz) * sy, (1 - (xx + zz)) * sy, (yz + wx) * sy, 0, (xz + wy) * sz, (yz - wx) * sz, (1 - (xx + yy)) * sz, 0, x, y, z, 1)
     }
 
-    fromRotationTranslationScaleOrigin(rot, trans, scale, origin)
+    static fromQuatTranslationScaleOrigin([qx, qy, qz, qw], [x, y, z], [sx, sy, sz], [ox, oy, oz], matrix = new Float32Array(16))
     {
         // Quaternion math
-        const [x, y, z, w] = rot
-        const x2 = x + x
-        const y2 = y + y
-        const z2 = z + z
-        const xx = x * x2
-        const xy = x * y2
-        const xz = x * z2
-        const yy = y * y2
-        const yz = y * z2
-        const zz = z * z2
-        const wx = w * x2
-        const wy = w * y2
-        const wz = w * z2
-
-        const [sx, sy, sz] = scale
-        const [ox, oy, oz] = origin
+        const x2 = qx + qx
+        const y2 = qy + qy
+        const z2 = qz + qz
+        const xx = qx * x2
+        const xy = qx * y2
+        const xz = qx * z2
+        const yy = qy * y2
+        const yz = qy * z2
+        const zz = qz * z2
+        const wx = qw * x2
+        const wy = qw * y2
+        const wz = qw * z2
 
         setMat(
-            this, 
+            matrix, 
             (1 - (yy + zz)) * sx,
             (xy + wz) * sx,
             (xz - wy) * sx,
@@ -667,73 +645,73 @@ export default class Matrix4 extends Float32Array
             (yz - wx) * sz,
             (1 - (xx + yy)) * sz,
             0,
-            trans[0] + ox - (this[0] * ox + this[4] * oy + this[8] * oz),
-            trans[1] + oy - (this[1] * ox + this[5] * oy + this[9] * oz),
-            trans[2] + oz - (this[2] * ox + this[6] * oy + this[10] * oz),
+            x + ox - (matrix[0] * ox + matrix[4] * oy + matrix[8] * oz),
+            y + oy - (matrix[1] * ox + matrix[5] * oy + matrix[9] * oz),
+            z + oz - (matrix[2] * ox + matrix[6] * oy + matrix[10] * oz),
             1
         )
 
-        return this
+        return matrix
     }
 
-    getTranslation(vec3 = new Float32Array(3))
+    static getTranslation(matrix, vec3 = new Float32Array(3))
     {
-        vec3[0] = this[12]
-        vec3[1] = this[13]
-        vec3[2] = this[14]
+        vec3[0] = matrix[12]
+        vec3[1] = matrix[13]
+        vec3[2] = matrix[14]
 
         return vec3
     }
 
-    getRotation(quat = new Float32Array(4))
+    static getQuat(matrix, quat = new Float32Array(4))
     {
         // Algorithm taken from http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
-        var trace = this[0] + this[5] + this[10]
+        var trace = matrix[0] + matrix[5] + matrix[10]
 
         if (trace > 0)
         {
             const S = Math.sqrt(trace + 1.0) * 2
-            quat[0] = (this[6] - this[9]) / S
-            quat[1] = (this[8] - this[2]) / S
-            quat[2] = (this[1] - this[4]) / S
+            quat[0] = (matrix[6] - matrix[9]) / S
+            quat[1] = (matrix[8] - matrix[2]) / S
+            quat[2] = (matrix[1] - matrix[4]) / S
             quat[3] = 0.25 * S
         }
-        else if (this[0] > this[5] & this[0] > this[10])
+        else if (matrix[0] > matrix[5] & matrix[0] > matrix[10])
         {
-            const S = Math.sqrt(1.0 + this[0] - this[5] - this[10]) * 2
+            const S = Math.sqrt(1.0 + matrix[0] - matrix[5] - matrix[10]) * 2
             quat[0] = 0.25 * S
-            quat[1] = (this[1] + this[4]) / S
-            quat[2] = (this[8] + this[2]) / S
-            quat[3] = (this[6] - this[9]) / S
+            quat[1] = (matrix[1] + matrix[4]) / S
+            quat[2] = (matrix[8] + matrix[2]) / S
+            quat[3] = (matrix[6] - matrix[9]) / S
         }
-        else if (this[5] > this[10])
+        else if (matrix[5] > matrix[10])
         {
-            const S = Math.sqrt(1.0 + this[5] - this[0] - this[10])
-            quat[0] = (this[1] + this[4]) / S * 2
+            const S = Math.sqrt(1.0 + matrix[5] - matrix[0] - matrix[10])
+            quat[0] = (matrix[1] + matrix[4]) / S * 2
             quat[1] = 0.25 * S
-            quat[2] = (this[6] + this[9]) / S
-            quat[3] = (this[8] - this[2]) / S
+            quat[2] = (matrix[6] + matrix[9]) / S
+            quat[3] = (matrix[8] - matrix[2]) / S
         }
         else
         {
-            const S = Math.sqrt(1.0 + this[10] - this[0] - this[5]) * 2
-            quat[0] = (this[8] + this[2]) / S
-            quat[1] = (this[6] + this[9]) / S
+            const S = Math.sqrt(1.0 + matrix[10] - matrix[0] - matrix[5]) * 2
+            quat[0] = (matrix[8] + matrix[2]) / S
+            quat[1] = (matrix[6] + matrix[9]) / S
             quat[2] = 0.25 * S
-            quat[3] = (this[1] - this[4]) / S
+            quat[3] = (matrix[1] - matrix[4]) / S
         }
 
         return quat
     }
 
-    frustrum(left, right, bottom, top, near, far)
+    static frustrum(matrix, left, right, bottom, top, near, far)
     {
         const rl = 1 / (right - left)
         const tb = 1 / (top - bottom)
         const nf = 1 / (near - far)
 
-        setMat(
-            this, 
+        return setMat(
+            matrix, 
             (near * 2) * rl,
             0,
             0,
@@ -751,21 +729,17 @@ export default class Matrix4 extends Float32Array
             (far * near * 2) * nf,
             0
         )
-
-        return this
     }
 
-    perspective(fovy, aspect, near, far)
+    static perspective(matrix, fovy, aspect, near, far)
     {
         const f = 1.0 / Math.tan(fovy / 2)
         const nf = 1 / (near - far)
 
-        setMat(this, f / aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, (far + near) * nf, -1, 0, 0, (2 * far * near) * nf, 0)
-
-        return this
+        return setMat(matrix, f / aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, (far + near) * nf, -1, 0, 0, (2 * far * near) * nf, 0)
     }
 
-    perspectiveFromFieldOfView(fov, near, far)
+    static perspectiveFromFieldOfView(matrix, fov, near, far)
     {
         const upTan = Math.tan(fov.upDegrees * Math.PI / 180)
         const downTan = Math.tan(fov.downDegrees * Math.PI / 180)
@@ -774,59 +748,37 @@ export default class Matrix4 extends Float32Array
         const xScale = 2 / (leftTan + rightTan)
         const yScale = 2 / (upTan + downTan)
 
-        setMat(
-            this, 
-            xScale,
-            0,
-            0,
-            0,
-            0,
-            yScale,
-            0,
-            0,
+        return setMat(
+            matrix,
+            xScale, 0, 0, 0,
+            0, yScale, 0, 0,
             -(leftTan - rightTan) * xScale * 0.5,
             (upTan - downTan) * yScale * 0.5,
-            far / (near - far),
-            -1.0,
-            0,
-            0,
+            far / (near - far), -1.0, 0, 0,
             (far * near) / (near - far),
             0
         )
-
-        return this
     }
 
-    ortho(left, right, bottom, top, near, far)
+    static ortho(matrix, left, right, bottom, top, near, far)
     {
         const lr = 1 / (left - right)
         const bt = 1 / (bottom - top)
         const nf = 1 / (near - far)
 
-        setMat(
-            this, 
-            -2 * lr,
-            0,
-            0,
-            0,
-            0,
-            -2 * bt,
-            0,
-            0,
-            0,
-            0,
-            2 * nf,
-            0,
+        return setMat(
+            matrix, 
+            -2 * lr, 0, 0, 0,
+            0, -2 * bt, 0, 0,
+            0, 0, 2 * nf, 0,
             (left + right) * lr,
             (top + bottom) * bt,
             (far + near) * nf,
             1
         )
-
-        return this
     }
 
-    lookAt(eye, center, up)
+    static lookAt(matrix, eye, center, up)
     {
         const [eyex, eyey, eyez] = eye
         const [upx, upy, upz] = up
@@ -836,7 +788,7 @@ export default class Matrix4 extends Float32Array
             Math.abs(eyey - centery) < EPSILON &&
             Math.abs(eyez - centerz) < EPSILON)
         {
-            return this.identity()
+            return Matrix4.identity(matrix)
         }
 
         let z0 = eyex - centerx
@@ -886,32 +838,20 @@ export default class Matrix4 extends Float32Array
             y2 *= len
         }
 
-        setMat(
-            this, 
-            x0,
-            y0,
-            z0,
-            0,
-            x1,
-            y1,
-            z1,
-            0,
-            x2,
-            y2,
-            z2,
-            0,
+        return setMat(
+            matrix, 
+            x0, y0, z0, 0,
+            x1, y1, z1, 0,
+            x2, y2, z2, 0,
             -(x0 * eyex + x1 * eyey + x2 * eyez),
             -(y0 * eyex + y1 * eyey + y2 * eyez),
             -(z0 * eyex + z1 * eyey + z2 * eyez),
             1
         )
-        
-
-        return this
     }
 
-    frob()
+    static frob(matrix)
     {
-        return (Math.sqrt(Math.pow(this[0], 2) + Math.pow(this[1], 2) + Math.pow(this[2], 2) + Math.pow(this[3], 2) + Math.pow(this[4], 2) + Math.pow(this[5], 2) + Math.pow(this[6], 2) + Math.pow(this[7], 2) + Math.pow(this[8], 2) + Math.pow(this[9], 2) + Math.pow(this[10], 2) + Math.pow(this[11], 2) + Math.pow(this[12], 2) + Math.pow(this[13], 2) + Math.pow(this[14], 2) + Math.pow(this[15], 2)))
+        return (Math.sqrt(Math.pow(matrix[0], 2) + Math.pow(matrix[1], 2) + Math.pow(matrix[2], 2) + Math.pow(matrix[3], 2) + Math.pow(matrix[4], 2) + Math.pow(matrix[5], 2) + Math.pow(matrix[6], 2) + Math.pow(matrix[7], 2) + Math.pow(matrix[8], 2) + Math.pow(matrix[9], 2) + Math.pow(matrix[10], 2) + Math.pow(matrix[11], 2) + Math.pow(matrix[12], 2) + Math.pow(matrix[13], 2) + Math.pow(matrix[14], 2) + Math.pow(matrix[15], 2)))
     }
 }

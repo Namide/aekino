@@ -29,12 +29,12 @@ export default class Camera3D extends Uniform
 {
     constructor(label)
     {
-        super(label, 35676, new Matrix4())
+        super(label, 35676, Matrix4.create())
        
         this.fovy = 45
         this.near = 0.1
         this.far = 1000
-        this._matrix = new Matrix4()
+        this._matrix = Matrix4.create()
         
         this.updated = true
         this.updateNum = 0

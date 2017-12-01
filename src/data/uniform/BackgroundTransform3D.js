@@ -32,7 +32,7 @@ export default class BackgroundTransform3D extends Uniform
 {
     constructor(label, camera3D, distance = 1)
     {
-        super(label, 35676, new Matrix4())
+        super(label, 35676, Matrix4.create())
 
         this.camera3D = camera3D
         this.updateNum = -1
@@ -57,15 +57,15 @@ export default class BackgroundTransform3D extends Uniform
         const transform3D = cam._matrix
 
         // Get translation of camera and invert it
-        transform3D.getTranslation(vec3)
+        Matrix4.getTranslation(transform3D, vec3)
         vec3[0] = -vec3[0] * this.distance
         vec3[1] = -vec3[1] * this.distance
         vec3[2] = -vec3[2] * this.distance
 
         // Apply perspective, substract translation and apply all transformations
-        this._data.perspective(cam.fovy * Math.PI / 180, cam.ratio, cam.near, cam.far)
-        this._data.translate(vec3)
-        this._data.multiply(transform3D)
+        Matrix4.perspective(this._data, cam.fovy * Math.PI / 180, cam.ratio, cam.near, cam.far)
+        Matrix4.translate(this._data, vec3)
+        Matrix4.multiply(this._data, transform3D)
 
         this.updateNum = this.camera3D.updateNum
     }
