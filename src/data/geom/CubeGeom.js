@@ -71,7 +71,7 @@ const cubeIndices = [
     20, 21, 22,   20, 22, 23  // Left face
 ]
 
-var cubeUV = [
+const cubeUV = [
     // Front face
     0.0, 0.0,
     1.0, 0.0,

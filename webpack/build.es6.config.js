@@ -3,11 +3,14 @@ var webpack = require('webpack')
 var BabiliPlugin = require('babili-webpack-plugin')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 
-const files = ['basics', 'load', 'relationship']
 
+// File list
+const files = ['basics', 'load', 'relationship']
 const entry = {}
 files.forEach(name => entry[name] = './sample/' + name + '.js')
 
+
+// Build config
 const plugins = [
     new BabiliPlugin(/*babiliOptions, overrides*/),
     ...files.map(name => 

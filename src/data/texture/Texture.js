@@ -70,8 +70,6 @@ export default class Texture
         this.setImg(new Uint8Array(color), 1, 1)
     }
     
-    
-    
     setImg(img = new Uint8Array([255, 255, 255, 255]), width = 1, height = 1)
     {
         this.img = img

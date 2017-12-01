@@ -3,7 +3,7 @@ const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 
-// GET A SAMPLE TO BUILD
+// Get a sample to build
 const sampleArg = process.argv.find(name => name.search('--env.sample=') > -1)
 if (!sampleArg)
 {
@@ -19,7 +19,7 @@ const sampleName = sampleArg.replace('--env.sample=', '')
 const entry = { [sampleName]: './sample/' + sampleName + '.js' }
 
 
-// BUILD CONFIG
+// Build config
 module.exports = {
     // devtool: 'eval',    // For sourcemaps
     entry,

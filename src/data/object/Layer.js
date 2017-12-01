@@ -24,7 +24,11 @@
 
 import CallOptimizer from '../../render/CallOptimizer'
 
-
+/**
+ * With a layer you can:
+ * - Group mesh : usefull to group transparent mesh and sort it
+ * - Use the same mask for multiple mesh
+ */
 export default class Layer
 {
     constructor()
@@ -41,33 +45,36 @@ export default class Layer
         this.sortCompare = (mesh1, mesh2) =>
         {
             if (mesh1.order !== mesh2.order)
-            {
                 return mesh1.order - mesh2.order
-            }
             else if (mesh1.program && mesh2.program && mesh1.program !== mesh2.program)
-            {
                 return  mesh1.program.id - mesh2.program.id
-            }
             else if (mesh1.textures && mesh2.textures && mesh1.textures.length > 0 && mesh1.textures.length > 0)
-            {
                 return  mesh1.textures[0].id - mesh2.textures[1].id
-            }
 
             return 0
         }
     }
 
+    /**
+     * @param {Mask} mask 
+     */
     setMask(mask)
     {
         this.mask = mask
     }
 
+    /**
+     * @param {Mesh} mesh 
+     */
     addMesh(mesh)
     {
         this.meshs.push(mesh)
     }
 
-    rmMesh()
+    /**
+     * @param {Mesh} mesh 
+     */
+    removeMesh(mesh)
     {
         const id = this.meshs.indexOf(mesh)
         if (id > -1)
@@ -79,6 +86,9 @@ export default class Layer
         this.meshs.sort(this.sortCompare)
     }
     
+    /**
+     * Check if meshes and mask are initialized in the rendering context
+     */
     isInitialized()
     {
         if (this.mask !== null)
@@ -99,7 +109,10 @@ export default class Layer
 
         return true
     }
-    
+
+    /**
+     * @param {WebGLRenderingContext} gl    Current WebGL context
+     */
     init(gl)
     {
         let success = true
@@ -115,7 +128,12 @@ export default class Layer
 
         return success
     }
-    
+    /**
+     * Draw meshes with mask in the current rendering context
+     * 
+     * @param {WebGLRenderingContext} gl        Current WebGL context
+     * @param {Array of Function} customCalls   Custom functions called during all meshes render
+     */
     draw(gl, customCalls = [])
     {
         if (this.mask)

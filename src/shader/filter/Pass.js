@@ -92,7 +92,7 @@ export default class Pass extends Mesh
      */
     setDepthTexture(enable, gl)
     {
-        this.rmTexture(this.inDepthTexture)
+        this.removeTexture(this.inDepthTexture)
         
         if (enable)
             this.addTexture(this.inDepthTexture)

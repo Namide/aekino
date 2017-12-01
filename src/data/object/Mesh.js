@@ -24,9 +24,15 @@
 
 import CallOptimizer from '../../render/CallOptimizer'
 
-
+/**
+ * A mesh contain all data of a renderable WebGL object.
+ */
 export default class Mesh
 {
+    /**
+     * @param {Geom} geom           Geometry of the object
+     * @param {Program} program     Program of the object
+     */
     constructor(geom, program)
     {
         this.geom = geom
@@ -48,56 +54,85 @@ export default class Mesh
         this._isInitialized = false
     }
 
-    // https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/blendFunc
-    // 770: gl.SRC_ALPHA, 771: gl.ONE_MINUS_SRC_ALPHA
+    /**
+     * Change the blending pixel arithmetic function of the object.
+     * https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/blendFunc
+     * 
+     * @param {GLenum} sfactor       770: gl.SRC_ALPHA, 771: gl.ONE_MINUS_SRC_ALPHA
+     * @param {GLenum} dfactor 
+     */
     addBlending(sfactor, dfactor)
     {
         this.blending[sfactor] = dfactor
     }
     
+    /**
+     * @param {Uniform} uniform
+     */
     addUniform(uniform)
     {
         this.uniforms.push(uniform)
     }
     
-    rmUniform(uniform)
+    /**
+     * @param {Uniform} uniform 
+     */
+    removeUniform(uniform)
     {
         const i = this.uniforms.indexOf(uniform)
         if (i > -1)
             this.uniforms.splice(i, 1)
     }
     
+    /**
+     * Global uniform is shared between objects.
+     * It's better for optimize
+     * 
+     * @param {Uniform} uniform 
+     */
     addGlobalUniform(uniform)
     {
         this.globalUniforms.push(uniform)
     }
     
-    rmGlobalUniform(uniform)
+    /**
+     * @param {Uniform} uniform 
+     */
+    removeGlobalUniform(uniform)
     {
         const i = this.globalUniforms.indexOf(uniform)
         if (i > -1)
             this.globalUniforms.splice(i, 1)
     }
     
+    /**
+     * @param {Texture} texture 
+     */
     addTexture(texture)
     {
         this.textures.push(texture)
     }
     
-    rmTexture(texture)
+    /**
+     * @param {Texture} texture 
+     */
+    removeTexture(texture)
     {
         const i = this.textures.indexOf(texture)
         if (i > -1)
             this.textures.splice(i, 1)
     }
     
+    /**
+     * Check if all the data of the mesh are initialized in the rendering context
+     */
     isInitialized()
     {
         let success = this._isInitialized
         
         if (success)
             return success
-        
+
         
         if (!this.program.isInitialized())
             success = false
@@ -118,7 +153,12 @@ export default class Mesh
         return success
     }
     
-    // GET LOCATIONS (AND INDEX) AND SAVE IT FOR CALLS
+    /**
+     * Get all locations of the uniforms, buffers, attributes and textures to
+     * storage these to "calls" functions
+     * 
+     * @param {WebGLRenderingContext} gl    Current WebGL context
+     */
     _setCalls(gl)
     {
         const program = this.program
@@ -160,6 +200,11 @@ export default class Mesh
         }
     }
     
+    /**
+     * Initilialize all data of the mesh to the current rendering context 
+     * 
+     * @param {WebGLRenderingContext} gl    Current WebGL context
+     */
     _initData(gl)
     {
         const program = this.program
@@ -190,6 +235,10 @@ export default class Mesh
         this.localCalls.length = 0
     }
     
+    
+    /**
+     * @param {WebGLRenderingContext} gl    Current WebGL context
+     */
     init(gl)
     {
         const program = this.program
@@ -225,6 +274,12 @@ export default class Mesh
         return success
     }
     
+    /**
+     * Draw the mesh in the current rendering context
+     * 
+     * @param {WebGLRenderingContext} gl        Current WebGL context
+     * @param {Array of Function} customCalls   Custom functions called during the mesh render
+     */
     draw(gl, customCalls = [])
     {
         if (!this._callOptimizer.optimizeDepthTest(this.depthTest))
