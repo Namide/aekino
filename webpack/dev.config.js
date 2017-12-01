@@ -1,10 +1,10 @@
-var path = require('path')
-var webpack = require('webpack')
-var HtmlWebpackPlugin = require('html-webpack-plugin')
+const path = require('path')
+const webpack = require('webpack')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 
+// GET A SAMPLE TO BUILD
 const sampleArg = process.argv.find(name => name.search('--env.sample=') > -1)
-
 if (!sampleArg)
 {
     console.log()
@@ -15,15 +15,13 @@ if (!sampleArg)
     console.log()
     process.exit()
 }
-
 const sampleName = sampleArg.replace('--env.sample=', '')
-
-var entry = { [sampleName]: './sample/' + sampleName + '.js' }
-
+const entry = { [sampleName]: './sample/' + sampleName + '.js' }
 
 
+// BUILD CONFIG
 module.exports = {
-    devtool: 'eval',    // For sourcemaps
+    // devtool: 'eval',    // For sourcemaps
     entry,
     output: {
         path: path.resolve(__dirname, 'dist'),
