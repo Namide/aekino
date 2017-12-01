@@ -30,11 +30,11 @@ export default class Transform2D extends Uniform
 {
     constructor(label)
     {
-        super(label, 35675 /* gl.FLOAT_MAT3 */, new Matrix3())
+        super(label, 35675 /* gl.FLOAT_MAT3 */, Matrix3.create())
 
         this.updateNum = 0
         this.updated = true
-        this.local = new Matrix3()
+        this.local = Matrix3.create()
 
         this.parent = null
     }
@@ -56,14 +56,13 @@ export default class Transform2D extends Uniform
 
             if (hasParent)
             {
-                parent.global.copy(data)
-
-                data.multiply(this.local)
+                Matrix3.copy(parent.global, data)
+                Matrix3.multiply(data, this.local)
                 this._parentUpdateNum = parent.updateNum
             }
             else
             {
-                this.local.copy(this._data)
+                Matrix3.copy(this.local, data)
             }
 
             this.updateNum++
@@ -73,28 +72,28 @@ export default class Transform2D extends Uniform
 
     clear()
     {
-        this.local.identity()
+        Matrix3.identity(this.local)
         this.updateNum++
         this.updated = true
     }
 
     scale(vec2)
     {
-        this.local.scale(vec2)
+        Matrix3.scale(this.local, vec2)
         this.updateNum++
         this.updated = true
     }
 
     translate(vec2)
     {
-        this.local.translate(vec2)
+        Matrix3.translate(this.local, vec2)
         this.updateNum++
         this.updated = true
     }
 
     rotate(rad)
     {
-        this.local.rotate(rad)
+        Matrix3.rotate(this.local, rad)
         this.updateNum++
         this.updated = true
     }

@@ -29,9 +29,9 @@ export default class Camera2D extends Uniform
 {
     constructor()
     {
-        super('uPMatrix', 35675, new Matrix3())
+        super('uPMatrix', 35675, Matrix3.create())
        
-        this._matrix = new Matrix3()
+        this._matrix = Matrix3.create()
         
         this.updated = true
         this.updateNum = 0
@@ -85,22 +85,19 @@ export default class Camera2D extends Uniform
     
     update()
     {
-        this._data.identity()
+        Matrix3.identity(this._data)
 
         const width = this._maxX - this._minX
         const height = this._maxY - this._minY
 
-        this._data.scale([
-            1 / width,
-            1 / height
-        ])
+        Matrix3.scale(this._data, [1 / width, 1 / height])
 
         /*this._data.translate([
             this._minX - width * 0.5,
             this._minY - height * 0.5
         ])*/
 
-        this._data.multiply(this._matrix)
+        Matrix3.multiply(this._data, this._matrix)
 
 
         this.updated = false

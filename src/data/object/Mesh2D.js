@@ -39,23 +39,6 @@ export default class Mesh2D extends Mesh
         this.addUniform(transform)
     }
 
-    /* _initTransform2D()
-    {
-        const transform2D = new Transform2D('uMVMatrix')
-        const matrix3 = transform2D.data
-
-        this.transform2D = transform2D
-        this.matrix3 = matrix3
-
-        // Add functions
-        this.translate = matrix3.translate.bind(matrix3)
-        this.scale = matrix3.scale.bind(matrix3)
-        this.rotate = matrix3.rotate.bind(matrix3)
-
-        // Add to uniforms
-        this.addUniform(transform2D)
-    }*/
-
     get position()
     {
         return this.transform.getTranslation()
