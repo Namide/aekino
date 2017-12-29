@@ -130,7 +130,7 @@ export default class Mask
         this.mesh.draw(gl, customCall)
 
         // Disable program optimization
-        this._callOptimizer.optimizeProgram(null)
+        // this._callOptimizer.optimizeProgram(null)
 
 
         gl.stencilFunc(this.displayFunc, this.displayRef, this.displayMask)

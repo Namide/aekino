@@ -49,16 +49,16 @@ export default class Layer
             else if (mesh1.program && mesh2.program && mesh1.program !== mesh2.program)
                 return  mesh1.program.id - mesh2.program.id
             else if (mesh1.textures && mesh2.textures && mesh1.textures.length > 0 && mesh1.textures.length > 0)
-                return  mesh1.textures[0].id - mesh2.textures[1].id
+                return  mesh1.textures[0].id - mesh2.textures[0].id
 
             return 0
         }
     }
 
     /**
-     * @param {Mask} mask 
+     * @param {Mask|null} mask 
      */
-    setMask(mask)
+    setMask(mask = null)
     {
         this.mask = mask
     }
@@ -91,9 +91,8 @@ export default class Layer
      */
     isInitialized()
     {
-        if (this.mask !== null)
-            if (!this.mask.isInitialized())
-                return false
+        if (this.mask !== null && !this.mask.isInitialized())
+            return false
 
         for (const mesh of this.meshs)
             if (!mesh.isInitialized())

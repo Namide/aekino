@@ -55,6 +55,22 @@ export default class Uniform
     {
         switch(this.type)
         {
+            case 5124 : // gl.INT
+            {
+                this.bind = (gl, location) =>
+                {
+                    gl.uniform1i(location, this.data)
+                }
+                break
+            }
+            case 5126: /* gl.FLOAT */
+            {
+                this.bind = (gl, location) =>
+                {
+                    gl.uniform1f(location, false, this.data)
+                }
+                break
+            }
             case 35675: /* gl.FLOAT_MAT3 */
             {
                 this.bind = (gl, location) =>
@@ -88,14 +104,7 @@ export default class Uniform
                 }
                 
                 break
-            }
-            case 5124 : // gl.INT
-                this.bind = (gl, location) =>
-                {
-                    gl.uniform1i(location, this.data)
-                }
-                break
-                
+            } 
             case -1 :
                 this.bind = (gl, location) =>
                 {

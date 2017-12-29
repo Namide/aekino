@@ -570,6 +570,7 @@ render.passEnabled = true
 render.addScene(scene)
 // render.resize(size[0] * resolution, size[1] * resolution)
 
+
 const fogPass = new FogPass({
     minDepth: 0.5,
     maxDepth: 0.6,
