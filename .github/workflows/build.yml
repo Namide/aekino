@@ -28,9 +28,6 @@ jobs:
     - name: build
       run: npm run build
 
-    - name: Build
-      run: npm run pages
-
     - name: Upload
       uses: actions/upload-pages-artifact@v2
       with:
