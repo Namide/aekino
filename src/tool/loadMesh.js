@@ -28,32 +28,31 @@ import Program from '../shader/material/Program'
 import Geom from '../data/geom/Geom'
 
 const defaultVertexShader = `attribute vec3 aVertexPosition;
-uniform mat4 uMVMatrix;
-uniform mat4 uPMatrix;
-void main(void){
-gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition,1.0);
+  uniform mat4 uMVMatrix;
+  uniform mat4 uPMatrix;
+  void main(void){
+  gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition,1.0);
 }`
 const defaultFragmentShader = `precision mediump float;
 void main(void){
-gl_FragColor = vec4(1.0,1.0,1.0,1.0);
+  gl_FragColor = vec4(1.0,1.0,1.0,1.0);
 }`
 
 const optionsDefault = {
-    onError: error => { throw new Error('Mesh load error ' + error) },
-    initCamera3D: cam => new Camera3D(),
-    initdMesh: mesh => new Mesh3D(new Geom(), new Program(defaultVertexShader, defaultFragmentShader))
+  onError: error => { throw new Error('Mesh load error ' + error) },
+  initCamera3D: cam => new Camera3D(),
+  initdMesh: mesh => new Mesh3D(new Geom(), new Program(defaultVertexShader, defaultFragmentShader))
 }
 
 function loadMesh(
-    url,
-    onLoaded,
-    {
-        onError = error => { throw new Error('Mesh load error ' + error) },
-        initCamera3D = cam => new Camera3D(),
-        initdMesh = mesh => new Mesh3D(new Geom(), new Program(defaultVertexShader, defaultFragmentShader))
-    })
-{
-    load(url, onLoaded, {onError, initCamera3D, initdMesh})
+  url,
+  onLoaded,
+  {
+    onError = error => { throw new Error('Mesh load error ' + error) },
+    initCamera3D = cam => new Camera3D(),
+    initdMesh = mesh => new Mesh3D(new Geom(), new Program(defaultVertexShader, defaultFragmentShader))
+  }) {
+  load(url, onLoaded, { onError, initCamera3D, initdMesh })
 }
 /*
 function mergeIndices(geom)
@@ -158,103 +157,91 @@ function mergeIndices(geom)
     // return { uvs: finalUvs, vertices: finalVerts, indices: finalIndices }
 }
 */
-function onJsonLoaded(json, onLoaded, options)
-{
-    const camera = []
-    const mesh = []
+function onJsonLoaded(json, onLoaded, options) {
+  const camera = []
+  const mesh = []
 
-    let mainCamera
+  let mainCamera
 
-    for (const camera3DData of json.camera)
-    {
-        const camera3D = options.initCamera3D(camera3DData)
-        camera3D.name = camera3DData.name
-        camera3D.fovy = camera3DData.fovy
-        camera3D.near = camera3DData.near
-        camera3D.far = camera3DData.far
+  for (const camera3DData of json.camera) {
+    const camera3D = options.initCamera3D(camera3DData)
+    camera3D.name = camera3DData.name
+    camera3D.fovy = camera3DData.fovy
+    camera3D.near = camera3DData.near
+    camera3D.far = camera3DData.far
 
-        const transform3D = camera3DData.transform
-        camera3D.lookAt(transform3D.pos, transform3D.lookAt, transform3D.up)
-        
-        camera.push(camera3D)
+    const transform3D = camera3DData.transform
+    camera3D.lookAt(transform3D.pos, transform3D.lookAt, transform3D.up)
 
-        if (!mainCamera)
-             mainCamera = camera3D
+    camera.push(camera3D)
+
+    if (!mainCamera)
+      mainCamera = camera3D
+  }
+
+  for (const mesh3DData of json.mesh) {
+    const mesh3D = options.initdMesh(mesh3DData)
+    mesh3D.name = mesh3DData.name
+
+    if (mainCamera)
+      mesh3D.addGlobalUniform(mainCamera)
+
+    if (mesh3DData.transform) {
+      const transform3D = mesh3DData.transform
+      mesh3D.transform.translate(transform3D.pos)
+
+      const rot = transform3D.rot
+      mesh3D.transform.rotateZ(rot[2] * Math.PI / 180)
+      mesh3D.transform.rotateY(rot[1] * Math.PI / 180)
+      mesh3D.transform.rotateX(rot[0] * Math.PI / 180)
     }
 
-    for (const mesh3DData of json.mesh)
-    {
-        const mesh3D = options.initdMesh(mesh3DData)
-        mesh3D.name = mesh3DData.name
 
-        if (mainCamera)
-            mesh3D.addGlobalUniform(mainCamera)
-        
-        if (mesh3DData.transform)
-        {
-            const transform3D = mesh3DData.transform
-            mesh3D.transform.translate(transform3D.pos)
+    if (mesh3DData.geom) {
+      // mergeIndices(mesh3DData.geom)
 
-            const rot = transform3D.rot
-            mesh3D.transform.rotateZ(rot[2] * Math.PI / 180)
-            mesh3D.transform.rotateY(rot[1] * Math.PI / 180)
-            mesh3D.transform.rotateX(rot[0] * Math.PI / 180)
-        }
+      const geomData = mesh3DData.geom
+      const geom = mesh3D.geom
 
+      if (geomData.vertices)
+        geom.addVertices('aVertexPosition', geomData.vertices, 3)
 
-        if (mesh3DData.geom)
-        {
-            // mergeIndices(mesh3DData.geom)
+      if (geomData.uv)
+        geom.addVertices('aTextureCoord', geomData.uv, 2)
 
-            const geomData = mesh3DData.geom
-            const geom = mesh3D.geom
-
-            if (geomData.vertices)
-                geom.addVertices('aVertexPosition', geomData.vertices, 3)
-            
-            if (geomData.uv)
-                geom.addVertices('aTextureCoord', geomData.uv, 2)
-
-            if (geomData.indices)
-                geom.addIndices(geomData.indices)
-        }
-        
-        mesh.push(mesh3D)
+      if (geomData.indices)
+        geom.addIndices(geomData.indices)
     }
 
-    onLoaded({camera, mesh})
+    mesh.push(mesh3D)
+  }
+
+  onLoaded({ camera, mesh })
 }
 
-function load(url, onLoaded, options)
-{
-    const xobj = new XMLHttpRequest()
-    xobj.open('GET', url, true)
-    xobj.overrideMimeType('application/json')
-    xobj.onreadystatechange = () =>
-    {
-        if (xobj.readyState === 4)
-        {
-            if (xobj.status === 200)
-            {
-                let json
-                try
-                {
-                    json = JSON.parse(xobj.responseText)
-                }
-                catch (error)
-                {
-                    return options.onError(error.message)
-                }
-
-                onJsonLoaded(json, onLoaded, options)
-            }
-            else
-            {
-                options.onError(xobj)
-            }  
+function load(url, onLoaded, options) {
+  const xobj = new XMLHttpRequest()
+  xobj.open('GET', url, true)
+  xobj.overrideMimeType('application/json')
+  xobj.onreadystatechange = () => {
+    if (xobj.readyState === 4) {
+      if (xobj.status === 200) {
+        let json
+        try {
+          json = JSON.parse(xobj.responseText)
         }
+        catch (error) {
+          return options.onError(error.message)
+        }
+
+        onJsonLoaded(json, onLoaded, options)
+      }
+      else {
+        options.onError(xobj)
+      }
     }
-    xobj.send(null)
+  }
+  xobj.send(null)
 }
 
 export default loadMesh

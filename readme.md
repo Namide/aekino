@@ -1,13 +1,14 @@
-```
+```bash
 # Install
-npm i
+npm install
 
 # Build samples
 npm run build
 
 # Run development server for samples
-npm run dev -- --env.sample=basics
-npm run dev -- --env.sample=load
+npm run dev-basics
+npm run dev-load
+npm run dev-relationship
 
 # Convert FBX file
 npm run fbx

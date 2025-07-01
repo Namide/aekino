@@ -3,7 +3,8 @@ node_modules/
 nbproject/
 src-save/
 crea/
-
+dist/
+*.html
 
 Thumbs.db
 ehthumbs.db

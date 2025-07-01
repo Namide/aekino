@@ -85,28 +85,28 @@ scene.depthTest = true
 
 
 const vertexShader = `      
-    attribute vec3 aVertexPosition;
-    attribute vec4 aVertexColor;
+  attribute vec3 aVertexPosition;
+  attribute vec4 aVertexColor;
 
-    uniform mat4 uMVMatrix;
-    uniform mat4 uPMatrix;
+  uniform mat4 uMVMatrix;
+  uniform mat4 uPMatrix;
 
-    varying vec4 vColor;
+  varying vec4 vColor;
 
-    void main(void) {
-        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-        vColor = aVertexColor;
-    }
+  void main(void) {
+    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+    vColor = aVertexColor;
+  }
 `
 
 const fragmentShader = `
-    precision mediump float;
+  precision mediump float;
 
-    varying vec4 vColor;
+  varying vec4 vColor;
 
-    void main(void) {
-        gl_FragColor = vColor;
-    }
+  void main(void) {
+    gl_FragColor = vColor;
+  }
 `
 
 
@@ -115,20 +115,20 @@ const fragmentShader = `
 const colorProgram = new Program(vertexShader, fragmentShader)
 
 const fogVertexShader = `
-    attribute vec3 aVertexPosition;
-    attribute vec4 aVertexColor;
+  attribute vec3 aVertexPosition;
+  attribute vec4 aVertexColor;
 
-    uniform mat4 uMVMatrix;
-    uniform mat4 uPMatrix;
+  uniform mat4 uMVMatrix;
+  uniform mat4 uPMatrix;
 
-    varying vec4 vColor;
+  varying vec4 vColor;
 
-    void main(void) {
-        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-        float zDepth = 0.2 * (8.0 - gl_Position.z);
-        vec4 modifyColor = vec4(aVertexColor.rgb * zDepth, aVertexColor.a);
-        vColor = modifyColor;
-    }
+  void main(void) {
+    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+    float zDepth = 0.2 * (8.0 - gl_Position.z);
+    vec4 modifyColor = vec4(aVertexColor.rgb * zDepth, aVertexColor.a);
+    vColor = modifyColor;
+  }
 `
 const fogProgram = new Program(fogVertexShader, fragmentShader)
 
@@ -198,27 +198,27 @@ pyramidMesh.addGlobalUniform(cam3D)
 // PLANE 2D
 
 const planeVertexShader = `      
-    attribute vec2 aVertexPosition;
+  attribute vec2 aVertexPosition;
 
-    uniform mat3 uMVMatrix;
-    uniform mat3 uPMatrix;
+  uniform mat3 uMVMatrix;
+  uniform mat3 uPMatrix;
 
-    varying vec2 vTextureCoord;
+  varying vec2 vTextureCoord;
 
-    void main(void) {
-        vec3 pos = uPMatrix * uMVMatrix * vec3(aVertexPosition, 0.0);
-        gl_Position = vec4(pos.xy, 0.0, 1.0);
-    }
+  void main(void) {
+    vec3 pos = uPMatrix * uMVMatrix * vec3(aVertexPosition, 0.0);
+    gl_Position = vec4(pos.xy, 0.0, 1.0);
+  }
 `
 
 const planeFragmentShader = `
-    precision mediump float;
+  precision mediump float;
 
-    uniform sampler2D uDiffuse1;
+  uniform sampler2D uDiffuse1;
 
-    void main(void) {
-        gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);
-    }
+  void main(void) {
+    gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);
+  }
 `
 
 const planeProgram = new Program(planeVertexShader, planeFragmentShader)
@@ -299,63 +299,63 @@ layer.setMask(new Mask(plane))
 
 // Square
 const cubeVertices = [
-    // Front face
-    -1.0, -1.0,  1.0,
-     1.0, -1.0,  1.0,
-     1.0,  1.0,  1.0,
-    -1.0,  1.0,  1.0,
+  // Front face
+  -1.0, -1.0,  1.0,
+    1.0, -1.0,  1.0,
+    1.0,  1.0,  1.0,
+  -1.0,  1.0,  1.0,
 
-    // Back face
-    -1.0, -1.0, -1.0,
-    -1.0,  1.0, -1.0,
-     1.0,  1.0, -1.0,
-     1.0, -1.0, -1.0,
+  // Back face
+  -1.0, -1.0, -1.0,
+  -1.0,  1.0, -1.0,
+    1.0,  1.0, -1.0,
+    1.0, -1.0, -1.0,
 
-    // Top face
-    -1.0,  1.0, -1.0,
-    -1.0,  1.0,  1.0,
-     1.0,  1.0,  1.0,
-     1.0,  1.0, -1.0,
+  // Top face
+  -1.0,  1.0, -1.0,
+  -1.0,  1.0,  1.0,
+    1.0,  1.0,  1.0,
+    1.0,  1.0, -1.0,
 
-    // Bottom face
-    -1.0, -1.0, -1.0,
-     1.0, -1.0, -1.0,
-     1.0, -1.0,  1.0,
-    -1.0, -1.0,  1.0,
+  // Bottom face
+  -1.0, -1.0, -1.0,
+    1.0, -1.0, -1.0,
+    1.0, -1.0,  1.0,
+  -1.0, -1.0,  1.0,
 
-    // Right face
-     1.0, -1.0, -1.0,
-     1.0,  1.0, -1.0,
-     1.0,  1.0,  1.0,
-     1.0, -1.0,  1.0,
+  // Right face
+    1.0, -1.0, -1.0,
+    1.0,  1.0, -1.0,
+    1.0,  1.0,  1.0,
+    1.0, -1.0,  1.0,
 
-    // Left face
-    -1.0, -1.0, -1.0,
-    -1.0, -1.0,  1.0,
-    -1.0,  1.0,  1.0,
-    -1.0,  1.0, -1.0
+  // Left face
+  -1.0, -1.0, -1.0,
+  -1.0, -1.0,  1.0,
+  -1.0,  1.0,  1.0,
+  -1.0,  1.0, -1.0
 ]
 const cubeIndices = [
-    0, 1, 2,      0, 2, 3,    // Front face
-    4, 5, 6,      4, 6, 7,    // Back face
-    8, 9, 10,     8, 10, 11,  // Top face
-    12, 13, 14,   12, 14, 15, // Bottom face
-    16, 17, 18,   16, 18, 19, // Right face
-    20, 21, 22,   20, 22, 23  // Left face
+  0, 1, 2,      0, 2, 3,    // Front face
+  4, 5, 6,      4, 6, 7,    // Back face
+  8, 9, 10,     8, 10, 11,  // Top face
+  12, 13, 14,   12, 14, 15, // Bottom face
+  16, 17, 18,   16, 18, 19, // Right face
+  20, 21, 22,   20, 22, 23  // Left face
 ]
 const cubeColors = [
-    [1.0, 0.0, 0.0, 1.0], // Front face
-    [1.0, 1.0, 0.0, 1.0], // Back face
-    [0.0, 1.0, 0.0, 1.0], // Top face
-    [1.0, 0.5, 0.5, 1.0], // Bottom face
-    [1.0, 0.0, 1.0, 1.0], // Right face
-    [0.0, 0.0, 1.0, 1.0]  // Left face
+  [1.0, 0.0, 0.0, 1.0], // Front face
+  [1.0, 1.0, 0.0, 1.0], // Back face
+  [0.0, 1.0, 0.0, 1.0], // Top face
+  [1.0, 0.5, 0.5, 1.0], // Bottom face
+  [1.0, 0.0, 1.0, 1.0], // Right face
+  [0.0, 0.0, 1.0, 1.0]  // Left face
 ]
 
 let unpackedCubeColors = []
 for (let i in cubeColors)
-    for (let j = 0; j < 4; j++)
-        unpackedCubeColors = unpackedCubeColors.concat(cubeColors[i])
+  for (let j = 0; j < 4; j++)
+    unpackedCubeColors = unpackedCubeColors.concat(cubeColors[i])
 
 
 const cubeGeom = new Geom()
@@ -394,72 +394,72 @@ scene.addMesh(pyramidMesh2)
 // ----------------------------
 
 const vertexTextureShader = `   
-    attribute vec3 aVertexPosition;
-    attribute vec2 aTextureCoord;
+  attribute vec3 aVertexPosition;
+  attribute vec2 aTextureCoord;
 
-    uniform mat4 uMVMatrix;
-    uniform mat4 uPMatrix;
+  uniform mat4 uMVMatrix;
+  uniform mat4 uPMatrix;
 
-    varying vec2 vTextureCoord;
+  varying vec2 vTextureCoord;
 
-    void main(void) {
-        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-        vTextureCoord = aTextureCoord;
-    }`
+  void main(void) {
+    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+    vTextureCoord = aTextureCoord;
+  }`
 
 const fragmentTextureShader = `
-    precision mediump float;
+  precision mediump float;
 
-    varying vec2 vTextureCoord;
+  varying vec2 vTextureCoord;
 
-    uniform sampler2D uDiffuse1;
-    uniform sampler2D uDiffuse2;
+  uniform sampler2D uDiffuse1;
+  uniform sampler2D uDiffuse2;
 
-    void main(void) {
-        vec4 color1 = texture2D(uDiffuse1, vec2(vTextureCoord.s, vTextureCoord.t));
-        vec4 color2 = texture2D(uDiffuse2, vec2(vTextureCoord.s, vTextureCoord.t));
-        float power = ((sin(vTextureCoord.s * 3.1415)) * (sin(vTextureCoord.t * 3.1415)));
-        gl_FragColor = mix(color1, color2, power);
-    }`
+  void main(void) {
+    vec4 color1 = texture2D(uDiffuse1, vec2(vTextureCoord.s, vTextureCoord.t));
+    vec4 color2 = texture2D(uDiffuse2, vec2(vTextureCoord.s, vTextureCoord.t));
+    float power = ((sin(vTextureCoord.s * 3.1415)) * (sin(vTextureCoord.t * 3.1415)));
+    gl_FragColor = mix(color1, color2, power);
+  }`
 
 const texturedProgram = new Program(vertexTextureShader, fragmentTextureShader)
 
 var cubeUV = [
-    // Front face
-    0.0, 0.0,
-    1.0, 0.0,
-    1.0, 1.0,
-    0.0, 1.0,
+  // Front face
+  0.0, 0.0,
+  1.0, 0.0,
+  1.0, 1.0,
+  0.0, 1.0,
 
-    // Back face
-    1.0, 0.0,
-    1.0, 1.0,
-    0.0, 1.0,
-    0.0, 0.0,
+  // Back face
+  1.0, 0.0,
+  1.0, 1.0,
+  0.0, 1.0,
+  0.0, 0.0,
 
-    // Top face
-    0.0, 1.0,
-    0.0, 0.0,
-    1.0, 0.0,
-    1.0, 1.0,
+  // Top face
+  0.0, 1.0,
+  0.0, 0.0,
+  1.0, 0.0,
+  1.0, 1.0,
 
-    // Bottom face
-    1.0, 1.0,
-    0.0, 1.0,
-    0.0, 0.0,
-    1.0, 0.0,
+  // Bottom face
+  1.0, 1.0,
+  0.0, 1.0,
+  0.0, 0.0,
+  1.0, 0.0,
 
-    // Right face
-    1.0, 0.0,
-    1.0, 1.0,
-    0.0, 1.0,
-    0.0, 0.0,
+  // Right face
+  1.0, 0.0,
+  1.0, 1.0,
+  0.0, 1.0,
+  0.0, 0.0,
 
-    // Left face
-    0.0, 0.0,
-    1.0, 0.0,
-    1.0, 1.0,
-    0.0, 1.0,
+  // Left face
+  0.0, 0.0,
+  1.0, 0.0,
+  1.0, 1.0,
+  0.0, 1.0,
 ]
 
 const cubeTexture = new SmartTexture('uDiffuse1')
@@ -510,31 +510,31 @@ scene.addMesh(cubeTexturedMesh2)
 // ----------------------------
 
 const skyboxVertexShader = `   
-    attribute vec3 aVertexPosition;
-    attribute vec2 aTextureCoord;
+  attribute vec3 aVertexPosition;
+  attribute vec2 aTextureCoord;
 
-    uniform mat4 uMVMatrix;
-    uniform mat4 uPMatrix;
+  uniform mat4 uMVMatrix;
+  uniform mat4 uPMatrix;
 
-    varying vec2 vTextureCoord;
+  varying vec2 vTextureCoord;
 
-    void main(void) {
+  void main(void) {
 
-        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-        vTextureCoord = aTextureCoord;
-    }`
+    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+    vTextureCoord = aTextureCoord;
+  }`
 
 const skyboxFragmentShader = `
-    precision mediump float;
+  precision mediump float;
 
-    varying vec2 vTextureCoord;
+  varying vec2 vTextureCoord;
 
-    uniform sampler2D uDiffuse1;
+  uniform sampler2D uDiffuse1;
 
-    void main(void) {
-        vec4 color1 = texture2D(uDiffuse1, vec2(vTextureCoord.s, vTextureCoord.t));
-        gl_FragColor = color1;
-    }`
+  void main(void) {
+    vec4 color1 = texture2D(uDiffuse1, vec2(vTextureCoord.s, vTextureCoord.t));
+    gl_FragColor = color1;
+  }`
 
 const bgTransform3D = new BackgroundTransform3D('uPMatrix', cam3D, 1)
 
@@ -572,22 +572,22 @@ render.addScene(scene)
 
 
 const fogPass = new FogPass({
-    minDepth: 0.5,
-    maxDepth: 0.6,
-    minPower: 0,
-    maxPower: 0.5,
-    depthCurve: 100,
-    color: [0.9, 0.95, 1.0]
+  minDepth: 0.5,
+  maxDepth: 0.6,
+  minPower: 0,
+  maxPower: 0.5,
+  depthCurve: 100,
+  color: [0.9, 0.95, 1.0]
 })
 render.addPass(fogPass)
 
 const gaussianOptions = {
-    minDepth: 0.95,
-    maxDepth: 1,
-    samples: 20,
-    xBlur: true,
-    power: 1,
-    depthCurve: 1
+  minDepth: 0.95,
+  maxDepth: 1,
+  samples: 20,
+  xBlur: true,
+  power: 1,
+  depthCurve: 1
 }
 const gaussianBlurX = new GaussianBlurPass(gaussianOptions)
 render.addPass(gaussianBlurX)
@@ -630,83 +630,83 @@ window.addEventListener('wheel', wheel)
 
 function wheel(event = null)
 {
-    let delta = 0
-    if (event)
-    {
-        if (event.wheelDelta)
-            delta = event.wheelDelta
-        else if (event.detail)
-            delta = -40 * event.detail
-        else if (event.deltaY)
-            delta = -40 * event.deltaY
-    }
-    
-    zoom -= delta / 1000
-    zoom = Math.min(Math.max(zoom, 0.37), 3)
-    cam3D.fovy = zoom * 45
+  let delta = 0
+  if (event)
+  {
+    if (event.wheelDelta)
+      delta = event.wheelDelta
+    else if (event.detail)
+      delta = -40 * event.detail
+    else if (event.deltaY)
+      delta = -40 * event.deltaY
+  }
+  
+  zoom -= delta / 1000
+  zoom = Math.min(Math.max(zoom, 0.37), 3)
+  cam3D.fovy = zoom * 45
 }
 
 
 function down(event)
 {   
-    const body = document.body
+  const body = document.body
 
-    mousePos[0] = event.clientX
-    mousePos[1] = event.clientY
-    
-    body.removeEventListener('mousemove', move)
-    body.removeEventListener('mouseup', up)
-    body.removeEventListener('mouseleave', up)
-    
-    body.addEventListener('mousemove', move)
-    body.addEventListener('mouseup', up)
-    body.addEventListener('mouseleave', up)
-    
-    body.classList.add('is-grabbing')
+  mousePos[0] = event.clientX
+  mousePos[1] = event.clientY
+  
+  body.removeEventListener('mousemove', move)
+  body.removeEventListener('mouseup', up)
+  body.removeEventListener('mouseleave', up)
+  
+  body.addEventListener('mousemove', move)
+  body.addEventListener('mouseup', up)
+  body.addEventListener('mouseleave', up)
+  
+  body.classList.add('is-grabbing')
 }
 
 function move(event)
 {
-    const x = event.clientX
-    const y = event.clientY
-    
-    const sx = (x - mousePos[0]) / winSize[0]
-    const sy = (y - mousePos[1]) / winSize[1]
-    
-    mousePos[0] = x
-    mousePos[1] = y
-    
-    rotX += sx * Math.PI * 2
-    rotY += sy * Math.PI
-    
-    rotY = Math.max(Math.min(rotY, Math.PI * 0.3), -Math.PI * 0.3)
+  const x = event.clientX
+  const y = event.clientY
+  
+  const sx = (x - mousePos[0]) / winSize[0]
+  const sy = (y - mousePos[1]) / winSize[1]
+  
+  mousePos[0] = x
+  mousePos[1] = y
+  
+  rotX += sx * Math.PI * 2
+  rotY += sy * Math.PI
+  
+  rotY = Math.max(Math.min(rotY, Math.PI * 0.3), -Math.PI * 0.3)
 }
 
 function up(event)
 {
-    const body = document.body
+  const body = document.body
 
-    body.removeEventListener('mousemove', move)
-    body.removeEventListener('mouseup', up)
-    body.removeEventListener('mouseleave', up)
-    body.classList.remove('is-grabbing')
+  body.removeEventListener('mousemove', move)
+  body.removeEventListener('mouseup', up)
+  body.removeEventListener('mouseleave', up)
+  body.classList.remove('is-grabbing')
 }
 
 function resize()
 {
-    const resolution = 1
+  const resolution = 1
 
-    winSize[0] = window.innerWidth
-    winSize[1] = window.innerHeight
+  winSize[0] = window.innerWidth
+  winSize[1] = window.innerHeight
 
-    render.resize(winSize[0] * resolution, winSize[1] * resolution)
+  render.resize(winSize[0] * resolution, winSize[1] * resolution)
 
 
-    canvas.width = winSize[0] * resolution
-    canvas.height = winSize[1] * resolution
+  canvas.width = winSize[0] * resolution
+  canvas.height = winSize[1] * resolution
 
-    cam3D.resize(...winSize)
-    cam2D.setArea(0, 0, ...winSize)
+  cam3D.resize(...winSize)
+  cam2D.setArea(0, 0, ...winSize)
 }
 
 window.onresize = resize
@@ -732,26 +732,26 @@ window.render = render
 refresh()
 function refresh()
 {
-    // Camera
-    cam3D.clear()
-    cam3D.translate([0, 0, -zoom])
-    cam3D.rotate(rotY, [1, 0, 0])
-    cam3D.rotate(rotX, [0, 1, 0])
-    // cam3D.update()
+  // Camera
+  cam3D.clear()
+  cam3D.translate([0, 0, -zoom])
+  cam3D.rotate(rotY, [1, 0, 0])
+  cam3D.rotate(rotX, [0, 1, 0])
+  // cam3D.update()
 
 
-    // Objects
-    // skybox.rotateZ(0.001)
-    pyramidMesh.transform.rotateY(0.005)
-    pyramidMesh2.transform.rotate(-0.005, [0, 1, 0])
-    cubeMesh.transform.rotate(0.01, [0, 1, 0])
-    cubeTexturedMesh.transform.rotate(-0.01, [0, 1, 0])
-    cubeTexturedMesh2.transform.rotate(0.025, [0.72, -0.33, 0.5])
-    
-    
-    render.draw()
+  // Objects
+  // skybox.rotateZ(0.001)
+  pyramidMesh.transform.rotateY(0.005)
+  pyramidMesh2.transform.rotate(-0.005, [0, 1, 0])
+  cubeMesh.transform.rotate(0.01, [0, 1, 0])
+  cubeTexturedMesh.transform.rotate(-0.01, [0, 1, 0])
+  cubeTexturedMesh2.transform.rotate(0.025, [0.72, -0.33, 0.5])
+  
+  
+  render.draw()
 
-    // console.timeEnd('draw')
-    
-    requestAnimationFrame(refresh)
+  // console.timeEnd('draw')
+  
+  requestAnimationFrame(refresh)
 }

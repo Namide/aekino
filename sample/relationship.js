@@ -30,47 +30,47 @@ render.addScene(scene)
 
 
 const vertexShader = `      
-    attribute vec3 aVertexPosition;
-    attribute vec4 aVertexColor;
+  attribute vec3 aVertexPosition;
+  attribute vec4 aVertexColor;
 
-    uniform mat4 uMVMatrix;
-    uniform mat4 uPMatrix;
+  uniform mat4 uMVMatrix;
+  uniform mat4 uPMatrix;
 
-    varying vec4 vColor;
-    varying vec3 vPos;
+  varying vec4 vColor;
+  varying vec3 vPos;
 
-    void main(void) {
-        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-        vColor = aVertexColor;
-        vPos = aVertexPosition;
-    }
+  void main(void) {
+    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+    vColor = aVertexColor;
+    vPos = aVertexPosition;
+  }
 `
 
 const fragmentShader = `
-    precision mediump float;
+  precision mediump float;
 
-    varying vec4 vColor;
-    varying vec3 vPos;
+  varying vec4 vColor;
+  varying vec3 vPos;
 
-    // https://stackoverflow.com/questions/5149544/can-i-generate-a-random-number-inside-a-pixel-shader
-    float random( vec2 p ) // Version 2
-    {
-        // e^pi (Gelfond's constant)
-        // 2^sqrt(2) (Gelfond–Schneider constant)
-        vec2 r = vec2( 23.14069263277926, 2.665144142690225 );
-        // return fract( cos( mod( 12345678., 256. * dot(p,r) ) ) ); // ver1
-        return fract(cos(dot(p,r)) * 123456.); // ver2
-    }
+  // https://stackoverflow.com/questions/5149544/can-i-generate-a-random-number-inside-a-pixel-shader
+  float random( vec2 p ) // Version 2
+  {
+    // e^pi (Gelfond's constant)
+    // 2^sqrt(2) (Gelfond–Schneider constant)
+    vec2 r = vec2( 23.14069263277926, 2.665144142690225 );
+    // return fract( cos( mod( 12345678., 256. * dot(p,r) ) ) ); // ver1
+    return fract(cos(dot(p,r)) * 123456.); // ver2
+  }
 
-    void main(void)
-    {
-        vec4 noise = vec4(
-            random(vPos.xy),
-            random(vPos.yz),
-            random(vPos.xz),
-            0.0);
-        gl_FragColor = vColor + noise * 0.001;
-    }
+  void main(void)
+  {
+    vec4 noise = vec4(
+      random(vPos.xy),
+      random(vPos.yz),
+      random(vPos.xz),
+      0.0);
+    gl_FragColor = vColor + noise * 0.001;
+  }
 `
 
 const colorProgram = new Program(vertexShader, fragmentShader)
@@ -83,19 +83,19 @@ function getColor()
 }
 
 const cubeColors = [
-    getColor(), // Front face
-    getColor(), // Back face
-    getColor(), // Top face
-    getColor(), // Bottom face
-    getColor(), // Right face
-    getColor()  // Left face
+  getColor(), // Front face
+  getColor(), // Back face
+  getColor(), // Top face
+  getColor(), // Bottom face
+  getColor(), // Right face
+  getColor()  // Left face
 ]
 
 const smoothCubeColors = [
-    getColor(), getColor(),
-    getColor(), getColor(),
-    getColor(), getColor(),
-    getColor(), getColor()
+  getColor(), getColor(),
+  getColor(), getColor(),
+  getColor(), getColor(),
+  getColor(), getColor()
 ]
 
 
@@ -138,12 +138,12 @@ scene.addMesh(cube3)
 // Resize
 function resize()
 {
-    const resolution = 1
-    const winSize = [window.innerWidth, window.innerHeight]
-    render.resize(winSize[0] * resolution, winSize[1] * resolution)
-    canvas.width = winSize[0] * resolution
-    canvas.height = winSize[1] * resolution
-    cam3D.resize(...winSize)
+  const resolution = 1
+  const winSize = [window.innerWidth, window.innerHeight]
+  render.resize(winSize[0] * resolution, winSize[1] * resolution)
+  canvas.width = winSize[0] * resolution
+  canvas.height = winSize[1] * resolution
+  cam3D.resize(...winSize)
 }
 
 window.onresize = resize
@@ -167,11 +167,11 @@ window.scene = scene
 refresh()
 function refresh()
 {
-    cube1.transform.rotate(0.01, [0, 1, 0.5])
-    cube2.transform.rotate(-0.1, [1.5, 0.1, 0.5])
-    cube3.transform.rotate(0.1, [1, 0.5, -0.5])
-    
-    render.draw()
+  cube1.transform.rotate(0.01, [0, 1, 0.5])
+  cube2.transform.rotate(-0.1, [1.5, 0.1, 0.5])
+  cube3.transform.rotate(0.1, [1, 0.5, -0.5])
 
-    requestAnimationFrame(refresh)
+  render.draw()
+
+  requestAnimationFrame(refresh)
 }
