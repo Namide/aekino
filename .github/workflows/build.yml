@@ -1,0 +1,41 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+
+    - name: Install
+      run: npm install
+
+    - name: build
+      run: npm run build
+
+    - name: Build
+      run: npm run pages
+
+    - name: Upload
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: './dist'
+
+    - name: Deploy
+      id: deployment
+      uses: actions/deploy-pages@v2
