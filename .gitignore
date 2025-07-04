@@ -4,7 +4,7 @@ src-save/
 crea/
 dist/
 *.html
-!example/index.html
+!public/index.html
 
 Thumbs.db
 ehthumbs.db

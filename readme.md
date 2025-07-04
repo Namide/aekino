@@ -1,5 +1,8 @@
 # Aekino
-WebGL render engine  
+
+![](public/assets/aekino.jpg)
+
+Prototype of WebGL render engine  
 [namide.github.io/aekino](https://namide.github.io/aekino)
 
 ## Commands
@@ -16,6 +19,6 @@ npm run dev-basics
 npm run dev-load
 npm run dev-relationship
 
-# Convert FBX file
+# Convert FBX file to json
 npm run fbx
 ```
